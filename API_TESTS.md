@@ -501,3 +501,126 @@ curl "$BASE_URL/api/manager/dashboard" \
 curl "$BASE_URL/api/owner/dashboard" \
   -H "Authorization: Bearer <AUDITOR_ACCESS_TOKEN>"
 ```
+
+
+---
+
+## 48) App Owner list clients
+
+```bash
+curl "$BASE_URL/api/appowner/clients" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 49) App Owner tier change
+
+```bash
+curl -X POST "$BASE_URL/api/appowner/clients/<CLIENT_ID>/tier" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>" \
+  -H 'Content-Type: application/json' \
+  -d '{"tier":"elite"}'
+```
+
+---
+
+## 50) App Owner list presets
+
+```bash
+curl "$BASE_URL/api/appowner/templates/presets" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 51) App Owner create template
+
+```bash
+curl -X POST "$BASE_URL/api/appowner/templates" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>" \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Trading Pro","sector":"Trading","widgets":["waste_map","risk_map"]}'
+```
+
+---
+
+## 52) App Owner push template
+
+```bash
+curl -X POST "$BASE_URL/api/appowner/templates/<TEMPLATE_ID>/push" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>" \
+  -H 'Content-Type: application/json' \
+  -d '{"client_name":"مجموعة النخيل التجارية","deployment_mode":"cloud"}'
+```
+
+---
+
+## 53) App Owner rollback template
+
+```bash
+curl -X POST "$BASE_URL/api/appowner/templates/<TEMPLATE_ID>/rollback" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>" \
+  -H 'Content-Type: application/json' \
+  -d '{"previous_payload":"{"name":"Trading Pro","sector":"Trading","widgets":["waste_map"]}"}'
+```
+
+---
+
+## 54) App Owner CRaaS queue
+
+```bash
+curl "$BASE_URL/api/appowner/craas" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 55) App Owner create CRaaS request
+
+```bash
+curl -X POST "$BASE_URL/api/appowner/craas" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>" \
+  -H 'Content-Type: application/json' \
+  -d '{"client_name":"مجموعة النخيل التجارية","title":"تقرير فرص خاص","quoted_price_iqd":400000,"deployment_mode":"cloud"}'
+```
+
+---
+
+## 56) App Owner maintenance log
+
+```bash
+curl "$BASE_URL/api/appowner/maintenance" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 57) App Owner inventory-only health scan
+
+```bash
+curl -X POST "$BASE_URL/api/appowner/clients/health-scan" \
+  -H "Authorization: Bearer <APPOWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 58) Run What-If simulator
+
+```bash
+curl -X POST "$BASE_URL/api/what-if/run" \
+  -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>" \
+  -H 'Content-Type: application/json' \
+  -d '{"waste_map_item_id":"<WASTE_MAP_ITEM_ID>","recovery_percent":50,"implementation_months":3,"manual_cost":100000,"horizon_months":6}'
+```
+
+---
+
+## 59) Export What-If result to PDF
+
+```bash
+curl -X POST "$BASE_URL/api/what-if/export" \
+  -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>" \
+  -H 'Content-Type: application/json' \
+  -d '{"waste_map_item_id":"<WASTE_MAP_ITEM_ID>","recovery_percent":50,"implementation_months":3,"manual_cost":100000,"horizon_months":6}'
+```

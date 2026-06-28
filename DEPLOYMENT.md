@@ -308,3 +308,13 @@ kubectl logs deployment/vault -n auditcore
 - add persistent volumes and backup policies
 - add real observability and alerts
 - run live integration tests after each deployment
+
+
+## Phase 4 operational scripts
+
+```bash
+./scripts/install.sh
+./scripts/backup.sh
+./scripts/healthcheck.sh
+./scripts/update.sh
+```

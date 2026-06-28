@@ -25,3 +25,9 @@
 ## App Owner boundary
 - App Owner inventory data must remain separate from tenant financial schemas
 - no financial/analytics joins into tenant schemas are allowed for App Owner inventory operations
+
+
+## Export security
+- every export includes ledger hash at generation
+- every export includes HMAC signature
+- exports are intended to be verifiable against ledger state

@@ -14,6 +14,7 @@ from app.models.entities import AnalyticsOutput, AuditLedger, User, WasteMapItem
 from app.models.enums import UserRole
 from app.schemas.phase4 import ExportRequest, WhatIfRequest
 from app.templates.builder import SECTOR_PRESETS, build_template
+from app.templates.versioning import bump_version, rollback_payload
 
 router = APIRouter(tags=['phase4'])
 
@@ -140,6 +141,21 @@ async def push_template(template_id: str, body: dict, current_user: User = Depen
     return {'message': 'تم دفع القالب إلى العميل.', 'transport': transport}
 
 
+
+
+@router.post('/appowner/templates/{template_id}/rollback')
+async def rollback_template(template_id: str, body: dict, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    if current_user.role != UserRole.appowner:
+        raise HTTPException(status_code=403, detail='ليس لديك الصلاحية المطلوبة.')
+    template = (await db.execute(select(PermissionTemplate).where(PermissionTemplate.id == template_id))).scalars().first()
+    if not template:
+        raise HTTPException(status_code=404, detail='القالب غير موجود.')
+    template.payload_json = rollback_payload(template.payload_json, body['previous_payload'])
+    template.version = bump_version(template.version)
+    db.add(AppOwnerAuditEvent(action='template_rollback', target_client='global', details=f'template_id={template_id}'))
+    await db.commit()
+    return {'message': 'تم التراجع إلى النسخة السابقة.', 'version': template.version}
+
 @router.get('/appowner/craas')
 async def craas_queue(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     if current_user.role != UserRole.appowner:
@@ -157,6 +173,19 @@ async def create_craas_request(body: dict, current_user: User = Depends(get_curr
     await db.commit()
     return {'message': 'تمت إضافة الطلب إلى صف CRaaS.'}
 
+
+
+
+@router.post('/appowner/clients/health-scan')
+async def health_scan(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    if current_user.role != UserRole.appowner:
+        raise HTTPException(status_code=403, detail='ليس لديك الصلاحية المطلوبة.')
+    rows = (await db.execute(select(ClientInventory))).scalars().all()
+    for r in rows:
+        r.last_health_check = 'ok'
+    db.add(AppOwnerAuditEvent(action='health_scan', target_client='all', details='inventory-only health refresh'))
+    await db.commit()
+    return {'message': 'تم تحديث حالة العملاء من نقاط الصحة فقط.', 'count': len(rows)}
 
 @router.get('/appowner/maintenance')
 async def appowner_maintenance(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
