@@ -84,3 +84,16 @@ async def _apply():
             task.demerit_points = 3 if task.severity == 'critical' else 1
             await append_ledger_entry(session, task.company_id, task.auditor_user_id, 'sla_demerit_applied', {'task_id': str(task.id), 'points': task.demerit_points})
         await session.commit()
+
+
+
+@celery_app.task(name='app.workers.tasks.flush_notification_queue_task')
+def flush_notification_queue_task():
+    import asyncio
+    asyncio.run(_flush_notifications())
+
+
+async def _flush_notifications():
+    from app.services.notifications import flush_notification_queue
+    async with SessionLocal() as session:
+        await flush_notification_queue(session)

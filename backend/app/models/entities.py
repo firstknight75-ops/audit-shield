@@ -108,6 +108,7 @@ class WasteMapItem(Base):
     category: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     impact_score: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    iqd_amount: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 

@@ -15,6 +15,8 @@ router = APIRouter(tags=['analytics'])
 
 @router.post('/analytics/run/{company_id}')
 async def trigger_analysis(company_id: str, current_user: User = Depends(require_permission('view_analytics')), db: AsyncSession = Depends(get_db)):
+    if str(current_user.company_id) != company_id:
+        raise HTTPException(status_code=403, detail='لا يمكنك تشغيل التحليل لشركة أخرى.')
     from app.ai.orchestrator import _run_daily_analysis
     await _run_daily_analysis(company_id)
     return {'message': 'تم تشغيل التحليل اليومي محلياً.'}
@@ -44,7 +46,7 @@ async def owner_dashboard(current_user: User = Depends(require_permission('view_
 @router.get('/owner/dashboard/layer2')
 async def owner_layer2(current_user: User = Depends(require_permission('view_analytics')), db: AsyncSession = Depends(get_db)):
     rows = (await db.execute(select(WasteMapItem).where(WasteMapItem.company_id == current_user.company_id))).scalars().all()
-    return [{'category': r.category, 'description': r.description, 'impact_score': r.impact_score} for r in rows]
+    return [{'category': r.category, 'description': r.description, 'impact_score': r.impact_score, 'iqd_amount': r.iqd_amount} for r in rows]
 
 
 @router.get('/owner/dashboard/layer3')
@@ -62,7 +64,7 @@ async def owner_layer4(document_id: str, current_user: User = Depends(require_pe
         raise HTTPException(status_code=404, detail='المستند غير موجود.')
     ocr = (await db.execute(select(OCRExtraction).where(OCRExtraction.document_id == document.id))).scalars().first()
     ledger_rows = (await db.execute(select(AuditLedger).where(AuditLedger.company_id == current_user.company_id).order_by(AuditLedger.created_at.asc()))).scalars().all()
-    return RecordTraceResponse(document_id=str(document.id), filename=document.original_filename, ledger=[{'id': str(r.id), 'action_type': r.action_type, 'payload': r.action_payload} for r in ledger_rows if document_id in str(r.action_payload)], extracted_data=ocr.extracted_data if ocr else {})
+    return RecordTraceResponse(document_id=str(document.id), filename=document.original_filename, ledger=[{'id': str(r.id), 'action_type': r.action_type, 'payload': r.action_payload} for r in ledger_rows if r.action_payload.get('document_id') == document_id or r.action_payload.get('extraction_id') == str(getattr(ocr, 'id', ''))], extracted_data=ocr.extracted_data if ocr else {})
 
 
 @router.get('/manager/dashboard')

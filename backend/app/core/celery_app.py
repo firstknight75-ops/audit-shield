@@ -3,6 +3,10 @@ from celery.schedules import crontab
 
 celery_app = Celery('auditcore', broker='redis://redis:6379/0', backend='redis://redis:6379/0')
 celery_app.conf.timezone = 'Asia/Baghdad'
+celery_app.conf.imports = (
+    'app.workers.tasks',
+    'app.ai.orchestrator',
+)
 celery_app.conf.beat_schedule = {
     'generate-daily-auditor-tasks': {
         'task': 'app.workers.tasks.generate_daily_tasks',
@@ -11,5 +15,9 @@ celery_app.conf.beat_schedule = {
     'apply-sla-demerits': {
         'task': 'app.workers.tasks.apply_sla_demerits',
         'schedule': crontab(minute='*/15'),
+    },
+    'flush-notification-queue': {
+        'task': 'app.workers.tasks.flush_notification_queue_task',
+        'schedule': crontab(minute='*/5'),
     },
 }

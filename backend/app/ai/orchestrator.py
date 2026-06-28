@@ -67,7 +67,7 @@ async def _run_daily_analysis(company_id: str):
         total_waste = 0.0
         for item in waste_items:
             total_waste += item.get('iqd_amount', 0.0)
-            session.add(WasteMapItem(company_id=company_id, category=item['category'], description=f"{item['description']} - {item.get('invoice_number') or ''}", impact_score=item['impact_score']))
+            session.add(WasteMapItem(company_id=company_id, category=item['category'], description=f"{item['description']} - {item.get('invoice_number') or ''} - {item.get('document_id') or ''}", impact_score=item['impact_score'], iqd_amount=int(item.get('iqd_amount', 0))))
             if item.get('severity') in {'critical', 'high'}:
                 alert = RiskAlert(company_id=company_id, severity=item['severity'], message=f"{item['description']} بقيمة {int(item.get('iqd_amount', 0))} د.ع", status='open')
                 session.add(alert)
