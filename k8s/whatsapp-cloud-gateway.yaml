@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whatsapp-cloud-gateway
+  namespace: auditcore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whatsapp-cloud-gateway
+  template:
+    metadata:
+      labels:
+        app: whatsapp-cloud-gateway
+    spec:
+      containers:
+        - name: gateway
+          image: node:20-alpine
+          command: ['sh', '-c', 'cat <<'"'"'EOF'"'"' > /tmp/server.js\nconst http = require("http");\nhttp.createServer((req,res)=>{res.writeHead(200,{"Content-Type":"application/json"});res.end(JSON.stringify({status:"ok",gateway:"whatsapp-cloud-gateway"}))}).listen(3002);\nEOF\nnode /tmp/server.js']
+          ports:
+            - containerPort: 3002
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whatsapp-cloud-gateway
+  namespace: auditcore
+spec:
+  selector:
+    app: whatsapp-cloud-gateway
+  ports:
+    - port: 3002
+      targetPort: 3002

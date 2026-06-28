@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auditcore-backend
+  namespace: auditcore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auditcore-backend
+  template:
+    metadata:
+      labels:
+        app: auditcore-backend
+    spec:
+      containers:
+        - name: backend
+          image: auditcore/backend:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DEPLOYMENT_MODE
+              value: cloud
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: auditcore-secrets
+                  key: database_url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: auditcore-secrets
+                  key: redis_url
+            - name: VAULT_URL
+              value: http://vault:8200
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: auditcore-secrets
+                  key: vault_token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auditcore-backend
+  namespace: auditcore
+spec:
+  selector:
+    app: auditcore-backend
+  ports:
+    - port: 8000
+      targetPort: 8000

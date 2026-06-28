@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auditcore-frontend
+  namespace: auditcore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auditcore-frontend
+  template:
+    metadata:
+      labels:
+        app: auditcore-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: auditcore/frontend:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auditcore-frontend
+  namespace: auditcore
+spec:
+  selector:
+    app: auditcore-frontend
+  ports:
+    - port: 80
+      targetPort: 80
