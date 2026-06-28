@@ -5,6 +5,7 @@ from app.api.auth import router as auth_router
 from app.api.documents import router as documents_router
 from app.api.certification import router as certification_router
 from app.api.owner import router as owner_router
+from app.api.analytics import router as analytics_router
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -14,6 +15,7 @@ app.include_router(documents_router, prefix=settings.api_v1_prefix)
 app.include_router(admin_router, prefix=settings.api_v1_prefix)
 app.include_router(certification_router, prefix=settings.api_v1_prefix)
 app.include_router(owner_router, prefix=settings.api_v1_prefix)
+app.include_router(analytics_router, prefix=settings.api_v1_prefix)
 
 
 @app.get('/health')

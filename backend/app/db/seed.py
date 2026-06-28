@@ -72,9 +72,16 @@ async def seed(session: AsyncSession, deployment_mode: str = 'onpremise', compan
     session.add(AnalyticsOutput(company_id=company.id, output_type='kpi', payload={'margin': 15}))
     session.add(WasteMapItem(company_id=company.id, category='process', description='Redundant handoff', impact_score=8))
     session.add(RiskAlert(company_id=company.id, severity='high', message='Cash variance spike', status='open'))
-    doc = Document(company_id=company.id, branch_id=branch.id, uploaded_by_user_id=created['auditor@auditcore.local'].id, original_filename='arabic-invoice.json', mime_type='application/json', file_size=24, encrypted_blob=b'encrypted', metadata_json={'encrypted': True})
+    doc = Document(company_id=company.id, branch_id=branch.id, uploaded_by_user_id=created['auditor@auditcore.local'].id, original_filename='arabic-invoice.json', mime_type='application/json', file_size=24, encrypted_blob=b'encrypted', metadata_json={'encrypted': True, 'department': 'المشتريات', 'branch': 'HQ'})
     session.add(doc)
     await session.flush()
-    session.add(OCRExtraction(document_id=doc.id, status='pending', extracted_data={'invoice_number': 'INV-2026-9001', 'date': '2026-06-28', 'amount': '', 'vendor_name': 'شركة الرافدين', 'items_list': ['صنف 1', 'صنف 2']}, confidence_map={'invoice_number': 92, 'date': 90, 'amount': 58, 'vendor_name': 82, 'items_list': 88}, raw_text='فاتورة عربية تجريبية', page_count=1, processing_time_ms=1200))
+    session.add(OCRExtraction(document_id=doc.id, status='certified', extracted_data={'invoice_number': 'INV-2026-9001', 'date': '2026-06-28', 'amount': '12400000', 'vendor_name': 'شركة الرافدين', 'items_list': ['صنف 1', 'صنف 2'], 'inventory_amount': '5600000', 'bank_outflow_amount': '12400000'}, confidence_map={'invoice_number': 92, 'date': 90, 'amount': 58, 'vendor_name': 82, 'items_list': 88}, raw_text='فاتورة عربية تجريبية', page_count=1, processing_time_ms=1200))
     session.add(DailyTask(company_id=company.id, auditor_user_id=created['auditor@auditcore.local'].id, task_type='ocr', title='اعتماد فاتورة عربية', status='open', source_document_id=doc.id, due_at=datetime.now(timezone.utc) + timedelta(hours=4), sla_minutes=240, severity='normal'))
+    for i in range(1, 12):
+        amount = 1000000 + i * 100000
+        meta = {'encrypted': True, 'department': 'المشتريات' if i % 2 else 'المخازن', 'branch': 'HQ'}
+        extra = Document(company_id=company.id, branch_id=branch.id, uploaded_by_user_id=created['auditor@auditcore.local'].id, original_filename=f'invoice-{i}.json', mime_type='application/json', file_size=24, encrypted_blob=b'encrypted', metadata_json=meta)
+        session.add(extra)
+        await session.flush()
+        session.add(OCRExtraction(document_id=extra.id, status='certified', extracted_data={'invoice_number': 'INV-2026-9001' if i == 2 else f'INV-2026-{9001+i}', 'date': '2026-06-28', 'amount': str(amount), 'vendor_name': 'شركة الرافدين', 'items_list': ['صنف'], 'inventory_amount': str(amount - 700000 if i == 3 else amount), 'bank_outflow_amount': str(amount)}, confidence_map={'invoice_number': 95, 'date': 93, 'amount': 90, 'vendor_name': 88, 'items_list': 86}, raw_text='فاتورة عربية', page_count=1, processing_time_ms=1100))
     await session.commit()

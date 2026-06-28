@@ -85,3 +85,26 @@ export const clients = [
 
 export const formatIQD = (n: number) =>
   new Intl.NumberFormat("ar-IQ").format(n) + " د.ع";
+
+export const ownerLayer2 = [
+  { department: "المشتريات", score: 5, amount: 12400000 },
+  { department: "المخازن", score: 4, amount: 6800000 },
+  { department: "المالية", score: 3, amount: 3200000 },
+];
+
+export const ownerLayer3 = [
+  { id: "f1", type: "duplicate_invoice", title: "فاتورة مكررة", invoice: "INV-2026-9001", amount: 12400000 },
+  { id: "f2", type: "procurement_inventory_mismatch", title: "تضارب مشتريات/مخزن", invoice: "INV-2026-9002", amount: 6800000 },
+];
+
+export const ownerLayer4 = {
+  documentId: "d1",
+  filename: "arabic-invoice.jpg",
+  imageUrl: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=80",
+  ledger: [
+    { id: "l1", action: "document_uploaded", at: "2026-06-28 08:10" },
+    { id: "l2", action: "ocr_processed", at: "2026-06-28 08:11" },
+    { id: "l3", action: "document_certified", at: "2026-06-28 08:14" },
+    { id: "l4", action: "daily_analysis_completed", at: "2026-06-28 02:00" },
+  ],
+};
