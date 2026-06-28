@@ -7,9 +7,11 @@ from sqlalchemy import select
 
 from app.core.celery_app import celery_app
 from app.db.session import SessionLocal
-from app.models.entities import DailyTask, OCRExtraction, User
+from app.models.entities import DailyTask, Document, OCRExtraction, User
 from app.models.enums import UserRole
+from app.services.encryption import decrypt_bytes_to_memory
 from app.services.ledger import append_ledger_entry
+from app.services.ocr import build_extraction_payload, parse_document_bytes
 
 SLA = {
     'ocr': 240,
@@ -17,6 +19,31 @@ SLA = {
     'reversals': 120,
     'branch_backlog': 240,
 }
+
+
+@celery_app.task(name='app.workers.tasks.process_ocr_document')
+def process_ocr_document(document_id: str):
+    import asyncio
+    asyncio.run(_process_ocr_document(document_id))
+
+
+async def _process_ocr_document(document_id: str):
+    async with SessionLocal() as session:
+        document = (await session.execute(select(Document).where(Document.id == document_id))).scalar_one_or_none()
+        extraction = (await session.execute(select(OCRExtraction).where(OCRExtraction.document_id == document_id))).scalar_one_or_none()
+        if not document or not extraction:
+            return
+        decrypted = await decrypt_bytes_to_memory(str(document.company_id), str(document.id), document.encrypted_blob)
+        text, page_count, processing_time_ms = parse_document_bytes(decrypted, document.mime_type)
+        extracted_data, confidence_map = build_extraction_payload(text)
+        extraction.status = 'pending'
+        extraction.extracted_data = extracted_data
+        extraction.confidence_map = confidence_map
+        extraction.raw_text = text
+        extraction.page_count = page_count
+        extraction.processing_time_ms = processing_time_ms
+        await append_ledger_entry(session, document.company_id, document.uploaded_by_user_id, 'ocr_processed', {'document_id': str(document.id), 'page_count': page_count, 'processing_time_ms': processing_time_ms})
+        await session.commit()
 
 
 @celery_app.task(name='app.workers.tasks.generate_daily_tasks')

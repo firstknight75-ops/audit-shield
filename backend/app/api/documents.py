@@ -12,8 +12,8 @@ from app.db.session import get_db
 from app.models.entities import Document, OCRExtraction, User
 from app.schemas.document import DocumentUploadResponse
 from app.services.encryption import encrypt_bytes, validate_encrypted_json_structure
-from app.services.ocr import build_extraction_payload, parse_document_bytes
 from app.services.ledger import append_ledger_entry
+from app.workers.tasks import process_ocr_document
 
 router = APIRouter(prefix='/documents', tags=['documents'])
 
@@ -47,12 +47,11 @@ async def upload_document(file: UploadFile = File(...), current_user: User = Dep
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='بنية JSON غير صالحة.')
     file_id = str(uuid.uuid4())
     encrypted = await encrypt_bytes(str(current_user.company_id), file_id, content)
-    document = Document(id=file_id, company_id=current_user.company_id, branch_id=current_user.branch_id, uploaded_by_user_id=current_user.id, original_filename=file.filename or file_id, mime_type=mime_type, file_size=len(content), encrypted_blob=encrypted, metadata_json={'encrypted': True})
+    document = Document(id=file_id, company_id=current_user.company_id, branch_id=current_user.branch_id, uploaded_by_user_id=current_user.id, original_filename=file.filename or file_id, mime_type=mime_type, file_size=len(content), encrypted_blob=encrypted, metadata_json={'encrypted': True, 'ocr_status': 'queued'})
+    extraction = OCRExtraction(document_id=file_id, status='queued', extracted_data={}, confidence_map={}, raw_text=None, page_count=1)
     db.add(document)
-    text, page_count, processing_time_ms = parse_document_bytes(content, mime_type)
-    extracted_data, confidence_map = build_extraction_payload(text)
-    extraction = OCRExtraction(document_id=file_id, status='pending', extracted_data=extracted_data, confidence_map=confidence_map, raw_text=text, page_count=page_count, processing_time_ms=processing_time_ms)
     db.add(extraction)
     await append_ledger_entry(db, current_user.company_id, current_user.id, 'document_uploaded', {'document_id': file_id, 'filename': document.original_filename})
     await db.commit()
+    process_ocr_document.delay(file_id)
     return DocumentUploadResponse(id=file_id, filename=document.original_filename, mime_type=mime_type, size=len(content))

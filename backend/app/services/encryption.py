@@ -9,10 +9,18 @@ from cryptography.fernet import Fernet
 from app.core.factories import get_key_backend
 
 
-async def encrypt_bytes(tenant_or_company: str, file_id: str, data: bytes) -> bytes:
+async def _fernet_for(tenant_or_company: str, file_id: str) -> Fernet:
     key = await get_key_backend().get_key(tenant_or_company, file_id)
     fernet_key = base64.urlsafe_b64encode(sha256(key).digest())
-    return Fernet(fernet_key).encrypt(data)
+    return Fernet(fernet_key)
+
+
+async def encrypt_bytes(tenant_or_company: str, file_id: str, data: bytes) -> bytes:
+    return (await _fernet_for(tenant_or_company, file_id)).encrypt(data)
+
+
+async def decrypt_bytes_to_memory(tenant_or_company: str, file_id: str, data: bytes) -> bytes:
+    return (await _fernet_for(tenant_or_company, file_id)).decrypt(data)
 
 
 async def validate_encrypted_json_structure(data: bytes) -> bool:

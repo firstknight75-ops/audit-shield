@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
-from sqlalchemy import func, select
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import require_permission
 from app.db.session import get_db
-from app.models.entities import DailyTask, User
+from app.models.entities import AuditLedger, DailyTask, User
 from app.models.enums import UserRole
 from app.schemas.ledger import LedgerVerifyResponse
 from app.services.ledger import verify_ledger_integrity
@@ -18,6 +18,16 @@ router = APIRouter(prefix='/owner', tags=['owner'])
 async def verify(current_user: User = Depends(require_permission('view_ledger')), db: AsyncSession = Depends(get_db)):
     valid, message, broken = await verify_ledger_integrity(db, current_user.company_id)
     return LedgerVerifyResponse(valid=valid, message=message, broken_entry_id=broken)
+
+
+@router.post('/ledger/tamper/{entry_id}')
+async def tamper(entry_id: str, current_user: User = Depends(require_permission('view_ledger')), db: AsyncSession = Depends(get_db)):
+    row = (await db.execute(select(AuditLedger).where(AuditLedger.id == entry_id, AuditLedger.company_id == current_user.company_id))).scalar_one_or_none()
+    if not row:
+        raise HTTPException(status_code=404, detail='القيد غير موجود.')
+    row.action_payload = {**row.action_payload, 'tampered': True}
+    await db.commit()
+    return {'message': 'تم العبث بالقيد للاختبار.'}
 
 
 @router.get('/auditor-efficiency')

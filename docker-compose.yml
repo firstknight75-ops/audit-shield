@@ -39,6 +39,34 @@ services:
       - '5173:5173'
     depends_on:
       - backend
+  celery-worker:
+    build: ./backend
+    environment:
+      DEPLOYMENT_MODE: ${DEPLOYMENT_MODE:-onpremise}
+      DATABASE_URL: postgresql+asyncpg://auditcore:auditcore@postgres:5432/auditcore
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: super-secret
+      COMPANY_MASTER_KEY: company-master-key
+      VAULT_URL: http://vault:8200
+      VAULT_TOKEN: dev-token
+    command: celery -A app.core.celery_app.celery_app worker --loglevel=info
+    depends_on:
+      - postgres
+      - redis
+  celery-beat:
+    build: ./backend
+    environment:
+      DEPLOYMENT_MODE: ${DEPLOYMENT_MODE:-onpremise}
+      DATABASE_URL: postgresql+asyncpg://auditcore:auditcore@postgres:5432/auditcore
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: super-secret
+      COMPANY_MASTER_KEY: company-master-key
+      VAULT_URL: http://vault:8200
+      VAULT_TOKEN: dev-token
+    command: celery -A app.core.celery_app.celery_app beat --loglevel=info
+    depends_on:
+      - postgres
+      - redis
   baileys-bridge:
     image: node:20-alpine
     working_dir: /srv
