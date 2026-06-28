@@ -14,7 +14,11 @@ from app.services.i18n import tr
 from app.services.permissions import get_effective_permissions
 
 
-async def get_current_user(authorization: str = Header(default=''), x_tenant_schema: str | None = Header(default=None), db: AsyncSession = Depends(get_db)) -> User:
+async def get_current_user(
+    authorization: str = Header(default=''),
+    x_tenant_schema: str | None = Header(default=None),
+    db: AsyncSession = Depends(get_db),
+) -> User:
     if not authorization.startswith('Bearer '):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=tr('auth.unauthorized', 'ar'))
     token = authorization.removeprefix('Bearer ').strip()
@@ -33,7 +37,15 @@ async def get_current_user(authorization: str = Header(default=''), x_tenant_sch
         raise HTTPException(status_code=status.HTTP_423_LOCKED, detail=tr('auth.locked', lang))
     if user.last_activity_at and user.last_activity_at < now - timedelta(minutes=15):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=tr('auth.session_expired', lang))
-    await set_session_context(db, role=user.role.value, tenant_schema=x_tenant_schema)
+
+    # Set session context for RLS: role and tenant (company_group_id)
+    await set_session_context(
+        db,
+        role=user.role.value,
+        tenant_id=str(user.company_group_id),
+        tenant_schema=x_tenant_schema,
+    )
+
     user.last_activity_at = now
     await db.commit()
     await db.refresh(user)

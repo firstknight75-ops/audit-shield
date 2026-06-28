@@ -1,0 +1,22 @@
+{
+  "users": "المستخدمين",
+  "create_user": "إنشاء مستخدم",
+  "permissions": "الصلاحيات",
+  "activity": "النشاط",
+  "branches": "الفروع",
+  "companies": "الشركات",
+  "email": "البريد الإلكتروني",
+  "full_name": "الاسم الكامل",
+  "role": "الدور",
+  "language": "اللغة",
+  "company_access": "صلاحية الشركة",
+  "deactivate": "تعطيل",
+  "grant": "منح",
+  "revoke": "سحب",
+  "override_permission": "تجاوز الصلاحية",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "client_companies": "الشركات العميلة",
+  "template_editor": "محرر القوالب",
+  "maintenance_log": "سجل الصيانة"
+}

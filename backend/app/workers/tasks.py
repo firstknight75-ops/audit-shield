@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from app.core.celery_app import celery_app
 from app.db.session import SessionLocal
-from app.models.entities import DailyTask, Document, OCRExtraction, User
+from app.models.entities import DailyTask, Document, OCRExtraction, User, UserCompanyAccess
 from app.models.enums import UserRole
 from app.services.encryption import decrypt_bytes_to_memory
 from app.services.ledger import append_ledger_entry
@@ -55,18 +55,65 @@ def generate_daily_tasks():
 async def _generate():
     now = datetime.now(ZoneInfo('Asia/Baghdad')).astimezone(timezone.utc)
     async with SessionLocal() as session:
-        auditors = (await session.execute(select(User).where(User.role == UserRole.auditor, User.is_active.is_(True)))).scalars().all()
-        pending = (await session.execute(select(OCRExtraction).where(OCRExtraction.status == 'pending'))).scalars().all()
+        # Get all active auditors
+        auditors = (await session.execute(
+            select(User).where(User.role == UserRole.auditor, User.is_active.is_(True))
+        )).scalars().all()
+
+        # Get pending OCR extractions
+        pending = (await session.execute(
+            select(OCRExtraction).where(OCRExtraction.status == 'pending')
+        )).scalars().all()
+
         for i, ext in enumerate(pending):
             if not auditors:
                 break
             auditor = auditors[i % len(auditors)]
-            exists = (await session.execute(select(DailyTask).where(DailyTask.source_document_id == ext.document_id, DailyTask.task_type == 'ocr', DailyTask.status == 'open'))).scalars().first()
+
+            # Find the document to get company_id
+            doc = (await session.execute(
+                select(Document).where(Document.id == ext.document_id)
+            )).scalar_one_or_none()
+            if not doc:
+                continue
+
+            # Verify auditor has access to this company
+            access = (await session.execute(
+                select(UserCompanyAccess).where(
+                    UserCompanyAccess.user_id == auditor.id,
+                    UserCompanyAccess.company_id == doc.company_id,
+                )
+            )).scalars().first()
+            if not access:
+                continue
+
+            # Check branch access if auditor is branch-scoped
+            if access.branch_id and doc.branch_id and str(access.branch_id) != str(doc.branch_id):
+                continue
+
+            exists = (await session.execute(
+                select(DailyTask).where(
+                    DailyTask.source_document_id == ext.document_id,
+                    DailyTask.task_type == 'ocr',
+                    DailyTask.status == 'open',
+                )
+            )).scalars().first()
             if exists:
                 continue
-            task = DailyTask(company_id=auditor.company_id, auditor_user_id=auditor.id, task_type='ocr', title=f'اعتماد مستند {ext.document_id}', status='open', source_document_id=ext.document_id, due_at=now + timedelta(minutes=SLA['ocr']), sla_minutes=SLA['ocr'], severity='normal')
+
+            task = DailyTask(
+                company_id=doc.company_id,
+                auditor_user_id=auditor.id,
+                task_type='ocr',
+                title=f'اعتماد مستند {ext.document_id}',
+                status='open',
+                source_document_id=ext.document_id,
+                due_at=now + timedelta(minutes=SLA['ocr']),
+                sla_minutes=SLA['ocr'],
+                severity='normal',
+            )
             session.add(task)
-            await append_ledger_entry(session, auditor.company_id, None, 'task_created', {'task_type': 'ocr', 'document_id': str(ext.document_id)})
+            await append_ledger_entry(session, doc.company_id, None, 'task_created', {'task_type': 'ocr', 'document_id': str(ext.document_id)})
         await session.commit()
 
 
@@ -79,12 +126,13 @@ def apply_sla_demerits():
 async def _apply():
     now = datetime.now(timezone.utc)
     async with SessionLocal() as session:
-        tasks = (await session.execute(select(DailyTask).where(DailyTask.status == 'open', DailyTask.due_at < now - timedelta(minutes=15), DailyTask.demerit_points == 0))).scalars().all()
+        tasks = (await session.execute(
+            select(DailyTask).where(DailyTask.status == 'open', DailyTask.due_at < now - timedelta(minutes=15), DailyTask.demerit_points == 0)
+        )).scalars().all()
         for task in tasks:
             task.demerit_points = 3 if task.severity == 'critical' else 1
             await append_ledger_entry(session, task.company_id, task.auditor_user_id, 'sla_demerit_applied', {'task_id': str(task.id), 'points': task.demerit_points})
         await session.commit()
-
 
 
 @celery_app.task(name='app.workers.tasks.flush_notification_queue_task')

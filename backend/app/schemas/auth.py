@@ -18,6 +18,17 @@ class RefreshRequest(BaseModel):
     refresh_token: str
 
 
+class AccessibleBranch(BaseModel):
+    branch_id: str
+    name: str
+
+
+class AccessibleCompany(BaseModel):
+    company_id: str
+    name: str
+    branches: list[AccessibleBranch]
+
+
 class MeResponse(BaseModel):
     id: str
     email: EmailStr
@@ -25,5 +36,5 @@ class MeResponse(BaseModel):
     role: str
     preferred_language: str
     permissions: list[str]
-    accessible_companies: list[dict]
+    accessible_companies: list[AccessibleCompany]
     last_activity_at: datetime | None = None

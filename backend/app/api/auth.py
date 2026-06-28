@@ -39,7 +39,10 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> To
     user.locked_until = None
     user.last_activity_at = now
     await db.commit()
-    return TokenResponse(access_token=create_token(str(user.id), 'access', 15), refresh_token=create_token(str(user.id), 'refresh', 1440))
+    return TokenResponse(
+        access_token=create_token(str(user.id), 'access', 15),
+        refresh_token=create_token(str(user.id), 'refresh', 1440),
+    )
 
 
 @router.post('/refresh', response_model=TokenResponse)
@@ -55,7 +58,10 @@ async def refresh(payload: RefreshRequest, db: AsyncSession = Depends(get_db)) -
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=tr('auth.unauthorized', 'ar'))
     user.last_activity_at = datetime.now(timezone.utc)
     await db.commit()
-    return TokenResponse(access_token=create_token(str(user.id), 'access', 15), refresh_token=create_token(str(user.id), 'refresh', 1440))
+    return TokenResponse(
+        access_token=create_token(str(user.id), 'access', 15),
+        refresh_token=create_token(str(user.id), 'refresh', 1440),
+    )
 
 
 @router.get('/me', response_model=MeResponse)
@@ -63,4 +69,13 @@ async def me(current_user: User = Depends(get_current_user), db: AsyncSession = 
     permissions = await get_effective_permissions(current_user, db)
     accessible = await get_accessible_companies(current_user, db)
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
-    return MeResponse(id=str(current_user.id), email=current_user.email, full_name=current_user.full_name, role=current_user.role.value, preferred_language=lang, permissions=permissions, accessible_companies=accessible, last_activity_at=current_user.last_activity_at)
+    return MeResponse(
+        id=str(current_user.id),
+        email=current_user.email,
+        full_name=current_user.full_name,
+        role=current_user.role.value,
+        preferred_language=lang,
+        permissions=permissions,
+        accessible_companies=accessible,
+        last_activity_at=current_user.last_activity_at,
+    )

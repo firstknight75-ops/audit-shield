@@ -3,5 +3,14 @@
   "departments": "الأقسام",
   "waste_map": "خريطة الهدر",
   "risk_map": "خريطة المخاطر",
-  "decision_simulator": "محاكي القرار"
+  "decision_simulator": "محاكي القرار",
+  "ledger": "السجل غير القابل للتعديل",
+  "exports": "التقارير والتصدير",
+  "department_dashboard": "لوحة القسم",
+  "correction_tasks": "مهام التصحيح",
+  "my_daily_tasks": "مهامي اليومية",
+  "upload_document": "رفع مستند",
+  "client_companies": "الشركات العميلة",
+  "template_editor": "محرر القوالب",
+  "maintenance_log": "سجل الصيانة"
 }

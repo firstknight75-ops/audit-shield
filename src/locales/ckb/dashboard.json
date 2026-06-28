@@ -3,5 +3,14 @@
   "departments": "بەشەکان",
   "waste_map": "نەخشەی خەسار",
   "risk_map": "نەخشەی مەترسی",
-  "decision_simulator": "هاوشێوەکاری بڕیار"
+  "decision_simulator": "هاوشێوەکاری بڕیار",
+  "ledger": "تۆماری نەگۆڕاو",
+  "exports": "ڕاپۆرت و هەناردەکردن",
+  "department_dashboard": "داشبۆردی بەش",
+  "correction_tasks": "ئەرکەکانی ڕاستکردنەوە",
+  "my_daily_tasks": "ئەرکە ڕۆژانەکەم",
+  "upload_document": "بارکردنی بەڵگەنامە",
+  "client_companies": "کۆمپانیا کڕیارەکان",
+  "template_editor": "دەستکاریکەری داڕێژە",
+  "maintenance_log": "تۆماری چاککردنەوە"
 }

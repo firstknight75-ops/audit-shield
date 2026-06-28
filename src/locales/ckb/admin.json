@@ -1,0 +1,22 @@
+{
+  "users": "بەکارهێنەران",
+  "create_user": "دروستکردنی بەکارهێنەر",
+  "permissions": "دەسەڵاتەکان",
+  "activity": "چالاکی",
+  "branches": "لقیەکان",
+  "companies": "کۆمپانیاکان",
+  "email": "ئیمەیڵ",
+  "full_name": "ناوی تەواو",
+  "role": "ڕۆڵ",
+  "language": "زمان",
+  "company_access": "دەسەڵاتی کۆمپانیا",
+  "deactivate": "ناچالاککردن",
+  "grant": "دانان",
+  "revoke": "هەڵگرتنەوە",
+  "override_permission": "بۆردکردنی دەسەڵات",
+  "save": "پاشەکەوتکردن",
+  "cancel": "هەڵوەشاندنەوە",
+  "client_companies": "کۆمپانیا کڕیارەکان",
+  "template_editor": "دەستکاریکەری داڕێژە",
+  "maintenance_log": "تۆماری چاککردنەوە"
+}

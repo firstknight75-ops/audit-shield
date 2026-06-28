@@ -17,7 +17,10 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-async def set_session_context(session: AsyncSession, *, role: str, tenant_schema: str | None = None) -> None:
+async def set_session_context(session: AsyncSession, *, role: str, tenant_id: str | None = None, tenant_schema: str | None = None) -> None:
+    """Set PostgreSQL session variables for RLS and tenant isolation."""
     await session.execute(text("select set_config('app.current_user_role', :role, true)"), {'role': role})
+    if tenant_id:
+        await session.execute(text("select set_config('app.current_tenant_id', :tid, true)"), {'tid': str(tenant_id)})
     if tenant_schema:
         await session.execute(text(f'SET search_path TO {tenant_schema}, public'))

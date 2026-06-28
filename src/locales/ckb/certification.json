@@ -1,0 +1,13 @@
+{
+  "next_document": "بەڵگەنامەی دواتر",
+  "certify": "پەسندکردن",
+  "field": "خانە",
+  "value": "بەها",
+  "confidence": "متمانە",
+  "status": "بارودۆخ",
+  "pending": "چاوەڕوان",
+  "certified": "پەسندکراو",
+  "requires_correction": "پێویستە ڕاست بکرێتەوە",
+  "no_pending": "بەڵگەنامەی چاوەڕوانکراو بۆ پەسندکردن نییە.",
+  "certification_env": "ژینگەی پەسندکردن"
+}

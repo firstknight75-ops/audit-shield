@@ -1,0 +1,13 @@
+{
+  "next_document": "المستند التالي",
+  "certify": "اعتماد",
+  "field": "حقل",
+  "value": "القيمة",
+  "confidence": "الثقة",
+  "status": "الحالة",
+  "pending": "قيد الانتظار",
+  "certified": "معتمد",
+  "requires_correction": "يتطلب تصحيح",
+  "no_pending": "لا توجد مستندات قيد الانتظار للاعتماد.",
+  "certification_env": "بيئة الاعتماد"
+}

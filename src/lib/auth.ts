@@ -1,6 +1,17 @@
 export type Role = "owner" | "gm" | "manager" | "auditor" | "admin" | "appowner";
 export type Locale = "ar" | "ckb";
 
+export interface AccessibleBranch {
+  branch_id: string;
+  name: string;
+}
+
+export interface AccessibleCompany {
+  company_id: string;
+  name: string;
+  branches: AccessibleBranch[];
+}
+
 export interface SeededUser {
   id: string;
   email: string;
@@ -8,14 +19,13 @@ export interface SeededUser {
   fullName: string;
   role: Role;
   preferredLanguage: Locale;
-  branch?: string;
-  department?: string;
+  accessibleCompanies?: AccessibleCompany[];
 }
 
 export const SEEDED_USERS: SeededUser[] = [
   { id: "u-owner", email: "owner@auditcore.local", password: "Owner123!", fullName: "المالك — أبو محمد", role: "owner", preferredLanguage: "ar" },
   { id: "u-gm", email: "gm@auditcore.local", password: "Gm123!", fullName: "بەڕێوەبەری گشتی — سالم الجبوري", role: "gm", preferredLanguage: "ckb" },
-  { id: "u-manager", email: "manager@auditcore.local", password: "Manager123!", fullName: "مدير المشتريات — حسن العاني", role: "manager", preferredLanguage: "ar", department: "المشتريات", branch: "بغداد - الرئيسي" },
+  { id: "u-manager", email: "manager@auditcore.local", password: "Manager123!", fullName: "مدير المشتريات — حسن العاني", role: "manager", preferredLanguage: "ar" },
   { id: "u-auditor", email: "auditor@auditcore.local", password: "Auditor123!", fullName: "ژمێریار — زينب الكاظمي", role: "auditor", preferredLanguage: "ckb" },
   { id: "u-admin", email: "sysadmin@auditcore.local", password: "Sysadmin123!", fullName: "مدير النظام — مصطفى", role: "admin", preferredLanguage: "ar" },
   { id: "u-appowner", email: "appowner@auditcore.local", password: "Appowner123!", fullName: "خاوەنی پلاتفۆڕم — AuditCore", role: "appowner", preferredLanguage: "ckb" },
@@ -62,4 +72,20 @@ export function signIn(email: string, password: string): SeededUser {
 
 export function signOut() {
   window.localStorage.removeItem(KEY);
+}
+
+/** Persist preferred language change to backend user record. */
+export async function persistLanguageChange(token: string, language: Locale): Promise<void> {
+  try {
+    await fetch("/api/admin/language", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ preferred_language: language }),
+    });
+  } catch {
+    // Best-effort; the localStorage change already happened client-side.
+  }
 }

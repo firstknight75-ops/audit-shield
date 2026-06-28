@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.entities import AuditLedger
+from app.services.i18n import tr
 
 
 def _stable_json(value: dict) -> str:
@@ -38,7 +39,7 @@ async def append_ledger_entry(session: AsyncSession, company_id, actor_user_id, 
     return ledger
 
 
-async def verify_ledger_integrity(session: AsyncSession, company_id) -> tuple[bool, str, str | None]:
+async def verify_ledger_integrity(session: AsyncSession, company_id, lang: str = 'ar') -> tuple[bool, str, str | None]:
     rows = (await session.execute(select(AuditLedger).where(AuditLedger.company_id == company_id).order_by(AuditLedger.created_at.asc()))).scalars().all()
     previous_hash = 'GENESIS'
     for row in rows:
@@ -46,6 +47,6 @@ async def verify_ledger_integrity(session: AsyncSession, company_id) -> tuple[bo
         stored_hash = row.action_payload.get('entry_hash')
         calc = _hash(previous_hash, body)
         if calc != stored_hash:
-            return False, f'السلسلة مكسورة عند القيد {row.id}', str(row.id)
+            return False, tr('ledger.chain_broken', lang).format(entry_id=row.id), str(row.id)
         previous_hash = stored_hash
-    return True, 'السجل سليم 100%', None
+    return True, tr('ledger.intact', lang), None
