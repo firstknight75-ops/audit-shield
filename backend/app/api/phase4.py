@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, require_permission
 from app.db.session import get_db
-from app.exports.engine import export_excel, export_pdf, export_png
+from app.exports.engine import CORE_OUTPUT_TITLES, export_excel, export_pdf, export_png
 from app.inventory.models import AppOwnerAuditEvent, ClientInventory, CraasRequest, PermissionTemplate
 from app.models.entities import AnalyticsOutput, AuditLedger, User, WasteMapItem
 from app.models.enums import UserRole
@@ -42,18 +41,22 @@ async def run_export(payload: ExportRequest, current_user: User = Depends(requir
     rows = []
     if payload.output_code == 'waste_map':
         rows = [{'category': r.category, 'description': r.description, 'impact_score': r.impact_score, 'iqd_amount': r.iqd_amount} for r in (await db.execute(select(WasteMapItem).where(WasteMapItem.company_id == current_user.company_id))).scalars().all()]
+    elif payload.output_code in {'true_picture', 'trust_index', 'risk_map', 'opportunity_map', 'action_plan', 'dashboards'}:
+        analytics = (await db.execute(select(AnalyticsOutput).where(AnalyticsOutput.company_id == current_user.company_id).order_by(AnalyticsOutput.created_at.desc()))).scalars().first()
+        rows = [analytics.payload] if analytics else []
     outdir = Path('exports')
     outdir.mkdir(exist_ok=True)
+    title = CORE_OUTPUT_TITLES.get(payload.output_code, payload.output_code)
     filebase = outdir / f"{payload.output_code}-{current_user.company_id}"
     if payload.format == 'excel':
-        path = export_excel(str(filebase.with_suffix('.xlsx')), payload.output_code, rows, ledger_hash)
+        path = export_excel(str(filebase.with_suffix('.xlsx')), title, rows, ledger_hash)
     elif payload.format == 'pdf':
-        path = export_pdf(str(filebase.with_suffix('.pdf.html')), payload.output_code, rows, ledger_hash)
+        path = export_pdf(str(filebase.with_suffix('.pdf')), title, rows, ledger_hash)
     elif payload.format == 'png':
-        path = export_png(str(filebase.with_suffix('.png.txt')), payload.output_code, rows, ledger_hash)
+        path = export_png(str(filebase.with_suffix('.png.txt')), title, rows, ledger_hash)
     else:
         raise HTTPException(status_code=400, detail='صيغة التصدير غير مدعومة.')
-    return {'path': path}
+    return {'path': path, 'title': title}
 
 
 @router.post('/what-if/run')
@@ -70,12 +73,22 @@ async def what_if_simulator(payload: WhatIfRequest, current_user: User = Depends
     return {'waste_map_item_id': payload.waste_map_item_id, 'recovered_total': round(recovered, 2), 'manual_cost': payload.manual_cost, 'projection': projection}
 
 
+@router.post('/what-if/export')
+async def what_if_export(payload: WhatIfRequest, current_user: User = Depends(require_permission('view_analytics')), db: AsyncSession = Depends(get_db)):
+    result = await what_if_simulator(payload, current_user, db)
+    latest_ledger = (await db.execute(select(AuditLedger).where(AuditLedger.company_id == current_user.company_id).order_by(AuditLedger.created_at.desc()))).scalars().first()
+    ledger_hash = latest_ledger.action_payload.get('entry_hash', 'GENESIS') if latest_ledger else 'GENESIS'
+    outdir = Path('exports')
+    outdir.mkdir(exist_ok=True)
+    path = export_pdf(str(outdir / f"what-if-{current_user.company_id}.pdf"), CORE_OUTPUT_TITLES['what_if'], result['projection'], ledger_hash)
+    return {'path': path}
+
+
 @router.get('/appowner/clients')
 async def appowner_clients(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     if current_user.role != UserRole.appowner:
         raise HTTPException(status_code=403, detail='ليس لديك الصلاحية المطلوبة.')
-    rows = (await db.execute(select(ClientInventory))).scalars().all()
-    return rows
+    return (await db.execute(select(ClientInventory))).scalars().all()
 
 
 @router.post('/appowner/clients/{client_id}/tier')
@@ -90,6 +103,7 @@ async def change_client_tier(client_id: str, body: dict, current_user: User = De
     client.user_cap = {'essential': 10, 'advanced': 20, 'elite': 50}.get(client.tier, client.user_cap)
     if old_tier != 'elite' and client.tier == 'elite' and client.deployment_mode == 'cloud':
         client.dedicated_database_url = f"postgresql://dedicated/{client.id}"
+        client.tenant_schema = None
     db.add(AppOwnerAuditEvent(action='tier_change', target_client=client.name, details=f'{old_tier}->{client.tier}'))
     await db.commit()
     return {'message': 'تم تحديث الباقة.', 'dedicated_database_url': client.dedicated_database_url}
@@ -119,9 +133,11 @@ async def push_template(template_id: str, body: dict, current_user: User = Depen
     if current_user.role != UserRole.appowner:
         raise HTTPException(status_code=403, detail='ليس لديك الصلاحية المطلوبة.')
     client = body.get('client_name', 'unknown')
-    db.add(AppOwnerAuditEvent(action='template_push', target_client=client, details=f'template_id={template_id}'))
+    deployment_mode = body.get('deployment_mode', 'cloud')
+    transport = 'vpn' if deployment_mode == 'onpremise' else 'cicd'
+    db.add(AppOwnerAuditEvent(action='template_push', target_client=client, details=f'template_id={template_id};transport={transport}'))
     await db.commit()
-    return {'message': 'تم دفع القالب إلى العميل.'}
+    return {'message': 'تم دفع القالب إلى العميل.', 'transport': transport}
 
 
 @router.get('/appowner/craas')

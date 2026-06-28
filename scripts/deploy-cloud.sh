@@ -8,7 +8,7 @@ export DEPLOYMENT_MODE=cloud
 docker compose up -d postgres redis
 sleep 5
 docker compose build backend
-docker compose up -d backend
+docker compose up -d backend celery-worker celery-beat
 cat <<PY | docker compose exec -T backend python
 import asyncio
 from sqlalchemy import text
@@ -39,3 +39,4 @@ printf 'manager@auditcore.local / Manager123!\n'
 printf 'auditor@auditcore.local / Auditor123!\n'
 printf 'sysadmin@auditcore.local / Sysadmin123!\n'
 printf 'appowner@auditcore.local / Appowner123!\n'
+printf '\nInventory registration and Vault secret scaffolding assumed in this phase scaffold.\n'
