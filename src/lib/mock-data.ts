@@ -7,6 +7,7 @@ export const ownerKpis = {
   criticalAlerts: 7,
   predictedCash: 612_000_000,
   auditorEfficiency: 91,
+  chainIntegrity: 100,
 };
 
 export const wasteByDepartment = [

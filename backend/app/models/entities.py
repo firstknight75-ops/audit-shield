@@ -149,3 +149,37 @@ class UserPermissionOverride(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_by_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+
+class OCRExtraction(Base):
+    __tablename__ = 'ocr_extraction'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('document.id', ondelete='CASCADE'), nullable=False, unique=True)
+    status: Mapped[str] = mapped_column(String(50), default='pending', nullable=False)
+    extracted_data: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    confidence_map: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    raw_text: Mapped[str | None] = mapped_column(Text)
+    page_count: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    processing_time_ms: Mapped[int | None] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    certified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    certified_by_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'))
+
+
+class DailyTask(Base):
+    __tablename__ = 'daily_task'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    auditor_user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('user_account.id', ondelete='CASCADE'), nullable=False)
+    task_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default='open', nullable=False)
+    source_document_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('document.id', ondelete='SET NULL'))
+    due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    sla_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    demerit_points: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    severity: Mapped[str] = mapped_column(String(20), default='normal', nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+

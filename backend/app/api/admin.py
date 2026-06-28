@@ -10,6 +10,7 @@ from app.models.entities import AuditLedger, Branch, Permission, User, UserPermi
 from app.models.enums import OverrideAction, UserRole
 from app.schemas.admin import PermissionOverrideRequest, UserCreateRequest
 from app.security.passwords import get_password_hash
+from app.services.ledger import append_ledger_entry
 
 router = APIRouter(prefix='/admin', tags=['admin'])
 
@@ -18,7 +19,7 @@ router = APIRouter(prefix='/admin', tags=['admin'])
 async def create_user(payload: UserCreateRequest, current_user: User = Depends(require_permission('manage_users')), db: AsyncSession = Depends(get_db)):
     user = User(email=payload.email, hashed_password=get_password_hash(payload.password), full_name=payload.full_name, role=UserRole(payload.role), branch_id=payload.branch_id, company_id=current_user.company_id, is_active=True)
     db.add(user)
-    db.add(AuditLedger(company_id=current_user.company_id, actor_user_id=current_user.id, action_type='user_created', action_payload={'email': payload.email}))
+    await append_ledger_entry(db, current_user.company_id, current_user.id, 'user_created', {'email': payload.email})
     await db.commit()
     return {'message': 'تم إنشاء المستخدم بنجاح.'}
 
@@ -29,7 +30,7 @@ async def deactivate_user(user_id: str, current_user: User = Depends(require_per
     if not user:
         raise HTTPException(status_code=404, detail='المستخدم غير موجود.')
     user.is_active = False
-    db.add(AuditLedger(company_id=current_user.company_id, actor_user_id=current_user.id, action_type='user_deactivated', action_payload={'user_id': user_id}))
+    await append_ledger_entry(db, current_user.company_id, current_user.id, 'user_deactivated', {'user_id': user_id})
     await db.commit()
     return {'message': 'تم تعطيل المستخدم.'}
 
@@ -43,7 +44,7 @@ async def set_override(payload: PermissionOverrideRequest, current_user: User = 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='لا يمكن منح صلاحيات مالك المنصة من هذه اللوحة.')
     override = UserPermissionOverride(user_id=payload.user_id, permission_id=permission.id, action=OverrideAction(payload.action), reason=payload.reason, expires_at=payload.expires_at, created_by_user_id=current_user.id, is_active=True)
     db.add(override)
-    db.add(AuditLedger(company_id=current_user.company_id, actor_user_id=current_user.id, action_type='permission_override', action_payload={'user_id': payload.user_id, 'permission_code': payload.permission_code, 'action': payload.action, 'expires_at': payload.expires_at.isoformat() if payload.expires_at else None}))
+    await append_ledger_entry(db, current_user.company_id, current_user.id, 'permission_override', {'user_id': payload.user_id, 'permission_code': payload.permission_code, 'action': payload.action, 'expires_at': payload.expires_at.isoformat() if payload.expires_at else None})
     await db.commit()
     return {'message': 'تم تحديث الصلاحية بنجاح.'}
 

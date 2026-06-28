@@ -9,9 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import require_permission
 from app.db.session import get_db
-from app.models.entities import Document, User
+from app.models.entities import Document, OCRExtraction, User
 from app.schemas.document import DocumentUploadResponse
 from app.services.encryption import encrypt_bytes, validate_encrypted_json_structure
+from app.services.ocr import build_extraction_payload, parse_document_bytes
+from app.services.ledger import append_ledger_entry
 
 router = APIRouter(prefix='/documents', tags=['documents'])
 
@@ -47,5 +49,10 @@ async def upload_document(file: UploadFile = File(...), current_user: User = Dep
     encrypted = await encrypt_bytes(str(current_user.company_id), file_id, content)
     document = Document(id=file_id, company_id=current_user.company_id, branch_id=current_user.branch_id, uploaded_by_user_id=current_user.id, original_filename=file.filename or file_id, mime_type=mime_type, file_size=len(content), encrypted_blob=encrypted, metadata_json={'encrypted': True})
     db.add(document)
+    text, page_count, processing_time_ms = parse_document_bytes(content, mime_type)
+    extracted_data, confidence_map = build_extraction_payload(text)
+    extraction = OCRExtraction(document_id=file_id, status='pending', extracted_data=extracted_data, confidence_map=confidence_map, raw_text=text, page_count=page_count, processing_time_ms=processing_time_ms)
+    db.add(extraction)
+    await append_ledger_entry(db, current_user.company_id, current_user.id, 'document_uploaded', {'document_id': file_id, 'filename': document.original_filename})
     await db.commit()
     return DocumentUploadResponse(id=file_id, filename=document.original_filename, mime_type=mime_type, size=len(content))
