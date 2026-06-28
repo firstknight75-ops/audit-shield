@@ -14,7 +14,7 @@ from app.ai.impact import findings_to_waste_items
 from app.ai.narrative import generate_narrative
 from app.ai.predictor import predict_next_month_cash_outflow
 from app.core.celery_app import celery_app
-from app.core.factories import get_notification_gateway
+from app.services.notifications import queue_or_send_notification
 from app.db.session import SessionLocal
 from app.models.entities import AnalyticsOutput, Document, OCRExtraction, RiskAlert, WasteMapItem
 from app.services.ledger import append_ledger_entry
@@ -26,10 +26,8 @@ def compute_trust_index(findings: list[dict], total_docs: int) -> int:
     return max(0, min(100, score))
 
 
-async def _queue_alert(company_id, severity: str, message: str):
-    gateway = get_notification_gateway()
-    if severity == 'critical':
-        await gateway.send('owner', message)
+async def _queue_alert(session, company_id, severity: str, message: str):
+    await queue_or_send_notification(session, company_id, 'owner', message, severity)
 
 
 async def _run_daily_analysis(company_id: str):
@@ -70,7 +68,7 @@ async def _run_daily_analysis(company_id: str):
                 alert = RiskAlert(company_id=company_id, severity=item['severity'], message=f"{item['description']} بقيمة {int(item.get('iqd_amount', 0))} د.ع", status='open')
                 session.add(alert)
                 if item.get('severity') == 'critical':
-                    await _queue_alert(company_id, 'critical', alert.message)
+                    await _queue_alert(session, company_id, 'critical', alert.message)
         pred_input = pd.DataFrame([{'month_index': i + 1, 'amount': r['amount']} for i, r in enumerate(rows[-12:])])
         pred = predict_next_month_cash_outflow(pred_input)
         trust = compute_trust_index(findings, len(rows))

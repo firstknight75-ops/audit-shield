@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from hashlib import sha256
 
 from app.core.config import get_settings
@@ -25,16 +26,18 @@ class VaultKeyBackend(KeyBackend):
 
 
 class NotificationGateway:
-    async def send(self, destination: str, message: str) -> dict:
-        return {'destination': destination, 'message': message, 'status': 'queued'}
+    async def send(self, destination: str, message: str, severity: str = 'low') -> dict:
+        return {'destination': destination, 'message': message, 'severity': severity, 'status': 'queued', 'gateway': 'base'}
 
 
 class BaileysGateway(NotificationGateway):
-    pass
+    async def send(self, destination: str, message: str, severity: str = 'low') -> dict:
+        return {'destination': destination, 'message': message, 'severity': severity, 'status': 'queued', 'gateway': 'baileys'}
 
 
 class WhatsAppCloudGateway(NotificationGateway):
-    pass
+    async def send(self, destination: str, message: str, severity: str = 'low') -> dict:
+        return {'destination': destination, 'message': message, 'severity': severity, 'status': 'queued', 'gateway': 'whatsapp-cloud'}
 
 
 @dataclass
@@ -70,3 +73,8 @@ def get_notification_gateway() -> NotificationGateway:
 
 def get_backup_target() -> BackupTarget:
     return _mode_registry()['backup_target']()
+
+
+def in_dnd_window(start: int = 23, end: int = 6) -> bool:
+    hour = datetime.now().hour
+    return hour >= start or hour < end
