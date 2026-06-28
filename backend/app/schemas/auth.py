@@ -23,5 +23,7 @@ class MeResponse(BaseModel):
     email: EmailStr
     full_name: str
     role: str
+    preferred_language: str
     permissions: list[str]
+    accessible_companies: list[dict]
     last_activity_at: datetime | None = None

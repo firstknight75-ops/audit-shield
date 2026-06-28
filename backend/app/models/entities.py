@@ -8,17 +8,25 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.models.enums import CompanyTier, DeploymentMode, OverrideAction, UserRole
+from app.models.enums import CompanyTier, DeploymentMode, OverrideAction, PreferredLanguage, UserRole
+
+
+class CompanyGroup(Base):
+    __tablename__ = 'company_group'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    tier: Mapped[CompanyTier] = mapped_column(Enum(CompanyTier, name='company_group_tier'), nullable=False)
+    deployment_mode: Mapped[DeploymentMode] = mapped_column(Enum(DeploymentMode, name='group_deployment_mode'), nullable=False)
+    tenant_schema: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
 class Company(Base):
     __tablename__ = 'company'
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_group_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company_group.id', ondelete='CASCADE'), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     sector: Mapped[str] = mapped_column(String(255), nullable=False)
-    tier: Mapped[CompanyTier] = mapped_column(Enum(CompanyTier, name='company_tier'), nullable=False)
-    deployment_mode: Mapped[DeploymentMode] = mapped_column(Enum(DeploymentMode, name='deployment_mode'), nullable=False)
-    tenant_schema: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
@@ -28,6 +36,7 @@ class Branch(Base):
     company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     location: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
 class User(Base):
@@ -37,24 +46,22 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[UserRole] = mapped_column(Enum(UserRole, name='user_role'), nullable=False)
-    branch_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('branch.id', ondelete='SET NULL'), nullable=True)
-    company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    company_group_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company_group.id', ondelete='CASCADE'), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    preferred_language: Mapped[PreferredLanguage] = mapped_column(Enum(PreferredLanguage, name='preferred_language'), nullable=False, default=PreferredLanguage.ar)
     failed_login_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_activity_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
-class AuditTask(Base):
-    __tablename__ = 'audit_task'
+class UserCompanyAccess(Base):
+    __tablename__ = 'user_company_access'
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('user_account.id', ondelete='CASCADE'), nullable=False)
     company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
-    branch_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('branch.id', ondelete='SET NULL'))
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    status: Mapped[str] = mapped_column(String(50), default='open', nullable=False)
-    assigned_to_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'))
-    due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    branch_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('branch.id', ondelete='SET NULL'), nullable=True)
+    granted_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
@@ -69,6 +76,18 @@ class Document(Base):
     file_size: Mapped[int] = mapped_column(Integer, nullable=False)
     encrypted_blob: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class AuditTask(Base):
+    __tablename__ = 'audit_task'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    branch_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('branch.id', ondelete='SET NULL'))
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default='open', nullable=False)
+    assigned_to_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'))
+    due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
@@ -96,6 +115,7 @@ class AnalyticsOutput(Base):
     __tablename__ = 'analytics_outputs'
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    branch_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('branch.id', ondelete='SET NULL'))
     output_type: Mapped[str] = mapped_column(String(100), nullable=False)
     payload: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -105,6 +125,7 @@ class WasteMapItem(Base):
     __tablename__ = 'waste_map_items'
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    branch_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('branch.id', ondelete='SET NULL'))
     category: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     impact_score: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -116,6 +137,7 @@ class RiskAlert(Base):
     __tablename__ = 'risk_alerts'
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    branch_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('branch.id', ondelete='SET NULL'))
     severity: Mapped[str] = mapped_column(String(50), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(50), default='open', nullable=False)
@@ -144,6 +166,7 @@ class UserPermissionOverride(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('user_account.id', ondelete='CASCADE'), nullable=False)
     permission_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('permission.id', ondelete='CASCADE'), nullable=False)
+    company_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=True)
     action: Mapped[OverrideAction] = mapped_column(Enum(OverrideAction, name='override_action'), nullable=False)
     reason: Mapped[str] = mapped_column(Text, nullable=False)
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -151,6 +174,14 @@ class UserPermissionOverride(Base):
     created_by_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
+
+class Translation(Base):
+    __tablename__ = 'translation'
+    __table_args__ = (UniqueConstraint('key', 'language', name='uq_translation_key_language'),)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    key: Mapped[str] = mapped_column(String(255), nullable=False)
+    language: Mapped[PreferredLanguage] = mapped_column(Enum(PreferredLanguage, name='translation_language'), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
 
 
 class OCRExtraction(Base):
@@ -185,12 +216,10 @@ class DailyTask(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
-
-
 class NotificationQueue(Base):
     __tablename__ = 'notification_queue'
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    company_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=True)
     channel: Mapped[str] = mapped_column(String(50), nullable=False)
     destination: Mapped[str] = mapped_column(String(255), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)

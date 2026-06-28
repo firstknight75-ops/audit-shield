@@ -24,3 +24,8 @@ class UserRole(str, enum.Enum):
 class OverrideAction(str, enum.Enum):
     grant = 'grant'
     revoke = 'revoke'
+
+
+class PreferredLanguage(str, enum.Enum):
+    ar = 'ar'
+    ckb = 'ckb'
