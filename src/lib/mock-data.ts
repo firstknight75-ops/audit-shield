@@ -108,3 +108,21 @@ export const ownerLayer4 = {
     { id: "l4", action: "daily_analysis_completed", at: "2026-06-28 02:00" },
   ],
 };
+
+
+export const managerWidgets = [
+  { code: 'budget_status', title: 'حالة الميزانية', value: '+12%' },
+  { code: 'open_tasks', title: 'المهام المفتوحة', value: '6' },
+  { code: 'dept_quality_index', title: 'مؤشر جودة القسم', value: '87 / 100' },
+  { code: 'team_performance', title: 'أداء الفريق', value: '91%' },
+  { code: 'pending_corrections', title: 'تصحيحات معلقة', value: '3' },
+];
+
+export const appOwnerTemplates = [
+  { id: 't1', name: 'Manufacturing Default', sector: 'Manufacturing', version: 1 },
+  { id: 't2', name: 'Restaurant Default', sector: 'Restaurant', version: 1 },
+];
+
+export const craasQueue = [
+  { id: 'c1', client: 'مجموعة النخيل التجارية', title: 'تقرير قطاعي خاص', status: 'quoted', price: 250000 },
+];
