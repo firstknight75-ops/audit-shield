@@ -318,3 +318,10 @@ kubectl logs deployment/vault -n auditcore
 ./scripts/healthcheck.sh
 ./scripts/update.sh
 ```
+
+
+## Phase 4 cloud tenant upgrade
+
+```bash
+./scripts/migrate-tenant-to-elite.sh <CLIENT_ID>
+```

@@ -12,6 +12,12 @@ try:
 except Exception:  # pragma: no cover
     HTML = None
 
+try:
+    from PIL import Image, ImageDraw
+except Exception:  # pragma: no cover
+    Image = None
+    ImageDraw = None
+
 
 CORE_OUTPUT_TITLES = {
     'true_picture': 'الصورة الحقيقية',
@@ -51,6 +57,7 @@ def export_excel(path: str, title: str, rows: list[dict], ledger_hash: str) -> s
 
 def export_pdf(path: str, title: str, rows: list[dict], ledger_hash: str) -> str:
     cert = tamper_proof_certificate({'title': title, 'rows_count': len(rows)}, ledger_hash)
+    headers = list(rows[0].keys()) if rows else []
     html = f"""
     <html dir='rtl' lang='ar'>
     <head>
@@ -64,8 +71,8 @@ def export_pdf(path: str, title: str, rows: list[dict], ledger_hash: str) -> str
     <body>
       <h1>{title}</h1>
       <table>
-        <thead><tr>{''.join(f'<th>{k}</th>' for k in (rows[0].keys() if rows else []))}</tr></thead>
-        <tbody>{''.join('<tr>' + ''.join(f'<td>{v}</td>' for v in row.values()) + '</tr>' for row in rows)}</tbody>
+        <thead><tr>{''.join(f'<th>{k}</th>' for k in headers)}</tr></thead>
+        <tbody>{''.join('<tr>' + ''.join(f'<td>{row.get(h, "")}</td>' for h in headers) + '</tr>' for row in rows)}</tbody>
       </table>
       <p>ledger_hash_at_generation: {cert['ledger_hash_at_generation']}</p>
       <p>signature: {cert['signature']}</p>
@@ -73,14 +80,33 @@ def export_pdf(path: str, title: str, rows: list[dict], ledger_hash: str) -> str
     """
     if HTML:
         HTML(string=html).write_pdf(path)
-    else:
-        Path(path).with_suffix('.html').write_text(html, encoding='utf-8')
-        return str(Path(path).with_suffix('.html'))
-    return path
+        return path
+    html_path = str(Path(path).with_suffix('.html'))
+    Path(html_path).write_text(html, encoding='utf-8')
+    return html_path
 
 
 def export_png(path: str, title: str, rows: list[dict], ledger_hash: str) -> str:
     cert = tamper_proof_certificate({'title': title, 'rows_count': len(rows)}, ledger_hash)
-    payload = f"PNG EXPORT 300DPI\n{title}\nrows={len(rows)}\nledger={cert['ledger_hash_at_generation']}\nsignature={cert['signature']}\n"
-    Path(path).write_text(payload, encoding='utf-8')
-    return path
+    if Image and ImageDraw:
+        img = Image.new('RGB', (1600, 1200), 'white')
+        draw = ImageDraw.Draw(img)
+        draw.text((40, 40), f'{title} (300 DPI)', fill='black')
+        y = 120
+        for row in rows[:15]:
+            draw.text((40, y), str(row), fill='black')
+            y += 50
+        draw.text((40, 1080), f"ledger={cert['ledger_hash_at_generation']}", fill='black')
+        draw.text((40, 1130), f"sig={cert['signature'][:32]}", fill='black')
+        img.save(path, dpi=(300, 300))
+        return path
+    fallback = Path(path).with_suffix('.txt')
+    payload = (
+        f"PNG EXPORT 300DPI\n"
+        f"{title}\n"
+        f"rows={len(rows)}\n"
+        f"ledger={cert['ledger_hash_at_generation']}\n"
+        f"signature={cert['signature']}\n"
+    )
+    fallback.write_text(payload, encoding='utf-8')
+    return str(fallback)

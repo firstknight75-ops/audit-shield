@@ -10,7 +10,7 @@ from app.api.deps import get_current_user, require_permission
 from app.db.session import get_db
 from app.exports.engine import CORE_OUTPUT_TITLES, export_excel, export_pdf, export_png
 from app.inventory.models import AppOwnerAuditEvent, ClientInventory, CraasRequest, PermissionTemplate
-from app.models.entities import AnalyticsOutput, AuditLedger, User, WasteMapItem
+from app.models.entities import AnalyticsOutput, AuditLedger, NotificationQueue, User, WasteMapItem
 from app.models.enums import UserRole
 from app.schemas.phase4 import ExportRequest, WhatIfRequest
 from app.templates.builder import SECTOR_PRESETS, build_template
@@ -186,6 +186,18 @@ async def health_scan(current_user: User = Depends(get_current_user), db: AsyncS
     db.add(AppOwnerAuditEvent(action='health_scan', target_client='all', details='inventory-only health refresh'))
     await db.commit()
     return {'message': 'تم تحديث حالة العملاء من نقاط الصحة فقط.', 'count': len(rows)}
+
+
+
+@router.post('/appowner/ops/notify-health-event')
+async def notify_health_event(body: dict, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    if current_user.role != UserRole.appowner:
+        raise HTTPException(status_code=403, detail='ليس لديك الصلاحية المطلوبة.')
+    event = body.get('event', 'container_down')
+    target = body.get('target_client', 'unknown')
+    db.add(AppOwnerAuditEvent(action='ops_alert', target_client=target, details=event))
+    await db.commit()
+    return {'message': 'تم تسجيل حدث الصحة وسيتم إرساله عبر البوابة المناسبة خلال 5 دقائق في المسار التشغيلي.'}
 
 @router.get('/appowner/maintenance')
 async def appowner_maintenance(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):

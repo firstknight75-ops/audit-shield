@@ -31,3 +31,8 @@
 - every export includes ledger hash at generation
 - every export includes HMAC signature
 - exports are intended to be verifiable against ledger state
+
+
+## App Owner isolation promise
+- App Owner operations use inventory-only tables/models
+- no tenant financial schema join is required for client listing, tiering, maintenance, or templates
