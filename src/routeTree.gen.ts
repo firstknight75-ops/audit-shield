@@ -9,38 +9,422 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OwnerRouteImport } from './routes/owner'
+import { Route as ManagerRouteImport } from './routes/manager'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as GmRouteImport } from './routes/gm'
+import { Route as AuditorRouteImport } from './routes/auditor'
+import { Route as AppownerRouteImport } from './routes/appowner'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OwnerIndexRouteImport } from './routes/owner.index'
+import { Route as ManagerIndexRouteImport } from './routes/manager.index'
+import { Route as GmIndexRouteImport } from './routes/gm.index'
+import { Route as AuditorIndexRouteImport } from './routes/auditor.index'
+import { Route as AppownerIndexRouteImport } from './routes/appowner.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as OwnerWhatIfRouteImport } from './routes/owner.what-if'
+import { Route as OwnerWasteMapRouteImport } from './routes/owner.waste-map'
+import { Route as OwnerRiskMapRouteImport } from './routes/owner.risk-map'
+import { Route as OwnerLedgerRouteImport } from './routes/owner.ledger'
+import { Route as OwnerExportsRouteImport } from './routes/owner.exports'
+import { Route as OwnerDepartmentsRouteImport } from './routes/owner.departments'
+import { Route as ManagerTasksRouteImport } from './routes/manager.tasks'
+import { Route as GmDepartmentsRouteImport } from './routes/gm.departments'
+import { Route as AuditorUploadRouteImport } from './routes/auditor.upload'
+import { Route as AuditorTasksRouteImport } from './routes/auditor.tasks'
+import { Route as AppownerTemplatesRouteImport } from './routes/appowner.templates'
+import { Route as AppownerMaintenanceRouteImport } from './routes/appowner.maintenance'
+import { Route as AdminPermissionsRouteImport } from './routes/admin.permissions'
+import { Route as AdminBranchesRouteImport } from './routes/admin.branches'
+import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 
+const OwnerRoute = OwnerRouteImport.update({
+  id: '/owner',
+  path: '/owner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManagerRoute = ManagerRouteImport.update({
+  id: '/manager',
+  path: '/manager',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GmRoute = GmRouteImport.update({
+  id: '/gm',
+  path: '/gm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuditorRoute = AuditorRouteImport.update({
+  id: '/auditor',
+  path: '/auditor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppownerRoute = AppownerRouteImport.update({
+  id: '/appowner',
+  path: '/appowner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerIndexRoute = OwnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const ManagerIndexRoute = ManagerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ManagerRoute,
+} as any)
+const GmIndexRoute = GmIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GmRoute,
+} as any)
+const AuditorIndexRoute = AuditorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuditorRoute,
+} as any)
+const AppownerIndexRoute = AppownerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppownerRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const OwnerWhatIfRoute = OwnerWhatIfRouteImport.update({
+  id: '/what-if',
+  path: '/what-if',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerWasteMapRoute = OwnerWasteMapRouteImport.update({
+  id: '/waste-map',
+  path: '/waste-map',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerRiskMapRoute = OwnerRiskMapRouteImport.update({
+  id: '/risk-map',
+  path: '/risk-map',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerLedgerRoute = OwnerLedgerRouteImport.update({
+  id: '/ledger',
+  path: '/ledger',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerExportsRoute = OwnerExportsRouteImport.update({
+  id: '/exports',
+  path: '/exports',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerDepartmentsRoute = OwnerDepartmentsRouteImport.update({
+  id: '/departments',
+  path: '/departments',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const ManagerTasksRoute = ManagerTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => ManagerRoute,
+} as any)
+const GmDepartmentsRoute = GmDepartmentsRouteImport.update({
+  id: '/departments',
+  path: '/departments',
+  getParentRoute: () => GmRoute,
+} as any)
+const AuditorUploadRoute = AuditorUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => AuditorRoute,
+} as any)
+const AuditorTasksRoute = AuditorTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AuditorRoute,
+} as any)
+const AppownerTemplatesRoute = AppownerTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AppownerRoute,
+} as any)
+const AppownerMaintenanceRoute = AppownerMaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => AppownerRoute,
+} as any)
+const AdminPermissionsRoute = AdminPermissionsRouteImport.update({
+  id: '/permissions',
+  path: '/permissions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBranchesRoute = AdminBranchesRouteImport.update({
+  id: '/branches',
+  path: '/branches',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminActivityRoute = AdminActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/appowner': typeof AppownerRouteWithChildren
+  '/auditor': typeof AuditorRouteWithChildren
+  '/gm': typeof GmRouteWithChildren
+  '/login': typeof LoginRoute
+  '/manager': typeof ManagerRouteWithChildren
+  '/owner': typeof OwnerRouteWithChildren
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/branches': typeof AdminBranchesRoute
+  '/admin/permissions': typeof AdminPermissionsRoute
+  '/appowner/maintenance': typeof AppownerMaintenanceRoute
+  '/appowner/templates': typeof AppownerTemplatesRoute
+  '/auditor/tasks': typeof AuditorTasksRoute
+  '/auditor/upload': typeof AuditorUploadRoute
+  '/gm/departments': typeof GmDepartmentsRoute
+  '/manager/tasks': typeof ManagerTasksRoute
+  '/owner/departments': typeof OwnerDepartmentsRoute
+  '/owner/exports': typeof OwnerExportsRoute
+  '/owner/ledger': typeof OwnerLedgerRoute
+  '/owner/risk-map': typeof OwnerRiskMapRoute
+  '/owner/waste-map': typeof OwnerWasteMapRoute
+  '/owner/what-if': typeof OwnerWhatIfRoute
+  '/admin/': typeof AdminIndexRoute
+  '/appowner/': typeof AppownerIndexRoute
+  '/auditor/': typeof AuditorIndexRoute
+  '/gm/': typeof GmIndexRoute
+  '/manager/': typeof ManagerIndexRoute
+  '/owner/': typeof OwnerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/branches': typeof AdminBranchesRoute
+  '/admin/permissions': typeof AdminPermissionsRoute
+  '/appowner/maintenance': typeof AppownerMaintenanceRoute
+  '/appowner/templates': typeof AppownerTemplatesRoute
+  '/auditor/tasks': typeof AuditorTasksRoute
+  '/auditor/upload': typeof AuditorUploadRoute
+  '/gm/departments': typeof GmDepartmentsRoute
+  '/manager/tasks': typeof ManagerTasksRoute
+  '/owner/departments': typeof OwnerDepartmentsRoute
+  '/owner/exports': typeof OwnerExportsRoute
+  '/owner/ledger': typeof OwnerLedgerRoute
+  '/owner/risk-map': typeof OwnerRiskMapRoute
+  '/owner/waste-map': typeof OwnerWasteMapRoute
+  '/owner/what-if': typeof OwnerWhatIfRoute
+  '/admin': typeof AdminIndexRoute
+  '/appowner': typeof AppownerIndexRoute
+  '/auditor': typeof AuditorIndexRoute
+  '/gm': typeof GmIndexRoute
+  '/manager': typeof ManagerIndexRoute
+  '/owner': typeof OwnerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/appowner': typeof AppownerRouteWithChildren
+  '/auditor': typeof AuditorRouteWithChildren
+  '/gm': typeof GmRouteWithChildren
+  '/login': typeof LoginRoute
+  '/manager': typeof ManagerRouteWithChildren
+  '/owner': typeof OwnerRouteWithChildren
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/branches': typeof AdminBranchesRoute
+  '/admin/permissions': typeof AdminPermissionsRoute
+  '/appowner/maintenance': typeof AppownerMaintenanceRoute
+  '/appowner/templates': typeof AppownerTemplatesRoute
+  '/auditor/tasks': typeof AuditorTasksRoute
+  '/auditor/upload': typeof AuditorUploadRoute
+  '/gm/departments': typeof GmDepartmentsRoute
+  '/manager/tasks': typeof ManagerTasksRoute
+  '/owner/departments': typeof OwnerDepartmentsRoute
+  '/owner/exports': typeof OwnerExportsRoute
+  '/owner/ledger': typeof OwnerLedgerRoute
+  '/owner/risk-map': typeof OwnerRiskMapRoute
+  '/owner/waste-map': typeof OwnerWasteMapRoute
+  '/owner/what-if': typeof OwnerWhatIfRoute
+  '/admin/': typeof AdminIndexRoute
+  '/appowner/': typeof AppownerIndexRoute
+  '/auditor/': typeof AuditorIndexRoute
+  '/gm/': typeof GmIndexRoute
+  '/manager/': typeof ManagerIndexRoute
+  '/owner/': typeof OwnerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/appowner'
+    | '/auditor'
+    | '/gm'
+    | '/login'
+    | '/manager'
+    | '/owner'
+    | '/admin/activity'
+    | '/admin/branches'
+    | '/admin/permissions'
+    | '/appowner/maintenance'
+    | '/appowner/templates'
+    | '/auditor/tasks'
+    | '/auditor/upload'
+    | '/gm/departments'
+    | '/manager/tasks'
+    | '/owner/departments'
+    | '/owner/exports'
+    | '/owner/ledger'
+    | '/owner/risk-map'
+    | '/owner/waste-map'
+    | '/owner/what-if'
+    | '/admin/'
+    | '/appowner/'
+    | '/auditor/'
+    | '/gm/'
+    | '/manager/'
+    | '/owner/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/admin/activity'
+    | '/admin/branches'
+    | '/admin/permissions'
+    | '/appowner/maintenance'
+    | '/appowner/templates'
+    | '/auditor/tasks'
+    | '/auditor/upload'
+    | '/gm/departments'
+    | '/manager/tasks'
+    | '/owner/departments'
+    | '/owner/exports'
+    | '/owner/ledger'
+    | '/owner/risk-map'
+    | '/owner/waste-map'
+    | '/owner/what-if'
+    | '/admin'
+    | '/appowner'
+    | '/auditor'
+    | '/gm'
+    | '/manager'
+    | '/owner'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/appowner'
+    | '/auditor'
+    | '/gm'
+    | '/login'
+    | '/manager'
+    | '/owner'
+    | '/admin/activity'
+    | '/admin/branches'
+    | '/admin/permissions'
+    | '/appowner/maintenance'
+    | '/appowner/templates'
+    | '/auditor/tasks'
+    | '/auditor/upload'
+    | '/gm/departments'
+    | '/manager/tasks'
+    | '/owner/departments'
+    | '/owner/exports'
+    | '/owner/ledger'
+    | '/owner/risk-map'
+    | '/owner/waste-map'
+    | '/owner/what-if'
+    | '/admin/'
+    | '/appowner/'
+    | '/auditor/'
+    | '/gm/'
+    | '/manager/'
+    | '/owner/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AppownerRoute: typeof AppownerRouteWithChildren
+  AuditorRoute: typeof AuditorRouteWithChildren
+  GmRoute: typeof GmRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  ManagerRoute: typeof ManagerRouteWithChildren
+  OwnerRoute: typeof OwnerRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/owner': {
+      id: '/owner'
+      path: '/owner'
+      fullPath: '/owner'
+      preLoaderRoute: typeof OwnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manager': {
+      id: '/manager'
+      path: '/manager'
+      fullPath: '/manager'
+      preLoaderRoute: typeof ManagerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gm': {
+      id: '/gm'
+      path: '/gm'
+      fullPath: '/gm'
+      preLoaderRoute: typeof GmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auditor': {
+      id: '/auditor'
+      path: '/auditor'
+      fullPath: '/auditor'
+      preLoaderRoute: typeof AuditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/appowner': {
+      id: '/appowner'
+      path: '/appowner'
+      fullPath: '/appowner'
+      preLoaderRoute: typeof AppownerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +432,260 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/': {
+      id: '/owner/'
+      path: '/'
+      fullPath: '/owner/'
+      preLoaderRoute: typeof OwnerIndexRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/manager/': {
+      id: '/manager/'
+      path: '/'
+      fullPath: '/manager/'
+      preLoaderRoute: typeof ManagerIndexRouteImport
+      parentRoute: typeof ManagerRoute
+    }
+    '/gm/': {
+      id: '/gm/'
+      path: '/'
+      fullPath: '/gm/'
+      preLoaderRoute: typeof GmIndexRouteImport
+      parentRoute: typeof GmRoute
+    }
+    '/auditor/': {
+      id: '/auditor/'
+      path: '/'
+      fullPath: '/auditor/'
+      preLoaderRoute: typeof AuditorIndexRouteImport
+      parentRoute: typeof AuditorRoute
+    }
+    '/appowner/': {
+      id: '/appowner/'
+      path: '/'
+      fullPath: '/appowner/'
+      preLoaderRoute: typeof AppownerIndexRouteImport
+      parentRoute: typeof AppownerRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/owner/what-if': {
+      id: '/owner/what-if'
+      path: '/what-if'
+      fullPath: '/owner/what-if'
+      preLoaderRoute: typeof OwnerWhatIfRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/waste-map': {
+      id: '/owner/waste-map'
+      path: '/waste-map'
+      fullPath: '/owner/waste-map'
+      preLoaderRoute: typeof OwnerWasteMapRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/risk-map': {
+      id: '/owner/risk-map'
+      path: '/risk-map'
+      fullPath: '/owner/risk-map'
+      preLoaderRoute: typeof OwnerRiskMapRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/ledger': {
+      id: '/owner/ledger'
+      path: '/ledger'
+      fullPath: '/owner/ledger'
+      preLoaderRoute: typeof OwnerLedgerRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/exports': {
+      id: '/owner/exports'
+      path: '/exports'
+      fullPath: '/owner/exports'
+      preLoaderRoute: typeof OwnerExportsRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/departments': {
+      id: '/owner/departments'
+      path: '/departments'
+      fullPath: '/owner/departments'
+      preLoaderRoute: typeof OwnerDepartmentsRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/manager/tasks': {
+      id: '/manager/tasks'
+      path: '/tasks'
+      fullPath: '/manager/tasks'
+      preLoaderRoute: typeof ManagerTasksRouteImport
+      parentRoute: typeof ManagerRoute
+    }
+    '/gm/departments': {
+      id: '/gm/departments'
+      path: '/departments'
+      fullPath: '/gm/departments'
+      preLoaderRoute: typeof GmDepartmentsRouteImport
+      parentRoute: typeof GmRoute
+    }
+    '/auditor/upload': {
+      id: '/auditor/upload'
+      path: '/upload'
+      fullPath: '/auditor/upload'
+      preLoaderRoute: typeof AuditorUploadRouteImport
+      parentRoute: typeof AuditorRoute
+    }
+    '/auditor/tasks': {
+      id: '/auditor/tasks'
+      path: '/tasks'
+      fullPath: '/auditor/tasks'
+      preLoaderRoute: typeof AuditorTasksRouteImport
+      parentRoute: typeof AuditorRoute
+    }
+    '/appowner/templates': {
+      id: '/appowner/templates'
+      path: '/templates'
+      fullPath: '/appowner/templates'
+      preLoaderRoute: typeof AppownerTemplatesRouteImport
+      parentRoute: typeof AppownerRoute
+    }
+    '/appowner/maintenance': {
+      id: '/appowner/maintenance'
+      path: '/maintenance'
+      fullPath: '/appowner/maintenance'
+      preLoaderRoute: typeof AppownerMaintenanceRouteImport
+      parentRoute: typeof AppownerRoute
+    }
+    '/admin/permissions': {
+      id: '/admin/permissions'
+      path: '/permissions'
+      fullPath: '/admin/permissions'
+      preLoaderRoute: typeof AdminPermissionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/branches': {
+      id: '/admin/branches'
+      path: '/branches'
+      fullPath: '/admin/branches'
+      preLoaderRoute: typeof AdminBranchesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/activity': {
+      id: '/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AdminActivityRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminActivityRoute: typeof AdminActivityRoute
+  AdminBranchesRoute: typeof AdminBranchesRoute
+  AdminPermissionsRoute: typeof AdminPermissionsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivityRoute: AdminActivityRoute,
+  AdminBranchesRoute: AdminBranchesRoute,
+  AdminPermissionsRoute: AdminPermissionsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface AppownerRouteChildren {
+  AppownerMaintenanceRoute: typeof AppownerMaintenanceRoute
+  AppownerTemplatesRoute: typeof AppownerTemplatesRoute
+  AppownerIndexRoute: typeof AppownerIndexRoute
+}
+
+const AppownerRouteChildren: AppownerRouteChildren = {
+  AppownerMaintenanceRoute: AppownerMaintenanceRoute,
+  AppownerTemplatesRoute: AppownerTemplatesRoute,
+  AppownerIndexRoute: AppownerIndexRoute,
+}
+
+const AppownerRouteWithChildren = AppownerRoute._addFileChildren(
+  AppownerRouteChildren,
+)
+
+interface AuditorRouteChildren {
+  AuditorTasksRoute: typeof AuditorTasksRoute
+  AuditorUploadRoute: typeof AuditorUploadRoute
+  AuditorIndexRoute: typeof AuditorIndexRoute
+}
+
+const AuditorRouteChildren: AuditorRouteChildren = {
+  AuditorTasksRoute: AuditorTasksRoute,
+  AuditorUploadRoute: AuditorUploadRoute,
+  AuditorIndexRoute: AuditorIndexRoute,
+}
+
+const AuditorRouteWithChildren =
+  AuditorRoute._addFileChildren(AuditorRouteChildren)
+
+interface GmRouteChildren {
+  GmDepartmentsRoute: typeof GmDepartmentsRoute
+  GmIndexRoute: typeof GmIndexRoute
+}
+
+const GmRouteChildren: GmRouteChildren = {
+  GmDepartmentsRoute: GmDepartmentsRoute,
+  GmIndexRoute: GmIndexRoute,
+}
+
+const GmRouteWithChildren = GmRoute._addFileChildren(GmRouteChildren)
+
+interface ManagerRouteChildren {
+  ManagerTasksRoute: typeof ManagerTasksRoute
+  ManagerIndexRoute: typeof ManagerIndexRoute
+}
+
+const ManagerRouteChildren: ManagerRouteChildren = {
+  ManagerTasksRoute: ManagerTasksRoute,
+  ManagerIndexRoute: ManagerIndexRoute,
+}
+
+const ManagerRouteWithChildren =
+  ManagerRoute._addFileChildren(ManagerRouteChildren)
+
+interface OwnerRouteChildren {
+  OwnerDepartmentsRoute: typeof OwnerDepartmentsRoute
+  OwnerExportsRoute: typeof OwnerExportsRoute
+  OwnerLedgerRoute: typeof OwnerLedgerRoute
+  OwnerRiskMapRoute: typeof OwnerRiskMapRoute
+  OwnerWasteMapRoute: typeof OwnerWasteMapRoute
+  OwnerWhatIfRoute: typeof OwnerWhatIfRoute
+  OwnerIndexRoute: typeof OwnerIndexRoute
+}
+
+const OwnerRouteChildren: OwnerRouteChildren = {
+  OwnerDepartmentsRoute: OwnerDepartmentsRoute,
+  OwnerExportsRoute: OwnerExportsRoute,
+  OwnerLedgerRoute: OwnerLedgerRoute,
+  OwnerRiskMapRoute: OwnerRiskMapRoute,
+  OwnerWasteMapRoute: OwnerWasteMapRoute,
+  OwnerWhatIfRoute: OwnerWhatIfRoute,
+  OwnerIndexRoute: OwnerIndexRoute,
+}
+
+const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AppownerRoute: AppownerRouteWithChildren,
+  AuditorRoute: AuditorRouteWithChildren,
+  GmRoute: GmRouteWithChildren,
+  LoginRoute: LoginRoute,
+  ManagerRoute: ManagerRouteWithChildren,
+  OwnerRoute: OwnerRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
