@@ -71,8 +71,10 @@ async def manager_dashboard(current_user: User = Depends(get_current_user), db: 
         raise HTTPException(status_code=403, detail='ليس لديك الصلاحية المطلوبة.')
     docs = (await db.execute(select(Document).where(Document.company_id == current_user.company_id, Document.branch_id == current_user.branch_id))).scalars().all()
     allowed_doc_ids = {str(d.id) for d in docs}
-    waste = []
-    for w in (await db.execute(select(WasteMapItem).where(WasteMapItem.company_id == current_user.company_id))).scalars().all():
-        if any(doc_id in w.description for doc_id in allowed_doc_ids):
-            waste.append(w)
-    return {'branch_id': str(current_user.branch_id) if current_user.branch_id else None, 'documents_count': len(docs), 'waste_items': [{'category': w.category, 'description': w.description, 'impact_score': w.impact_score} for w in waste[:10]], 'note': 'تم تقييد النتائج على نطاق الفرع/القسم الخاص بالمدير.'}
+    row = (await db.execute(select(AnalyticsOutput).where(AnalyticsOutput.company_id == current_user.company_id, AnalyticsOutput.output_type == 'owner_dashboard').order_by(AnalyticsOutput.created_at.desc()))).scalars().first()
+    scoped_findings = []
+    if row:
+        for f in row.payload.get('findings', []):
+            if str(f.get('document_id', '')) in allowed_doc_ids:
+                scoped_findings.append(f)
+    return {'branch_id': str(current_user.branch_id) if current_user.branch_id else None, 'documents_count': len(docs), 'findings': scoped_findings[:20], 'note': 'تم تقييد النتائج على نطاق الفرع/القسم الخاص بالمدير.'}

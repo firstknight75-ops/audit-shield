@@ -56,6 +56,10 @@ async def _run_daily_analysis(company_id: str):
         findings.extend(run_data_quality(df))
         findings.extend(run_anomaly_detection(df))
         findings.extend(run_cross_reference(procurement, bank, inventory))
+        invoice_to_doc = {str(r['invoice_number']): str(r['document_id']) for r in rows}
+        for f in findings:
+            if not f.get('document_id') and f.get('invoice_number') in invoice_to_doc:
+                f['document_id'] = invoice_to_doc[f['invoice_number']]
         waste_items = findings_to_waste_items(findings)
         await session.execute(delete(WasteMapItem).where(WasteMapItem.company_id == company_id))
         await session.execute(delete(RiskAlert).where(RiskAlert.company_id == company_id))

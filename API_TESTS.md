@@ -437,3 +437,67 @@ curl "$BASE_URL/api/auth/me" \
   -H "X-Tenant-Schema: tenant_a"
 ```
 
+
+
+---
+
+## 41) Trigger local analytics run
+
+```bash
+curl -X POST "$BASE_URL/api/analytics/run/<COMPANY_ID>" \
+  -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 42) Owner dashboard
+
+```bash
+curl "$BASE_URL/api/owner/dashboard" \
+  -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 43) Owner dashboard layer 2
+
+```bash
+curl "$BASE_URL/api/owner/dashboard/layer2" \
+  -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 44) Owner dashboard layer 3
+
+```bash
+curl "$BASE_URL/api/owner/dashboard/layer3" \
+  -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 45) Owner dashboard layer 4
+
+```bash
+curl "$BASE_URL/api/owner/dashboard/layer4/<DOCUMENT_ID>" \
+  -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
+```
+
+---
+
+## 46) Manager dashboard
+
+```bash
+curl "$BASE_URL/api/manager/dashboard" \
+  -H "Authorization: Bearer <MANAGER_ACCESS_TOKEN>"
+```
+
+---
+
+## 47) Auditor tries owner dashboard and should get 403
+
+```bash
+curl "$BASE_URL/api/owner/dashboard" \
+  -H "Authorization: Bearer <AUDITOR_ACCESS_TOKEN>"
+```
