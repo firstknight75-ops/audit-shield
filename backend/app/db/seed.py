@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.entities import AnalyticsOutput, Branch, Company, Permission, RiskAlert, RolePermission, User, UserPermissionOverride, WasteMapItem
+from app.models.entities import AnalyticsOutput, Branch, Company, DailyTask, Document, OCRExtraction, Permission, RiskAlert, RolePermission, User, UserPermissionOverride, WasteMapItem
 from app.models.enums import CompanyTier, DeploymentMode, OverrideAction, UserRole
 from app.security.passwords import get_password_hash
 from app.services.permissions import ROLE_DEFAULTS
@@ -72,4 +72,9 @@ async def seed(session: AsyncSession, deployment_mode: str = 'onpremise', compan
     session.add(AnalyticsOutput(company_id=company.id, output_type='kpi', payload={'margin': 15}))
     session.add(WasteMapItem(company_id=company.id, category='process', description='Redundant handoff', impact_score=8))
     session.add(RiskAlert(company_id=company.id, severity='high', message='Cash variance spike', status='open'))
+    doc = Document(company_id=company.id, branch_id=branch.id, uploaded_by_user_id=created['auditor@auditcore.local'].id, original_filename='arabic-invoice.json', mime_type='application/json', file_size=24, encrypted_blob=b'encrypted', metadata_json={'encrypted': True})
+    session.add(doc)
+    await session.flush()
+    session.add(OCRExtraction(document_id=doc.id, status='pending', extracted_data={'invoice_number': 'INV-2026-9001', 'date': '2026-06-28', 'amount': '', 'vendor_name': 'شركة الرافدين', 'items_list': ['صنف 1', 'صنف 2']}, confidence_map={'invoice_number': 92, 'date': 90, 'amount': 58, 'vendor_name': 82, 'items_list': 88}, raw_text='فاتورة عربية تجريبية', page_count=1, processing_time_ms=1200))
+    session.add(DailyTask(company_id=company.id, auditor_user_id=created['auditor@auditcore.local'].id, task_type='ocr', title='اعتماد فاتورة عربية', status='open', source_document_id=doc.id, due_at=datetime.now(timezone.utc) + timedelta(hours=4), sla_minutes=240, severity='normal'))
     await session.commit()
