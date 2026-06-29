@@ -2,6 +2,33 @@
 @source "../src";
 @import "tw-animate-css";
 
+/* ── Self-hosted Noto Sans Arabic ──────────────────────────────────────────────
+ * Bug #3 fix: previously this file declared `--font-sans: "Cairo", "Tajawal",
+ * system-ui, sans-serif` but contained NO @font-face, NO <link>, NO @import
+ * loading Cairo / Tajawal / Noto Sans Arabic. In any browser without those
+ * families installed as system fonts, the stack fell through to OS sans-serif
+ * which does NOT guarantee the 6 Kurdish-Sorani-specific glyphs.
+ *
+ * Now: Noto Sans Arabic is bundled at /fonts/NotoSansArabic-{Regular,Bold}.woff2
+ * (self-hosted — no CDN, no Google Fonts fetch). The PDF export engine already
+ * commits to the same family (backend/app/exports/engine.py: PDF_FONT_STACK),
+ * so web and PDF share the glyph coverage decision.
+ */
+@font-face {
+  font-family: "Noto Sans Arabic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/NotoSansArabic-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Noto Sans Arabic";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/NotoSansArabic-Bold.woff2") format("woff2");
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -59,8 +86,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: "Cairo", "Tajawal", system-ui, sans-serif;
-  --font-display: "Tajawal", "Cairo", system-ui, sans-serif;
+  --font-sans: "Noto Sans Arabic", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Noto Sans Arabic", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 :root {
