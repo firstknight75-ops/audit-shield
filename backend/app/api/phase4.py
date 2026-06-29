@@ -8,13 +8,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, require_permission
 from app.db.session import get_db
+from app.exports.certificates import tamper_proof_certificate
 from app.exports.engine import CORE_OUTPUT_TITLES, export_excel, export_pdf, export_png
 from app.inventory.models import AppOwnerAuditEvent, ClientInventory, CraasRequest, PermissionTemplate
-from app.models.entities import AnalyticsOutput, AuditLedger, User, WasteMapItem
+from app.models.entities import AnalyticsOutput, AuditLedger, ReportCertificate, User, WasteMapItem
 from app.models.enums import UserRole
 from app.schemas.phase4 import ExportRequest, WhatIfRequest
 from app.services.access import get_accessible_company_ids, require_company_access
 from app.services.i18n import tr
+from app.services.ledger import append_ledger_entry
 from app.templates.builder import SECTOR_PRESETS, build_template
 from app.templates.versioning import bump_version, rollback_payload
 
@@ -70,15 +72,52 @@ async def run_export(
     outdir.mkdir(exist_ok=True)
     title = CORE_OUTPUT_TITLES.get(payload.output_code, payload.output_code)
     filebase = outdir / f"{payload.output_code}-{company_id}"
+
+    # Build the tamper-proof certificate BEFORE writing the file so we can
+    # embed it in the rendered output and persist it for /verify/{report_id}.
+    payload_summary = f'{title}|rows={len(rows)}|lang={lang}'
+    cert = tamper_proof_certificate(
+        payload={'summary': payload_summary, 'company_id': str(company_id), 'output_code': payload.output_code, 'format': payload.format},
+        ledger_hash_at_generation=ledger_hash,
+    )
+
     if payload.format == 'excel':
-        path = export_excel(str(filebase.with_suffix('.xlsx')), title, rows, ledger_hash)
+        path = export_excel(str(filebase.with_suffix('.xlsx')), title, rows, ledger_hash, cert)
     elif payload.format == 'pdf':
-        path = export_pdf(str(filebase.with_suffix('.pdf')), title, rows, ledger_hash)
+        path = export_pdf(str(filebase.with_suffix('.pdf')), title, rows, ledger_hash, cert)
     elif payload.format == 'png':
-        path = export_png(str(filebase.with_suffix('.png.txt')), title, rows, ledger_hash)
+        path = export_png(str(filebase.with_suffix('.png.txt')), title, rows, ledger_hash, cert)
     else:
         raise HTTPException(status_code=400, detail=tr('exports.unsupported_format', lang))
-    return {'path': path, 'title': title}
+
+    # Persist the certificate so /verify/{report_id} can validate it later.
+    rc = ReportCertificate(
+        id=cert['report_id'],
+        company_id=company_id,
+        report_type=payload.output_code,
+        format=payload.format,
+        output_code=payload.output_code,
+        ledger_hash_at_generation=ledger_hash,
+        signature=cert['signature'],
+        generated_by_user_id=current_user.id,
+        payload_summary=payload_summary,
+    )
+    db.add(rc)
+    await append_ledger_entry(db, company_id, current_user.id, 'report_exported', {
+        'report_id': cert['report_id'],
+        'format': payload.format,
+        'output_code': payload.output_code,
+        'rows_count': len(rows),
+    })
+    await db.commit()
+
+    return {
+        'path': path,
+        'title': title,
+        'report_id': cert['report_id'],
+        'certificate': cert,
+        'verify_url': f'/verify/{cert["report_id"]}',
+    }
 
 
 @router.post('/what-if/run')
