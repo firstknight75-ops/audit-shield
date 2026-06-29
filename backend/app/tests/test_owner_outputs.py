@@ -121,19 +121,19 @@ def test_output_6_action_plan_has_change_and_adaptation():
 
 def test_output_7_role_dashboards_have_distinct_shapes():
     """Output #7 must serve different role-specific shapes: Owner, GM, Manager, Auditor."""
-    owner_perms = {'view_analytics', 'view_ledger', 'view_waste_map'}
-    gm_perms = {'view_analytics', 'view_waste_map'}
+    owner_perms = {'view_owner_dashboard', 'view_audit_ledger', 'view_waste_map'}
+    gm_perms = {'view_owner_dashboard', 'view_waste_map'}
     manager_perms = {'upload_documents', 'view_tasks'}
     auditor_perms = {'view_documents', 'view_tasks'}
 
     # owner sees analytics + ledger
-    assert 'view_analytics' in owner_perms and 'view_ledger' in owner_perms
+    assert 'view_owner_dashboard' in owner_perms and 'view_audit_ledger' in owner_perms
     # gm sees analytics but not ledger
-    assert 'view_analytics' in gm_perms and 'view_ledger' not in gm_perms
+    assert 'view_owner_dashboard' in gm_perms and 'view_audit_ledger' not in gm_perms
     # manager sees neither analytics nor ledger
-    assert 'view_analytics' not in manager_perms and 'view_ledger' not in manager_perms
+    assert 'view_owner_dashboard' not in manager_perms and 'view_audit_ledger' not in manager_perms
     # auditor sees only documents/tasks
-    assert 'view_analytics' not in auditor_perms and 'view_ledger' not in auditor_perms
+    assert 'view_owner_dashboard' not in auditor_perms and 'view_audit_ledger' not in auditor_perms
 
 
 def test_activation_tracker_returns_within_48h_flag():

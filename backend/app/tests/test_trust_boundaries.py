@@ -29,11 +29,11 @@ from app.services.trust_index import compute_trust_index, merge_findings_into_tr
 
 # ── Principle 2: Zero-Knowledge Audit ────────────────────────────────
 
-def test_principle2_auditor_role_has_no_view_analytics_permission():
-    """Auditor's effective permission set must NOT include view_analytics."""
+def test_principle2_auditor_role_has_no_view_owner_dashboard_permission():
+    """Auditor's effective permission set must NOT include view_owner_dashboard."""
     from app.services.permissions import ROLE_DEFAULTS
     auditor_perms = ROLE_DEFAULTS['auditor']
-    assert 'view_analytics' not in auditor_perms
+    assert 'view_owner_dashboard' not in auditor_perms
     assert 'view_waste_map' not in auditor_perms
     assert 'view_risk_alerts' not in auditor_perms
 
@@ -122,7 +122,7 @@ def test_principle4_silent_ai_self_test_fails_with_chatbot_route():
 
 
 def test_principle4_silent_ai_no_external_ai_calls_in_modules():
-    """None of the local AI modules may import openai/anthropic/etc."""
+    """None of the local AI modules may call out to known external-AI SDKs."""
     result = check_no_external_ai_calls()
     assert result['passed'], f'forbidden imports found: {result["violations"]}'
 
@@ -163,10 +163,10 @@ def test_principle5_portfolio_handles_empty():
 # ── Principle 6: App Owner zero visibility ───────────────────────────
 
 def test_principle6_appowner_role_permissions_exclude_tenant_data():
-    """The appowner role must NOT include view_analytics/view_ledger/upload_documents."""
+    """The appowner role must NOT include view_owner_dashboard/view_audit_ledger/upload_documents."""
     from app.services.permissions import ROLE_DEFAULTS
     appowner_perms = ROLE_DEFAULTS['appowner']
-    forbidden_in_appowner = ['view_analytics', 'view_ledger', 'upload_documents', 'view_waste_map', 'view_risk_alerts']
+    forbidden_in_appowner = ['view_owner_dashboard', 'view_audit_ledger', 'upload_documents', 'view_waste_map', 'view_risk_alerts']
     for code in forbidden_in_appowner:
         assert code not in appowner_perms, f'appowner must NOT have {code}'
     # and must include only platform permissions

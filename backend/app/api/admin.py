@@ -20,7 +20,7 @@ router = APIRouter(prefix='/admin', tags=['admin'])
 @router.post('/users')
 async def create_user(
     payload: UserCreateRequest,
-    current_user: User = Depends(require_permission('manage_users')),
+    current_user: User = Depends(require_permission('manage_company_users')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -59,7 +59,7 @@ async def create_user(
 @router.post('/users/{user_id}/deactivate')
 async def deactivate_user(
     user_id: str,
-    current_user: User = Depends(require_permission('manage_users')),
+    current_user: User = Depends(require_permission('manage_company_users')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -113,7 +113,7 @@ async def set_override(
 
 @router.get('/activity')
 async def activity_feed(
-    current_user: User = Depends(require_permission('view_ledger')),
+    current_user: User = Depends(require_permission('view_audit_ledger')),
     db: AsyncSession = Depends(get_db),
 ):
     accessible_ids = await get_accessible_company_ids(current_user, db)

@@ -86,7 +86,7 @@ async def _documents_for_company(db: AsyncSession, company_id: str) -> list[dict
 @router.get('/picture')
 async def owner_picture(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = await _ensure_company_access(current_user, db, company_id)
@@ -123,7 +123,7 @@ async def owner_picture(
 @router.get('/trust-index')
 async def owner_trust_index(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = await _ensure_company_access(current_user, db, company_id)
@@ -174,7 +174,7 @@ async def owner_trust_index(
 @router.get('/waste-map')
 async def owner_waste_map(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = await _ensure_company_access(current_user, db, company_id)
@@ -198,7 +198,7 @@ async def owner_waste_map(
 @router.get('/risk-map')
 async def owner_risk_map(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = await _ensure_company_access(current_user, db, company_id)
@@ -227,7 +227,7 @@ async def owner_risk_map(
 @router.get('/opportunity-map')
 async def owner_opportunity_map(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = await _ensure_company_access(current_user, db, company_id)
@@ -262,7 +262,7 @@ async def owner_opportunity_map(
 @router.get('/action-plan')
 async def owner_action_plan(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = await _ensure_company_access(current_user, db, company_id)
@@ -323,7 +323,7 @@ async def owner_action_plan(
 @router.get('/activation')
 async def owner_activation(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = await _ensure_company_access(current_user, db, company_id)
@@ -370,7 +370,7 @@ async def owner_activation(
 # ── Portfolio (multi-company owner view, never blended silently) ─────
 @router.get('/portfolio')
 async def owner_portfolio(
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     from app.services.access import get_accessible_company_ids

@@ -1,0 +1,15 @@
+# AuditCore No-External-AI Whitelist
+#
+# Format (one per line): <file-path> :: <pattern>
+# Example: scripts/dummy-ai-test.py :: import openai
+#
+# This whitelist is INTENTIONALLY EMPTY.
+# Any external-AI SDK import or known API endpoint must be justified
+# in code review before being added here.
+#
+# If you find yourself adding to this file, ask:
+#   1. Is there a local alternative in app.ai.* ?
+#   2. Has the Owner explicitly approved this external dependency ?
+#   3. Does the deployment mode (onpremise) still work without it ?
+#
+# An empty whitelist is the correct state. Keep it that way.
