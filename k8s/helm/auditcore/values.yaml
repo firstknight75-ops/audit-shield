@@ -1,0 +1,148 @@
+# AuditCore Helm chart values — defaults suitable for on-prem Smart Box.
+# Override per-deployment in your values-overrides.yaml.
+
+deploymentMode: onpremise  # onpremise | cloud
+
+replicaCount: 2
+
+image:
+  repository: auditcore/backend
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+frontend:
+  repository: auditcore/frontend
+  tag: "1.0.0"
+
+imagePullSecrets: []
+
+service:
+  type: ClusterIP
+  port: 8000
+  annotations: {}
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+  hosts:
+    - host: auditcore.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: auditcore-tls
+      hosts:
+        - auditcore.local
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "2"
+    memory: 2Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+postgresql:
+  enabled: true  # on-prem: bundled. Cloud: disable and use managed.
+  image:
+    repository: postgres
+    tag: "15-alpine"
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: ""
+  auth:
+    username: auditcore
+    password: changeme  # REQUIRED override
+    database: auditcore
+
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7-alpine"
+  persistence:
+    enabled: false
+    size: 2Gi
+
+celeryWorker:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+celeryBeat:
+  replicaCount: 1
+
+# Notification routing
+notifications:
+  whatsappGatewayUrl: http://baileys-bridge:3001
+  smtp:
+    host: ""
+    port: 587
+    user: ""
+    password: ""  # from secret
+
+# Security knobs
+security:
+  # OWASP defaults — tuned for an internal SaaS deployment.
+  rateLimitPerMinute: 120
+  failedLoginThreshold: 5
+  lockoutMinutes: 15
+  inactivityTimeoutMinutes: 15
+
+# Observability
+observability:
+  enableMetrics: true
+  logLevel: INFO
+  prometheusScrape: true
+
+# Pod-level security context — required for CIS compliance
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+# Probes
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3

@@ -1,0 +1,62 @@
+{{- if .Values.networkPolicy.enabled | default true }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "auditcore.fullname" . }}-backend
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ include "auditcore.name" . }}
+      component: backend
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow from ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress
+      ports:
+        - port: 8000
+          protocol: TCP
+    # Allow from celery worker
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ include "auditcore.name" . }}
+              component: celery
+      ports:
+        - port: 8000
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+    # Allow PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - port: 5432
+          protocol: TCP
+    # Allow Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - port: 6379
+          protocol: TCP
+    # Allow WhatsApp bridge (on-prem only)
+    - to:
+        - podSelector:
+            matchLabels:
+              app: baileys-bridge
+      ports:
+        - port: 3001
+          protocol: TCP
+{{- end }}
