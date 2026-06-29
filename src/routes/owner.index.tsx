@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/app-shell";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ExecutiveSkeleton, AnalyzingMessage } from "@/components/loading-skeleton";
-import { TrendingDown, ShieldCheck, AlertTriangle, Wallet, Users, ArrowLeft, Briefcase, RefreshCw } from "lucide-react";
+import { TrendingDown, ShieldCheck, AlertTriangle, Wallet, Users, ArrowLeft, Briefcase, RefreshCw, Sparkles } from "lucide-react";
 import { getLocale, type Locale } from "@/lib/i18n";
 import { api, getActiveCompanyId } from "@/lib/api-client";
 import { useApiData } from "@/lib/use-api-data";
@@ -55,11 +55,24 @@ const COPY = {
   },
 } as const;
 
+// tone → icon chip styling + soft glow color used for the card hover aura
 const toneClass: Record<string, string> = {
   danger: "text-danger border-danger/30 bg-danger/5",
   warning: "text-warning border-warning/30 bg-warning/5",
   success: "text-success border-success/30 bg-success/5",
   primary: "text-primary border-primary/30 bg-primary/5",
+};
+const toneGlow: Record<string, string> = {
+  danger: "group-hover:shadow-[0_12px_40px_-16px_var(--danger)]",
+  warning: "group-hover:shadow-[0_12px_40px_-16px_var(--warning)]",
+  success: "group-hover:shadow-[0_12px_40px_-16px_var(--success)]",
+  primary: "group-hover:shadow-[0_12px_40px_-16px_var(--primary)]",
+};
+const toneBar: Record<string, string> = {
+  danger: "bg-danger",
+  warning: "bg-warning",
+  success: "bg-success",
+  primary: "bg-primary",
 };
 
 function formatIQD(n: number, locale: Locale): string {
@@ -82,7 +95,7 @@ function OwnerHome() {
 
   const t = COPY[locale];
 
-  // ── Real API integration ────────────────────────────────────────
+  // ── Real API integration (UNCHANGED) ─────────────────────────────
   const { data, error, isLoading, refetch, isStale } = useApiData<ExecutiveKpis | null>(
     async () => {
       if (!companyId) return null;
@@ -104,7 +117,7 @@ function OwnerHome() {
     { enabled: !!companyId, staleTime: 60_000 },
   );
 
-  // Executive layer — exactly 5 cards per Phase 3 spec
+  // Executive layer — exactly 5 cards per Phase 3 spec (UNCHANGED logic)
   const cards = data
     ? [
         { key: "waste", label: t.monthly_waste, value: formatIQD(data.monthlyWaste, locale), icon: TrendingDown, tone: "danger", to: "/owner/waste-map" },
@@ -119,7 +132,7 @@ function OwnerHome() {
     return (
       <div>
         <PageHeader title={t.title} subtitle={t.subtitle} />
-        <div className="p-6 rounded-xl bg-danger/5 border border-danger/30">
+        <div className="p-6 rounded-2xl bg-danger/5 border border-danger/30">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -129,7 +142,7 @@ function OwnerHome() {
                   request_id: {(error as { request_id: string | null }).request_id}
                 </div>
               )}
-              <button onClick={() => void refetch()} className="mt-3 flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-bold">
+              <button onClick={() => void refetch()} className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-bold transition-all hover:bg-primary/90 hover:shadow-[0_4px_20px_-4px_var(--primary)] active:scale-[0.98]">
                 <RefreshCw className="w-4 h-4" /> {t.retry}
               </button>
             </div>
@@ -143,7 +156,7 @@ function OwnerHome() {
     <div>
       <PageHeader title={t.title} subtitle={t.subtitle} />
 
-      <div className="mb-6 p-4 rounded-xl bg-primary/5 border border-primary/30 flex items-center gap-3 text-sm">
+      <div className="mb-6 p-4 rounded-2xl bg-gradient-to-l from-primary/10 to-primary/0 border border-primary/25 flex items-center gap-3 text-sm">
         <Briefcase className="w-4 h-4 text-primary shrink-0" />
         <span>{t.multi_company_note}</span>
       </div>
@@ -156,14 +169,16 @@ function OwnerHome() {
               <Link
                 key={c.key}
                 to={c.to}
-                className={`group p-5 rounded-2xl bg-card border border-border hover:border-primary transition relative overflow-hidden`}
+                className={`group relative overflow-hidden p-5 rounded-2xl border border-border bg-gradient-to-b from-card to-card/60 transition-all duration-300 hover:-translate-y-1 hover:border-primary/60 ${toneGlow[c.tone]}`}
               >
-                <div className={`inline-flex p-2 rounded-lg border ${toneClass[c.tone]}`}>
+                {/* accent top bar */}
+                <span className={`absolute inset-x-0 top-0 h-1 ${toneBar[c.tone]} opacity-60 group-hover:opacity-100 transition`} />
+                <div className={`inline-flex p-2.5 rounded-xl border ${toneClass[c.tone]}`}>
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="text-sm text-muted-foreground mt-4">{c.label}</div>
-                <div className="text-2xl font-bold font-display mt-2">{c.value}</div>
-                <div className="flex items-center gap-1 text-xs text-primary mt-4 opacity-0 group-hover:opacity-100 transition">
+                <div className="text-2xl font-bold font-display mt-2 tracking-tight">{c.value}</div>
+                <div className="flex items-center gap-1 text-xs text-primary mt-4 translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all">
                   {t.detail} <ArrowLeft className="w-3 h-3" />
                 </div>
               </Link>
@@ -174,11 +189,13 @@ function OwnerHome() {
 
       {/* AI narrative — strategic for Owner */}
       {data?.narrative && (
-        <div className="p-6 rounded-2xl bg-card border border-border mb-6">
+        <div className="trust-card p-6 rounded-2xl bg-gradient-to-bl from-primary/8 to-card border border-primary/25 mb-6">
           <div className="flex items-start gap-3">
-            <Briefcase className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div className="inline-flex p-2 rounded-xl border border-primary/30 bg-primary/10 text-primary shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
             <div className="flex-1">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+              <div className="text-xs uppercase tracking-wide text-primary/80 mb-2 font-bold">
                 {locale === "ar" ? "ملخص استراتيجي للمالك" : "کورتی ستراتژی بۆ خاوەن"}
               </div>
               <p className="text-base leading-relaxed">{data.narrative}</p>
@@ -193,8 +210,9 @@ function OwnerHome() {
       )}
 
       {!isLoading && (
-        <div className="p-5 rounded-xl bg-card border border-border">
-          <h3 className="font-bold mb-4">
+        <div className="p-6 rounded-2xl bg-card border border-border">
+          <h3 className="font-bold font-display mb-5 flex items-center gap-2">
+            <span className="w-1 h-5 rounded-full bg-primary" />
             {locale === "ar" ? "الإجراءات التالية الموصى بها" : "کارەکانی دواتر پێشنیارکراو"}
           </h3>
           <ol className="space-y-4 text-sm">
@@ -204,9 +222,9 @@ function OwnerHome() {
               locale === "ar" ? "اطّلاع على تقرير الأداء الأسبوعي للمدققين" : "سەیری ڕاپۆرتی کارایی هەفتانەی پشکنەران",
               locale === "ar" ? "تشغيل محاكي القرار للقرار الشهري الكبير" : "کارپێکردنی هاوشێوەکاری بڕیار بۆ بڕیاری گەورەی مانگانە",
             ].map((s, i) => (
-              <li key={i} className="flex gap-3">
-                <span className="w-6 h-6 rounded-full bg-primary/15 text-primary text-xs flex items-center justify-center font-bold shrink-0">{i + 1}</span>
-                <span className="leading-relaxed">{s}</span>
+              <li key={i} className="flex gap-3 items-start group">
+                <span className="w-7 h-7 rounded-full bg-primary/15 text-primary text-xs flex items-center justify-center font-bold shrink-0 border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground transition">{i + 1}</span>
+                <span className="leading-relaxed pt-0.5">{s}</span>
               </li>
             ))}
           </ol>
