@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useEffect, useState } from "react";
-import { ShieldCheck, LayoutDashboard, FileCheck2, ListTodo, AlertTriangle, Users, KeyRound, Building2, ScrollText, Boxes, Settings2, FileBarChart, LogOut, Bell, Briefcase, Sparkles, Sliders } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, FileCheck2, ListTodo, AlertTriangle, Users, KeyRound, Building2, ScrollText, Boxes, Settings2, FileBarChart, LogOut, Bell, Briefcase, Sparkles, Sliders, Server } from "lucide-react";
 import { Role, ROLE_LABELS, getCurrentUser, signOut, persistLanguageChange } from "@/lib/auth";
 import { getLocale, setLocale, t, type Namespace } from "@/lib/i18n";
+import { CompanySwitcher } from "@/components/company-switcher";
 
 type NavItem = { to: string; label: string; ns: Namespace; icon: any };
 
@@ -22,6 +23,7 @@ const NAV: Record<Role, NavItem[]> = {
     { to: "/owner/ledger", label: "ledger", ns: "dashboard", icon: ScrollText },
     { to: "/owner/exports", label: "exports", ns: "dashboard", icon: FileBarChart },
     { to: "/silent-ai", label: "silent_ai", ns: "dashboard", icon: ShieldCheck },
+    { to: "/trust", label: "trust_center", ns: "dashboard", icon: Server },
   ],
   gm: [
     { to: "/gm", label: "executive_view", ns: "dashboard", icon: LayoutDashboard },
@@ -127,8 +129,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex-1 flex flex-col">
-        <header className="h-14 border-b border-border flex items-center justify-between px-6 bg-card/50">
-          <div className="text-sm text-muted-foreground">{new Date().toLocaleDateString(locale === "ar" ? "ar-IQ" : "ku", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
+        <header className="h-14 border-b border-border flex items-center justify-between px-6 bg-card/50 gap-4">
+          <div className="flex items-center gap-4">
+            <CompanySwitcher />
+          </div>
+          <div className="text-sm text-muted-foreground hidden md:block">{new Date().toLocaleDateString(locale === "ar" ? "ar-IQ" : "ku", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
           <div className="flex items-center gap-3"><button className="relative w-9 h-9 rounded-md bg-card border border-border flex items-center justify-center hover:border-primary transition"><Bell className="w-4 h-4" /><span className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-danger text-[10px] text-white flex items-center justify-center">3</span></button></div>
         </header>
         <main className="flex-1 p-6 overflow-auto">{children}</main>
