@@ -9,6 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrustRouteImport } from './routes/trust'
+import { Route as StatusRouteImport } from './routes/status'
+import { Route as SilentAiRouteImport } from './routes/silent-ai'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as ManagerRouteImport } from './routes/manager'
 import { Route as LoginRouteImport } from './routes/login'
@@ -25,30 +28,42 @@ import { Route as AppownerIndexRouteImport } from './routes/appowner.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as OwnerWhatIfRouteImport } from './routes/owner.what-if'
 import { Route as OwnerWasteMapRouteImport } from './routes/owner.waste-map'
+import { Route as OwnerTrustIndexRouteImport } from './routes/owner.trust-index'
 import { Route as OwnerRiskMapRouteImport } from './routes/owner.risk-map'
+import { Route as OwnerPortfolioRouteImport } from './routes/owner.portfolio'
+import { Route as OwnerOpportunityMapRouteImport } from './routes/owner.opportunity-map'
 import { Route as OwnerLedgerRouteImport } from './routes/owner.ledger'
+import { Route as OwnerLayer4RouteImport } from './routes/owner.layer4'
 import { Route as OwnerExportsRouteImport } from './routes/owner.exports'
 import { Route as OwnerDepartmentsRouteImport } from './routes/owner.departments'
+import { Route as OwnerActivationRouteImport } from './routes/owner.activation'
+import { Route as OwnerActionPlanRouteImport } from './routes/owner.action-plan'
 import { Route as ManagerTasksRouteImport } from './routes/manager.tasks'
 import { Route as GmDepartmentsRouteImport } from './routes/gm.departments'
 import { Route as AuditorUploadRouteImport } from './routes/auditor.upload'
 import { Route as AuditorTasksRouteImport } from './routes/auditor.tasks'
 import { Route as AppownerTemplatesRouteImport } from './routes/appowner.templates'
 import { Route as AppownerMaintenanceRouteImport } from './routes/appowner.maintenance'
+import { Route as AppownerIsolationProofRouteImport } from './routes/appowner.isolation-proof'
 import { Route as AdminPermissionsRouteImport } from './routes/admin.permissions'
 import { Route as AdminBranchesRouteImport } from './routes/admin.branches'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
-import { Route as OwnerTrustIndexRouteImport } from './routes/owner.trust-index'
-import { Route as OwnerOpportunityMapRouteImport } from './routes/owner.opportunity-map'
-import { Route as OwnerActionPlanRouteImport } from './routes/owner.action-plan'
-import { Route as OwnerActivationRouteImport } from './routes/owner.activation'
-import { Route as OwnerPortfolioRouteImport } from './routes/owner.portfolio'
-import { Route as OwnerLayer4RouteImport } from './routes/owner.layer4'
-import { Route as AppownerIsolationProofRouteImport } from './routes/appowner.isolation-proof'
-import { Route as SilentAiRouteImport } from './routes/silent-ai'
-import { Route as TrustRouteImport } from './routes/trust'
-import { Route as StatusRouteImport } from './routes/status'
 
+const TrustRoute = TrustRouteImport.update({
+  id: '/trust',
+  path: '/trust',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SilentAiRoute = SilentAiRouteImport.update({
+  id: '/silent-ai',
+  path: '/silent-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerRoute = OwnerRouteImport.update({
   id: '/owner',
   path: '/owner',
@@ -129,14 +144,34 @@ const OwnerWasteMapRoute = OwnerWasteMapRouteImport.update({
   path: '/waste-map',
   getParentRoute: () => OwnerRoute,
 } as any)
+const OwnerTrustIndexRoute = OwnerTrustIndexRouteImport.update({
+  id: '/trust-index',
+  path: '/trust-index',
+  getParentRoute: () => OwnerRoute,
+} as any)
 const OwnerRiskMapRoute = OwnerRiskMapRouteImport.update({
   id: '/risk-map',
   path: '/risk-map',
   getParentRoute: () => OwnerRoute,
 } as any)
+const OwnerPortfolioRoute = OwnerPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerOpportunityMapRoute = OwnerOpportunityMapRouteImport.update({
+  id: '/opportunity-map',
+  path: '/opportunity-map',
+  getParentRoute: () => OwnerRoute,
+} as any)
 const OwnerLedgerRoute = OwnerLedgerRouteImport.update({
   id: '/ledger',
   path: '/ledger',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerLayer4Route = OwnerLayer4RouteImport.update({
+  id: '/layer4',
+  path: '/layer4',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerExportsRoute = OwnerExportsRouteImport.update({
@@ -147,6 +182,16 @@ const OwnerExportsRoute = OwnerExportsRouteImport.update({
 const OwnerDepartmentsRoute = OwnerDepartmentsRouteImport.update({
   id: '/departments',
   path: '/departments',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerActivationRoute = OwnerActivationRouteImport.update({
+  id: '/activation',
+  path: '/activation',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerActionPlanRoute = OwnerActionPlanRouteImport.update({
+  id: '/action-plan',
+  path: '/action-plan',
   getParentRoute: () => OwnerRoute,
 } as any)
 const ManagerTasksRoute = ManagerTasksRouteImport.update({
@@ -179,6 +224,11 @@ const AppownerMaintenanceRoute = AppownerMaintenanceRouteImport.update({
   path: '/maintenance',
   getParentRoute: () => AppownerRoute,
 } as any)
+const AppownerIsolationProofRoute = AppownerIsolationProofRouteImport.update({
+  id: '/isolation-proof',
+  path: '/isolation-proof',
+  getParentRoute: () => AppownerRoute,
+} as any)
 const AdminPermissionsRoute = AdminPermissionsRouteImport.update({
   id: '/permissions',
   path: '/permissions',
@@ -194,58 +244,6 @@ const AdminActivityRoute = AdminActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AdminRoute,
 } as any)
-const OwnerTrustIndexRoute = OwnerTrustIndexRouteImport.update({
-  id: '/trust-index',
-  path: '/trust-index',
-  getParentRoute: () => OwnerRoute,
-} as any)
-const OwnerOpportunityMapRoute = OwnerOpportunityMapRouteImport.update({
-  id: '/opportunity-map',
-  path: '/opportunity-map',
-  getParentRoute: () => OwnerRoute,
-} as any)
-const OwnerActionPlanRoute = OwnerActionPlanRouteImport.update({
-  id: '/action-plan',
-  path: '/action-plan',
-  getParentRoute: () => OwnerRoute,
-} as any)
-const OwnerActivationRoute = OwnerActivationRouteImport.update({
-  id: '/activation',
-  path: '/activation',
-  getParentRoute: () => OwnerRoute,
-} as any)
-const OwnerPortfolioRoute = OwnerPortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => OwnerRoute,
-} as any)
-const OwnerLayer4Route = OwnerLayer4RouteImport.update({
-  id: '/layer4',
-  path: '/layer4',
-  getParentRoute: () => OwnerRoute,
-} as any)
-const AppownerIsolationProofRoute = AppownerIsolationProofRouteImport.update({
-  id: '/isolation-proof',
-  path: '/isolation-proof',
-  getParentRoute: () => AppownerRoute,
-} as any)
-const SilentAiRoute = SilentAiRouteImport.update({
-  id: '/silent-ai',
-  path: '/silent-ai',
-  getParentRoute: () => rootRouteImport,
-} as any)
-
-const TrustRoute = TrustRouteImport.update({
-  id: '/trust',
-  path: '/trust',
-  getParentRoute: () => rootRouteImport,
-} as any)
-
-const StatusRoute = StatusRouteImport.update({
-  id: '/status',
-  path: '/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -257,6 +255,8 @@ export interface FileRoutesByFullPath {
   '/manager': typeof ManagerRouteWithChildren
   '/owner': typeof OwnerRouteWithChildren
   '/silent-ai': typeof SilentAiRoute
+  '/status': typeof StatusRoute
+  '/trust': typeof TrustRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/permissions': typeof AdminPermissionsRoute
@@ -267,8 +267,8 @@ export interface FileRoutesByFullPath {
   '/auditor/upload': typeof AuditorUploadRoute
   '/gm/departments': typeof GmDepartmentsRoute
   '/manager/tasks': typeof ManagerTasksRoute
-  '/owner/activation': typeof OwnerActivationRoute
   '/owner/action-plan': typeof OwnerActionPlanRoute
+  '/owner/activation': typeof OwnerActivationRoute
   '/owner/departments': typeof OwnerDepartmentsRoute
   '/owner/exports': typeof OwnerExportsRoute
   '/owner/layer4': typeof OwnerLayer4Route
@@ -290,6 +290,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/silent-ai': typeof SilentAiRoute
+  '/status': typeof StatusRoute
+  '/trust': typeof TrustRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/permissions': typeof AdminPermissionsRoute
@@ -300,8 +302,8 @@ export interface FileRoutesByTo {
   '/auditor/upload': typeof AuditorUploadRoute
   '/gm/departments': typeof GmDepartmentsRoute
   '/manager/tasks': typeof ManagerTasksRoute
-  '/owner/activation': typeof OwnerActivationRoute
   '/owner/action-plan': typeof OwnerActionPlanRoute
+  '/owner/activation': typeof OwnerActivationRoute
   '/owner/departments': typeof OwnerDepartmentsRoute
   '/owner/exports': typeof OwnerExportsRoute
   '/owner/layer4': typeof OwnerLayer4Route
@@ -330,6 +332,8 @@ export interface FileRoutesById {
   '/manager': typeof ManagerRouteWithChildren
   '/owner': typeof OwnerRouteWithChildren
   '/silent-ai': typeof SilentAiRoute
+  '/status': typeof StatusRoute
+  '/trust': typeof TrustRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/permissions': typeof AdminPermissionsRoute
@@ -340,8 +344,8 @@ export interface FileRoutesById {
   '/auditor/upload': typeof AuditorUploadRoute
   '/gm/departments': typeof GmDepartmentsRoute
   '/manager/tasks': typeof ManagerTasksRoute
-  '/owner/activation': typeof OwnerActivationRoute
   '/owner/action-plan': typeof OwnerActionPlanRoute
+  '/owner/activation': typeof OwnerActivationRoute
   '/owner/departments': typeof OwnerDepartmentsRoute
   '/owner/exports': typeof OwnerExportsRoute
   '/owner/layer4': typeof OwnerLayer4Route
@@ -371,6 +375,8 @@ export interface FileRouteTypes {
     | '/manager'
     | '/owner'
     | '/silent-ai'
+    | '/status'
+    | '/trust'
     | '/admin/activity'
     | '/admin/branches'
     | '/admin/permissions'
@@ -381,8 +387,8 @@ export interface FileRouteTypes {
     | '/auditor/upload'
     | '/gm/departments'
     | '/manager/tasks'
-    | '/owner/activation'
     | '/owner/action-plan'
+    | '/owner/activation'
     | '/owner/departments'
     | '/owner/exports'
     | '/owner/layer4'
@@ -404,6 +410,8 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/silent-ai'
+    | '/status'
+    | '/trust'
     | '/admin/activity'
     | '/admin/branches'
     | '/admin/permissions'
@@ -414,8 +422,8 @@ export interface FileRouteTypes {
     | '/auditor/upload'
     | '/gm/departments'
     | '/manager/tasks'
-    | '/owner/activation'
     | '/owner/action-plan'
+    | '/owner/activation'
     | '/owner/departments'
     | '/owner/exports'
     | '/owner/layer4'
@@ -443,6 +451,8 @@ export interface FileRouteTypes {
     | '/manager'
     | '/owner'
     | '/silent-ai'
+    | '/status'
+    | '/trust'
     | '/admin/activity'
     | '/admin/branches'
     | '/admin/permissions'
@@ -453,8 +463,8 @@ export interface FileRouteTypes {
     | '/auditor/upload'
     | '/gm/departments'
     | '/manager/tasks'
-    | '/owner/activation'
     | '/owner/action-plan'
+    | '/owner/activation'
     | '/owner/departments'
     | '/owner/exports'
     | '/owner/layer4'
@@ -483,12 +493,33 @@ export interface RootRouteChildren {
   ManagerRoute: typeof ManagerRouteWithChildren
   OwnerRoute: typeof OwnerRouteWithChildren
   SilentAiRoute: typeof SilentAiRoute
-  TrustRoute: typeof TrustRoute
   StatusRoute: typeof StatusRoute
+  TrustRoute: typeof TrustRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trust': {
+      id: '/trust'
+      path: '/trust'
+      fullPath: '/trust'
+      preLoaderRoute: typeof TrustRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/silent-ai': {
+      id: '/silent-ai'
+      path: '/silent-ai'
+      fullPath: '/silent-ai'
+      preLoaderRoute: typeof SilentAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/owner': {
       id: '/owner'
       path: '/owner'
@@ -601,6 +632,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerWasteMapRouteImport
       parentRoute: typeof OwnerRoute
     }
+    '/owner/trust-index': {
+      id: '/owner/trust-index'
+      path: '/trust-index'
+      fullPath: '/owner/trust-index'
+      preLoaderRoute: typeof OwnerTrustIndexRouteImport
+      parentRoute: typeof OwnerRoute
+    }
     '/owner/risk-map': {
       id: '/owner/risk-map'
       path: '/risk-map'
@@ -608,11 +646,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerRiskMapRouteImport
       parentRoute: typeof OwnerRoute
     }
+    '/owner/portfolio': {
+      id: '/owner/portfolio'
+      path: '/portfolio'
+      fullPath: '/owner/portfolio'
+      preLoaderRoute: typeof OwnerPortfolioRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/opportunity-map': {
+      id: '/owner/opportunity-map'
+      path: '/opportunity-map'
+      fullPath: '/owner/opportunity-map'
+      preLoaderRoute: typeof OwnerOpportunityMapRouteImport
+      parentRoute: typeof OwnerRoute
+    }
     '/owner/ledger': {
       id: '/owner/ledger'
       path: '/ledger'
       fullPath: '/owner/ledger'
       preLoaderRoute: typeof OwnerLedgerRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/layer4': {
+      id: '/owner/layer4'
+      path: '/layer4'
+      fullPath: '/owner/layer4'
+      preLoaderRoute: typeof OwnerLayer4RouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/exports': {
@@ -627,6 +686,20 @@ declare module '@tanstack/react-router' {
       path: '/departments'
       fullPath: '/owner/departments'
       preLoaderRoute: typeof OwnerDepartmentsRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/activation': {
+      id: '/owner/activation'
+      path: '/activation'
+      fullPath: '/owner/activation'
+      preLoaderRoute: typeof OwnerActivationRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/action-plan': {
+      id: '/owner/action-plan'
+      path: '/action-plan'
+      fullPath: '/owner/action-plan'
+      preLoaderRoute: typeof OwnerActionPlanRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/manager/tasks': {
@@ -671,6 +744,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppownerMaintenanceRouteImport
       parentRoute: typeof AppownerRoute
     }
+    '/appowner/isolation-proof': {
+      id: '/appowner/isolation-proof'
+      path: '/isolation-proof'
+      fullPath: '/appowner/isolation-proof'
+      preLoaderRoute: typeof AppownerIsolationProofRouteImport
+      parentRoute: typeof AppownerRoute
+    }
     '/admin/permissions': {
       id: '/admin/permissions'
       path: '/permissions'
@@ -691,76 +771,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/activity'
       preLoaderRoute: typeof AdminActivityRouteImport
       parentRoute: typeof AdminRoute
-    }
-    '/owner/trust-index': {
-      id: '/owner/trust-index'
-      path: '/trust-index'
-      fullPath: '/owner/trust-index'
-      preLoaderRoute: typeof OwnerTrustIndexRouteImport
-      parentRoute: typeof OwnerRoute
-    }
-    '/owner/opportunity-map': {
-      id: '/owner/opportunity-map'
-      path: '/opportunity-map'
-      fullPath: '/owner/opportunity-map'
-      preLoaderRoute: typeof OwnerOpportunityMapRouteImport
-      parentRoute: typeof OwnerRoute
-    }
-    '/owner/action-plan': {
-      id: '/owner/action-plan'
-      path: '/action-plan'
-      fullPath: '/owner/action-plan'
-      preLoaderRoute: typeof OwnerActionPlanRouteImport
-      parentRoute: typeof OwnerRoute
-    }
-    '/owner/activation': {
-      id: '/owner/activation'
-      path: '/activation'
-      fullPath: '/owner/activation'
-      preLoaderRoute: typeof OwnerActivationRouteImport
-      parentRoute: typeof OwnerRoute
-    }
-    '/owner/portfolio': {
-      id: '/owner/portfolio'
-      path: '/portfolio'
-      fullPath: '/owner/portfolio'
-      preLoaderRoute: typeof OwnerPortfolioRouteImport
-      parentRoute: typeof OwnerRoute
-    }
-    '/owner/layer4': {
-      id: '/owner/layer4'
-      path: '/layer4'
-      fullPath: '/owner/layer4'
-      preLoaderRoute: typeof OwnerLayer4RouteImport
-      parentRoute: typeof OwnerRoute
-    }
-    '/appowner/isolation-proof': {
-      id: '/appowner/isolation-proof'
-      path: '/isolation-proof'
-      fullPath: '/appowner/isolation-proof'
-      preLoaderRoute: typeof AppownerIsolationProofRouteImport
-      parentRoute: typeof AppownerRoute
-    }
-    '/silent-ai': {
-      id: '/silent-ai'
-      path: '/silent-ai'
-      fullPath: '/silent-ai'
-      preLoaderRoute: typeof SilentAiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trust': {
-      id: '/trust'
-      path: '/trust'
-      fullPath: '/trust'
-      preLoaderRoute: typeof TrustRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/status': {
-      id: '/status'
-      path: '/status'
-      fullPath: '/status'
-      preLoaderRoute: typeof StatusRouteImport
-      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -840,8 +850,8 @@ const ManagerRouteWithChildren =
   ManagerRoute._addFileChildren(ManagerRouteChildren)
 
 interface OwnerRouteChildren {
-  OwnerActivationRoute: typeof OwnerActivationRoute
   OwnerActionPlanRoute: typeof OwnerActionPlanRoute
+  OwnerActivationRoute: typeof OwnerActivationRoute
   OwnerDepartmentsRoute: typeof OwnerDepartmentsRoute
   OwnerExportsRoute: typeof OwnerExportsRoute
   OwnerLayer4Route: typeof OwnerLayer4Route
@@ -856,8 +866,8 @@ interface OwnerRouteChildren {
 }
 
 const OwnerRouteChildren: OwnerRouteChildren = {
-  OwnerActivationRoute: OwnerActivationRoute,
   OwnerActionPlanRoute: OwnerActionPlanRoute,
+  OwnerActivationRoute: OwnerActivationRoute,
   OwnerDepartmentsRoute: OwnerDepartmentsRoute,
   OwnerExportsRoute: OwnerExportsRoute,
   OwnerLayer4Route: OwnerLayer4Route,
@@ -883,7 +893,19 @@ const rootRouteChildren: RootRouteChildren = {
   ManagerRoute: ManagerRouteWithChildren,
   OwnerRoute: OwnerRouteWithChildren,
   SilentAiRoute: SilentAiRoute,
+  StatusRoute: StatusRoute,
+  TrustRoute: TrustRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
