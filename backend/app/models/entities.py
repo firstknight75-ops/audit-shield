@@ -18,6 +18,7 @@ class CompanyGroup(Base):
     tier: Mapped[CompanyTier] = mapped_column(Enum(CompanyTier, name='company_group_tier'), nullable=False)
     deployment_mode: Mapped[DeploymentMode] = mapped_column(Enum(DeploymentMode, name='group_deployment_mode'), nullable=False)
     tenant_schema: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    activation_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 

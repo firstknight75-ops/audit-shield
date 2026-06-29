@@ -12,15 +12,25 @@ from app.services.permissions import ROLE_DEFAULTS
 from app.i18n.translations import TRANSLATIONS
 
 PERMISSIONS = [
-    ('manage_users', 'إدارة المستخدمين', 'company_admin'),
+    # ── Company admin ───────────────────────────────────────────
+    ('manage_company_users', 'إدارة مستخدمي الشركة', 'company_admin'),
     ('manage_permissions', 'إدارة الصلاحيات', 'company_admin'),
-    ('view_analytics', 'عرض التحليلات', 'analytics'),
-    ('view_waste_map', 'عرض خريطة الهدر', 'analytics'),
-    ('view_risk_alerts', 'عرض التنبيهات', 'analytics'),
+    ('grant_temporary_access', 'منح صلاحيات مؤقتة', 'company_admin'),
+    # ── Dashboard / analytics ───────────────────────────────────
+    ('view_owner_dashboard', 'عرض لوحة المالك', 'dashboard'),
+    ('view_waste_map', 'عرض خريطة الهدر', 'dashboard'),
+    ('view_risk_alerts', 'عرض التنبيهات', 'dashboard'),
+    ('view_all_companies', 'عرض جميع الشركات', 'dashboard'),
+    ('view_audit_ledger', 'عرض السجل', 'ledger'),
+    # ── Documents / tasks ───────────────────────────────────────
     ('upload_documents', 'رفع المستندات', 'documents'),
-    ('view_ledger', 'عرض السجل', 'ledger'),
-    ('view_tasks', 'عرض المهام', 'tasks'),
     ('view_documents', 'عرض المستندات', 'documents'),
+    ('view_tasks', 'عرض المهام', 'tasks'),
+    # ── Export / CRaaS ──────────────────────────────────────────
+    ('export_reports', 'تصدير التقارير', 'export'),
+    ('approve_custom_reports', 'اعتماد تقارير مخصصة', 'export'),
+    ('manage_templates', 'إدارة القوالب', 'export'),
+    # ── App Owner (vendor) ──────────────────────────────────────
     ('app_owner_inventory', 'مخزون المنصة', 'app_owner'),
     ('app_owner_templates', 'قوالب المنصة', 'app_owner'),
     ('app_owner_maintenance', 'صيانة المنصة', 'app_owner'),
@@ -38,6 +48,7 @@ async def seed(session: AsyncSession, deployment_mode: str = 'onpremise', group_
         tier=CompanyTier.advanced,
         deployment_mode=DeploymentMode(deployment_mode),
         tenant_schema=tenant_schema,
+        activation_started_at=datetime.now(timezone.utc),
     )
     session.add(group)
     await session.flush()

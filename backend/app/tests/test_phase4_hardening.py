@@ -10,4 +10,4 @@ def test_template_versioning_and_rollback():
 
 def test_appowner_boundary_contract():
     appowner_permissions = {'app_owner_inventory', 'app_owner_templates', 'app_owner_maintenance'}
-    assert 'view_analytics' not in appowner_permissions
+    assert 'view_owner_dashboard' not in appowner_permissions

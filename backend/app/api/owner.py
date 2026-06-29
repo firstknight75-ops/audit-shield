@@ -19,7 +19,7 @@ router = APIRouter(prefix='/owner', tags=['owner'])
 @router.get('/ledger/verify', response_model=LedgerVerifyResponse)
 async def verify(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_ledger')),
+    current_user: User = Depends(require_permission('view_audit_ledger')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -33,7 +33,7 @@ async def verify(
 async def tamper(
     entry_id: str,
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_ledger')),
+    current_user: User = Depends(require_permission('view_audit_ledger')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -50,7 +50,7 @@ async def tamper(
 @router.get('/auditor-efficiency')
 async def auditor_efficiency(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)

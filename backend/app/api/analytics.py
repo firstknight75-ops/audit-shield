@@ -18,7 +18,7 @@ router = APIRouter(tags=['analytics'])
 @router.post('/analytics/run/{company_id}')
 async def trigger_analysis(
     company_id: str,
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -32,7 +32,7 @@ async def trigger_analysis(
 @router.get('/owner/dashboard', response_model=OwnerDashboardResponse)
 async def owner_dashboard(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -75,7 +75,7 @@ async def owner_dashboard(
 @router.get('/owner/dashboard/layer2')
 async def owner_layer2(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -88,7 +88,7 @@ async def owner_layer2(
 @router.get('/owner/dashboard/layer3')
 async def owner_layer3(
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -108,7 +108,7 @@ async def owner_layer3(
 async def owner_layer4(
     document_id: str,
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)

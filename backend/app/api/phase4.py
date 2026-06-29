@@ -49,7 +49,7 @@ async def manager_widgets(
 async def run_export(
     payload: ExportRequest,
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -85,7 +85,7 @@ async def run_export(
 async def what_if_simulator(
     payload: WhatIfRequest,
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     lang = current_user.preferred_language.value if hasattr(current_user.preferred_language, 'value') else str(current_user.preferred_language)
@@ -107,7 +107,7 @@ async def what_if_simulator(
 async def what_if_export(
     payload: WhatIfRequest,
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     result = await what_if_simulator(payload, company_id, current_user, db)

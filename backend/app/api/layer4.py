@@ -30,7 +30,7 @@ router = APIRouter(prefix='/owner/dashboard/layer4', tags=['layer4'])
 async def get_original_image(
     document_id: str,
     company_id: str = Query(...),
-    current_user: User = Depends(require_permission('view_analytics')),
+    current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
     """Decrypt and stream the original invoice image — in-memory only."""

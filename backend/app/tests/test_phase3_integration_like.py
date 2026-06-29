@@ -60,10 +60,10 @@ def test_phase3_local_analysis_pipeline_like_flow():
 
 
 def test_auditor_owner_manager_access_contracts():
-    owner_permissions = {'view_analytics', 'view_ledger'}
+    owner_permissions = {'view_owner_dashboard', 'view_audit_ledger'}
     auditor_permissions = {'view_documents', 'view_tasks'}
     manager_permissions = {'upload_documents', 'view_tasks'}
 
-    assert 'view_analytics' in owner_permissions
-    assert 'view_analytics' not in auditor_permissions
-    assert 'view_analytics' not in manager_permissions
+    assert 'view_owner_dashboard' in owner_permissions
+    assert 'view_owner_dashboard' not in auditor_permissions
+    assert 'view_owner_dashboard' not in manager_permissions

@@ -26,10 +26,56 @@ async def get_effective_permissions(user: User, session: AsyncSession) -> list[s
 
 
 ROLE_DEFAULTS = {
-    'owner': ['manage_users', 'manage_permissions', 'view_analytics', 'view_waste_map', 'view_risk_alerts', 'upload_documents', 'view_ledger'],
-    'gm': ['view_analytics', 'view_waste_map', 'view_risk_alerts', 'upload_documents'],
-    'manager': ['upload_documents', 'view_tasks'],
-    'auditor': ['upload_documents', 'view_tasks', 'view_documents'],
-    'admin': ['manage_users', 'manage_permissions', 'view_ledger'],
-    'appowner': ['app_owner_inventory', 'app_owner_templates', 'app_owner_maintenance'],
+    # owner: full picture + ledger + can grant temp access
+    'owner': [
+        'view_owner_dashboard',
+        'view_waste_map',
+        'view_risk_alerts',
+        'view_audit_ledger',
+        'view_all_companies',
+        'view_documents',
+        'upload_documents',
+        'export_reports',
+        'approve_custom_reports',
+        'manage_templates',
+        'manage_company_users',
+        'manage_permissions',
+        'grant_temporary_access',
+    ],
+    # gm: dashboard view but no ledger, no user-management
+    'gm': [
+        'view_owner_dashboard',
+        'view_waste_map',
+        'view_risk_alerts',
+        'view_documents',
+        'upload_documents',
+        'export_reports',
+        'manage_templates',
+    ],
+    # manager: scoped to assigned company/branches only.
+    # Sees tasks but not raw documents (auditor uploads + certifies for them).
+    'manager': [
+        'upload_documents',
+        'view_tasks',
+    ],
+    # auditor: upload + certify + view raw documents ONLY.
+    # NO analytics, NO waste map, NO risk alerts, NO ledger.
+    'auditor': [
+        'upload_documents',
+        'view_documents',
+        'view_tasks',
+    ],
+    # sysadmin: user + permission management, ledger read
+    'admin': [
+        'manage_company_users',
+        'manage_permissions',
+        'grant_temporary_access',
+        'view_audit_ledger',
+    ],
+    # appowner: only the vendor-platform permissions, nothing else
+    'appowner': [
+        'app_owner_inventory',
+        'app_owner_templates',
+        'app_owner_maintenance',
+    ],
 }
