@@ -488,4 +488,127 @@ TRANSLATIONS = {
         'ar': 'تم تسجيل خطة العمل.',
         'ckb': 'پلانی کار تۆمار کرا.',
     },
+
+    # ── Auditor onboarding & trust framing (Phase 2) ──────────
+    # This card is shown to the Auditor on first login AND at the top of
+    # the certification screen. It states plainly and warmly that the
+    # Auditor is the most operationally trusted role (90%), and that the
+    # restriction on seeing analytical conclusions protects the integrity
+    # of their own work — so their input can never be shaped by knowing
+    # what it will reveal — rather than reflecting any distrust of them
+    # personally.
+    'auditor.onboarding.greeting': {
+        'ar': 'أهلاً بك في فريق التدقيق',
+        'ckb': 'بەخێربێیت بۆ تیمی پشکنین',
+    },
+    'auditor.onboarding.headline': {
+        'ar': 'أنت الدور الأكثر ثقة تشغيلاً في هذا النظام',
+        'ckb': 'تۆ متمانەپێوترین ڕۆڵی کارپێکردن لەم سیستەمەدا',
+    },
+    'auditor.onboarding.trust_pct': {
+        'ar': '٪90 من الثقة التشغيلية',
+        'ckb': '٪٩٠ متمانەی کارپێکردن',
+    },
+    'auditor.onboarding.why_restricted': {
+        'ar': 'لماذا لا أرى التحليلات؟',
+        'ckb': 'بۆچی شیکارییەکان نابینم؟',
+    },
+    'auditor.onboarding.explanation': {
+        'ar': 'عدم رؤيتك للتحليلات المالية لا ينبع من أي شك فيك شخصياً — بل العكس تماماً: لأن مدخلاتك يجب ألا تتأثر بمعرفة ما ستكشفه لاحقاً. هذا يحمي نزاهة عملك أنت.',
+        'ckb': 'ئەوەی تۆ شیکاری دارایییەکان نابینیت لە هیچ دوودڵییەکی تایبەت بە تۆوە سەرچاوە ناگرێت — بەڵکو بە پێچەوانە: چونکە داتاکانی تۆ نابێت کار لەسەر زانینی ئەوەی دواتر ئاشکرا دەبێت بکەن. ئەمە دەستپاکی کاری تۆ دەپارێزێت.',
+    },
+    'auditor.onboarding.training_target': {
+        'ar': 'هدف التدريب: أقل من 30 دقيقة لتصبح جاهزاً.',
+        'ckb': 'ئامانجی ڕاهێنان: کەمتر لە ٣٠ خولەک بۆ ئامادەبوون.',
+    },
+    'auditor.onboarding.no_auto_commit': {
+        'ar': 'لا يتم اعتماد أي مستند تلقائياً — كل نتيجة OCR تنتظر مراجعتك وتصحيحك.',
+        'ckb': 'هیچ بەڵگەنامەیەک بە خۆکار پەسند ناکرێت — هەموو ئەنجامی OCR چاوەڕێ پێداچوونەوە و ڕاستکردنەوەی تۆ دەکات.',
+    },
+    'auditor.onboarding.irreversible': {
+        'ar': 'كل اعتماد يُسجَّل في سلسلة غير قابلة للتعديل. عملك محفوظ إلى الأبد.',
+        'ckb': 'هەموو پەسندکردنێک لە زنجیرەیەکی نەگۆڕاو تۆمار دەکرێت. کاری تۆ بۆ هەمیشە پارێزراوە.',
+    },
+    'auditor.onboarding.dismiss': {
+        'ar': 'فهمت، لن يظهر مرة أخرى',
+        'ckb': 'تێگەیشتم، دووبارە نادەردەکرێتەوە',
+    },
+
+    # ── Certification screen extras ───────────────────────────
+    'certification.no_pending': {
+        'ar': 'لا توجد مستندات بانتظار الاعتماد.',
+        'ckb': 'هیچ بەڵگەنامەیەک چاوەڕێ پەسندکردن ناکات.',
+    },
+    'certification.color_green': {
+        'ar': 'أخضر',
+        'ckb': 'سەوز',
+    },
+    'certification.color_yellow': {
+        'ar': 'أصفر',
+        'ckb': 'زەرد',
+    },
+    'certification.color_red': {
+        'ar': 'أحمر',
+        'ckb': 'سوور',
+    },
+    'certification.certify_button': {
+        'ar': 'تأكيد واعتماد المستند',
+        'ckb': 'دووبەرەکرن و پەسندکردنی بەڵگەنامە',
+    },
+    'certification.certified_and_next': {
+        'ar': 'تم اعتماد المستند وتحميل التالي تلقائياً.',
+        'ckb': 'بەڵگەنامە پەسند کرا و دواترین بە خۆکار بارکرا.',
+    },
+    'certification.queue_empty': {
+        'ar': 'لا توجد مستندات في نطاقك.',
+        'ckb': 'هیچ بەڵگەنامەیەک لە بواری تۆدا نییە.',
+    },
+
+    # ── Reverse entries (Phase 2 immutability) ─────────────────
+    'ledger.reverse_created': {
+        'ar': 'تم تسجيل قيد عكسي للتصحيح — التصحيح مرئي دائماً بجانب الأصل.',
+        'ckb': 'تۆماری پێچەوانە بۆ ڕاستکردنەوە تۆمار کرا — ڕاستکردنەوە هەمیشە لە تەنیشت ئەسڵەوە دیارە.',
+    },
+    'ledger.reverse_reason_required': {
+        'ar': 'سبب التصحيح مطلوب.',
+        'ckb': 'هۆکاری ڕاستکردنەوە پێویستە.',
+    },
+    'ledger.reverse_target_not_found': {
+        'ar': 'القيد الأصلي غير موجود.',
+        'ckb': 'تۆماری ئەسڵی نەدۆزرایەوە.',
+    },
+    'ledger.tamper_test_only': {
+        'ar': 'هذا الإصلاح للاختبار فقط — في الإنتاج كل تصحيح يُسجَّل كقيد عكسي، لا تعديل مباشر.',
+        'ckb': 'ئەم چاککردنەوە تەنها بۆ تاقیکردنەوەیە — لە بەرهەمدا هەموو ڕاستکردنەوەیەک وەک تۆماری پێچەوانە تۆمار دەکرێت، نەک دەستکاری ڕاستەوخۆ.',
+    },
+
+    # ── Daily task UI ──────────────────────────────────────────
+    'tasks.title': {
+        'ar': 'مهامي اليومية',
+        'ckb': 'ئەرکە ڕۆژانەکانم',
+    },
+    'tasks.subtitle': {
+        'ar': 'قائمة المهام مفلترة على نطاقك فقط — الشركات أو الفروع خارج نطاقك لا تظهر أبداً.',
+        'ckb': 'لیستی ئەرکەکان سنووردار کراون بە بواری تۆ تەنها — کۆمپانیا یان لقەکانی دەرەوەی بواری تۆ هەرگیز دەرناکەون.',
+    },
+    'tasks.overdue': {
+        'ar': 'متأخر',
+        'ckb': 'درەنگ',
+    },
+    'tasks.remaining_minutes': {
+        'ar': 'متبقي {minutes} د',
+        'ckb': '{minutes} خولەک ماوە',
+    },
+    'tasks.demerit_points': {
+        'ar': '+{points} نقاط سلبية',
+        'ckb': '+{points} خاڵی نەرێنی',
+    },
+    'tasks.empty': {
+        'ar': 'لا توجد مهام في نطاقك اليوم.',
+        'ckb': 'ئەمڕۆ هیچ ئەرکێک لە بواری تۆدا نییە.',
+    },
+    'tasks.summary': {
+        'ar': 'المنجزة: {done} | المتأخرة: {overdue} | النقاط السلبية: {demerits}',
+        'ckb': 'تەواوبوو: {done} | درەنگ: {overdue} | خاڵی نەرێنی: {demerits}',
+    },
 }

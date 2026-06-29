@@ -39,6 +39,55 @@ async def append_ledger_entry(session: AsyncSession, company_id, actor_user_id, 
     return ledger
 
 
+async def append_reverse_entry(
+    session: AsyncSession,
+    company_id,
+    actor_user_id,
+    target_entry_id: str,
+    reason: str,
+    correction_payload: dict | None = None,
+) -> AuditLedger:
+    """Append a reverse entry that documents a correction.
+
+    Per Phase 2 spec:
+      "nothing in audit_ledger is ever updated or deleted — corrections are
+       reverse entries, documented, and permanently visible next to the
+       original."
+
+    The original entry is NEVER modified. A new ledger entry is appended
+    with action_type='reverse_entry' that references the target by id and
+    carries the documented reason.
+
+    Args:
+        reason: Required. The human-readable justification for the correction.
+        correction_payload: Optional dict with the corrected values.
+
+    Returns:
+        The newly appended reverse entry.
+    """
+    target = (await session.execute(
+        select(AuditLedger).where(AuditLedger.id == target_entry_id, AuditLedger.company_id == company_id)
+    )).scalar_one_or_none()
+    if target is None:
+        raise ValueError(f'Reverse target not found: {target_entry_id}')
+
+    payload = {
+        'reverse_target_id': target_entry_id,
+        'reverse_target_action_type': target.action_type,
+        'reverse_target_original_hash': target.action_payload.get('entry_hash'),
+        'reason': reason,
+        'correction': correction_payload or {},
+        'original_unchanged': True,  # explicit guarantee
+    }
+    return await append_ledger_entry(
+        session,
+        company_id=company_id,
+        actor_user_id=actor_user_id,
+        action_type='reverse_entry',
+        action_payload=payload,
+    )
+
+
 async def verify_ledger_integrity(session: AsyncSession, company_id, lang: str = 'ar') -> tuple[bool, str, str | None]:
     rows = (await session.execute(select(AuditLedger).where(AuditLedger.company_id == company_id).order_by(AuditLedger.created_at.asc()))).scalars().all()
     previous_hash = 'GENESIS'
