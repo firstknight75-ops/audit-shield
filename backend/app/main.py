@@ -28,7 +28,10 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: auto-seed if needed
+    # Startup: initialize tracing, observability, then auto-seed
+    from app.core.tracing import init_tracing
+    init_tracing(service_name=settings.app_name)
+
     from app.db.session import SessionLocal
     from app.db.seed import seed
     async with SessionLocal() as session:

@@ -47,6 +47,7 @@ import { Route as OwnerLayer4RouteImport } from './routes/owner.layer4'
 import { Route as AppownerIsolationProofRouteImport } from './routes/appowner.isolation-proof'
 import { Route as SilentAiRouteImport } from './routes/silent-ai'
 import { Route as TrustRouteImport } from './routes/trust'
+import { Route as StatusRouteImport } from './routes/status'
 
 const OwnerRoute = OwnerRouteImport.update({
   id: '/owner',
@@ -237,6 +238,12 @@ const SilentAiRoute = SilentAiRouteImport.update({
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
   path: '/trust',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -477,6 +484,7 @@ export interface RootRouteChildren {
   OwnerRoute: typeof OwnerRouteWithChildren
   SilentAiRoute: typeof SilentAiRoute
   TrustRoute: typeof TrustRoute
+  StatusRoute: typeof StatusRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -745,6 +753,13 @@ declare module '@tanstack/react-router' {
       path: '/trust'
       fullPath: '/trust'
       preLoaderRoute: typeof TrustRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
