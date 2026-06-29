@@ -265,3 +265,71 @@ class ActivationMilestone(Base):
     stage_key: Mapped[str] = mapped_column(String(100), nullable=False)
     achieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class InAppNotification(Base):
+    """In-app notification inbox row. Read by the frontend bell dropdown."""
+    __tablename__ = 'inapp_notification'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('user_account.id', ondelete='CASCADE'), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    severity: Mapped[str] = mapped_column(String(20), nullable=False, default='normal')
+    link: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class WorkflowEvent(Base):
+    """Workflow engine state transitions — for approvals, escalations, SLAs."""
+    __tablename__ = 'workflow_event'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    workflow: Mapped[str] = mapped_column(String(100), nullable=False)
+    state: Mapped[str] = mapped_column(String(100), nullable=False)
+    actor_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'))
+    payload: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class AIFeedback(Base):
+    """Human-in-the-loop feedback on AI outputs (Phase 5 — AI)."""
+    __tablename__ = 'ai_feedback'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    finding_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    finding_kind: Mapped[str] = mapped_column(String(50), nullable=False)
+    actor_user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'))
+    rating: Mapped[str] = mapped_column(String(20), nullable=False)  # correct | false_positive | missed
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class ScheduledReport(Base):
+    """A report scheduled to run on a cron and email to recipients."""
+    __tablename__ = 'scheduled_report'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    report_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    format: Mapped[str] = mapped_column(String(20), nullable=False)
+    cron: Mapped[str] = mapped_column(String(100), nullable=False)
+    recipients: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    last_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    next_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class QuotaUsage(Base):
+    """Per-company-group rolling usage counters for billing/quotas."""
+    __tablename__ = 'quota_usage'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_group_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company_group.id', ondelete='CASCADE'), nullable=False)
+    metric: Mapped[str] = mapped_column(String(50), nullable=False)  # documents_processed | ocr_pages | api_calls
+    period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    period_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    cap: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
