@@ -13,6 +13,8 @@ from app.api.owner_outputs import router as owner_outputs_router
 from app.api.trust_proof import router as trust_proof_router
 from app.api.layer4 import router as layer4_router
 from app.api.silent_ai import router as silent_ai_router
+from app.api.verify import router as verify_router
+from app.api.activation import router as activation_router
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -41,6 +43,9 @@ app.include_router(owner_outputs_router, prefix=settings.api_v1_prefix)
 app.include_router(trust_proof_router, prefix=settings.api_v1_prefix)
 app.include_router(layer4_router, prefix=settings.api_v1_prefix)
 app.include_router(silent_ai_router, prefix=settings.api_v1_prefix)
+# Phase 4 additions
+app.include_router(verify_router)  # /verify/{report_id} — public, no /api prefix
+app.include_router(activation_router, prefix=settings.api_v1_prefix)
 
 
 @app.get('/health')

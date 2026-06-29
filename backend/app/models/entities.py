@@ -229,3 +229,39 @@ class NotificationQueue(Base):
     retry_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     next_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class ReportCertificate(Base):
+    """Tamper-Proof Certificate for an exported report.
+
+    Stored server-side so /verify/{report_id} can re-validate the HMAC
+    signature without revealing the report's content to the verifier.
+    Per Phase 4: the verifier never sees the report's data — only confirms
+    hash/signature integrity.
+    """
+    __tablename__ = 'report_certificate'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company.id', ondelete='CASCADE'), nullable=False)
+    report_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    format: Mapped[str] = mapped_column(String(20), nullable=False)
+    output_code: Mapped[str] = mapped_column(String(100), nullable=False)
+    ledger_hash_at_generation: Mapped[str] = mapped_column(String(64), nullable=False)
+    signature: Mapped[str] = mapped_column(String(64), nullable=False)
+    generated_by_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('user_account.id', ondelete='SET NULL'))
+    payload_summary: Mapped[str] = mapped_column(Text, nullable=False)  # non-sensitive metadata
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class ActivationMilestone(Base):
+    """Per-company_group 48-hour activation milestones (Phase 4).
+
+    Records each of the four stages so the Owner can see progress and
+    a shareable completion banner appears at stage 4.
+    """
+    __tablename__ = 'activation_milestone'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_group_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('company_group.id', ondelete='CASCADE'), nullable=False)
+    stage: Mapped[int] = mapped_column(Integer, nullable=False)  # 1..4
+    stage_key: Mapped[str] = mapped_column(String(100), nullable=False)
+    achieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
