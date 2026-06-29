@@ -2,18 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-/* ── Self-hosted Noto Sans Arabic ──────────────────────────────────────────────
- * Bug #3 fix: previously this file declared `--font-sans: "Cairo", "Tajawal",
- * system-ui, sans-serif` but contained NO @font-face, NO <link>, NO @import
- * loading Cairo / Tajawal / Noto Sans Arabic. In any browser without those
- * families installed as system fonts, the stack fell through to OS sans-serif
- * which does NOT guarantee the 6 Kurdish-Sorani-specific glyphs.
- *
- * Now: Noto Sans Arabic is bundled at /fonts/NotoSansArabic-{Regular,Bold}.woff2
- * (self-hosted — no CDN, no Google Fonts fetch). The PDF export engine already
- * commits to the same family (backend/app/exports/engine.py: PDF_FONT_STACK),
- * so web and PDF share the glyph coverage decision.
- */
+/* ── Self-hosted Noto Sans Arabic (Bug #3 fix — UNCHANGED) ──────────────────── */
 @font-face {
   font-family: "Noto Sans Arabic";
   font-style: normal;
@@ -30,20 +19,6 @@
 }
 
 @custom-variant dark (&:is(.dark *));
-
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -91,49 +66,62 @@
 }
 
 :root {
-  /* AuditCore — sovereign trust palette: deep ink + warm gold + signal greens/reds */
-  --radius: 0.625rem;
-  --background: oklch(0.18 0.025 250);
-  --foreground: oklch(0.97 0.01 90);
-  --card: oklch(0.22 0.028 250);
-  --card-foreground: oklch(0.97 0.01 90);
-  --popover: oklch(0.22 0.028 250);
-  --popover-foreground: oklch(0.97 0.01 90);
-  --primary: oklch(0.78 0.13 82);
-  --primary-foreground: oklch(0.18 0.025 250);
-  --secondary: oklch(0.28 0.03 250);
-  --secondary-foreground: oklch(0.97 0.01 90);
-  --muted: oklch(0.26 0.025 250);
-  --muted-foreground: oklch(0.72 0.02 90);
-  --accent: oklch(0.78 0.13 82);
-  --accent-foreground: oklch(0.18 0.025 250);
-  --destructive: oklch(0.62 0.22 27);
-  --destructive-foreground: oklch(0.98 0.01 90);
-  --border: oklch(0.32 0.03 250);
-  --input: oklch(0.28 0.03 250);
-  --ring: oklch(0.78 0.13 82);
-  --success: oklch(0.7 0.16 150);
-  --warning: oklch(0.82 0.16 85);
-  --danger: oklch(0.65 0.22 25);
-  --chart-1: oklch(0.78 0.13 82);
-  --chart-2: oklch(0.7 0.16 150);
-  --chart-3: oklch(0.65 0.22 25);
-  --chart-4: oklch(0.6 0.15 240);
-  --chart-5: oklch(0.75 0.12 320);
-  --sidebar: oklch(0.15 0.025 250);
-  --sidebar-foreground: oklch(0.92 0.01 90);
-  --sidebar-primary: oklch(0.78 0.13 82);
-  --sidebar-primary-foreground: oklch(0.18 0.025 250);
-  --sidebar-accent: oklch(0.24 0.03 250);
-  --sidebar-accent-foreground: oklch(0.97 0.01 90);
-  --sidebar-border: oklch(0.28 0.03 250);
-  --sidebar-ring: oklch(0.78 0.13 82);
+  /* AuditCore v2 — refined sovereign trust: deeper ink, brighter gold, cleaner signals */
+  --radius: 0.75rem;                       /* softer corners (was 0.625) */
+
+  --background: oklch(0.16 0.028 255);     /* deeper, slightly cooler ink */
+  --foreground: oklch(0.97 0.008 95);
+
+  --card: oklch(0.21 0.03 255);            /* lifts cleanly off bg */
+  --card-foreground: oklch(0.97 0.008 95);
+  --popover: oklch(0.21 0.03 255);
+  --popover-foreground: oklch(0.97 0.008 95);
+
+  --primary: oklch(0.80 0.135 84);         /* brighter, more confident gold */
+  --primary-foreground: oklch(0.16 0.028 255);
+
+  --secondary: oklch(0.27 0.032 255);
+  --secondary-foreground: oklch(0.97 0.008 95);
+
+  --muted: oklch(0.25 0.028 255);
+  --muted-foreground: oklch(0.74 0.018 95);
+
+  --accent: oklch(0.80 0.135 84);
+  --accent-foreground: oklch(0.16 0.028 255);
+
+  --destructive: oklch(0.62 0.225 27);
+  --destructive-foreground: oklch(0.98 0.01 95);
+
+  --border: oklch(0.33 0.032 255);
+  --input: oklch(0.27 0.032 255);
+  --ring: oklch(0.80 0.135 84);
+
+  --success: oklch(0.72 0.16 152);
+  --warning: oklch(0.83 0.16 86);
+  --danger: oklch(0.65 0.225 25);
+
+  --chart-1: oklch(0.80 0.135 84);
+  --chart-2: oklch(0.72 0.16 152);
+  --chart-3: oklch(0.65 0.225 25);
+  --chart-4: oklch(0.62 0.15 242);
+  --chart-5: oklch(0.76 0.12 322);
+
+  --sidebar: oklch(0.13 0.026 255);        /* darker rail for separation */
+  --sidebar-foreground: oklch(0.92 0.008 95);
+  --sidebar-primary: oklch(0.80 0.135 84);
+  --sidebar-primary-foreground: oklch(0.16 0.028 255);
+  --sidebar-accent: oklch(0.23 0.03 255);
+  --sidebar-accent-foreground: oklch(0.97 0.008 95);
+  --sidebar-border: oklch(0.27 0.032 255);
+  --sidebar-ring: oklch(0.80 0.135 84);
+
+  /* NEW: subtle gold edge-glow token used by key cards */
+  --trust-glow: oklch(0.80 0.135 84 / 0.12);
 }
 
 .dark {
-  /* dark mirrors :root — app is dark-first */
-  --background: oklch(0.15 0.025 250);
-  --foreground: oklch(0.97 0.01 90);
+  --background: oklch(0.13 0.026 255);
+  --foreground: oklch(0.97 0.008 95);
 }
 
 @layer base {
@@ -146,6 +134,13 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "ss02";
+    /* NEW: faint radial depth behind content */
+    background-image: radial-gradient(
+      120% 80% at 50% 0%,
+      oklch(0.20 0.035 255) 0%,
+      var(--color-background) 60%
+    );
+    background-attachment: fixed;
   }
 
   html { direction: rtl; }
@@ -162,3 +157,8 @@
 @utility border-success { border-color: var(--success); }
 @utility border-warning { border-color: var(--warning); }
 @utility border-danger  { border-color: var(--danger); }
+
+/* NEW: optional "trust card" accent — add className="trust-card" to hero panels */
+@utility trust-card {
+  box-shadow: 0 0 0 1px var(--trust-glow), 0 8px 30px -12px oklch(0 0 0 / 0.5);
+}
