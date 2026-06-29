@@ -12,5 +12,13 @@
   "upload_document": "رفع مستند",
   "client_companies": "الشركات العميلة",
   "template_editor": "محرر القوالب",
-  "maintenance_log": "سجل الصيانة"
+  "maintenance_log": "سجل الصيانة",
+  "trust_index": "مؤشر الموثوقية",
+  "opportunity_map": "خريطة الفرص",
+  "action_plan": "خطة العمل",
+  "activation": "حالة التفعيل",
+  "portfolio": "محفظة الشركات",
+  "layer4_viewer": "المستند الأصلي",
+  "isolation_proof": "إثبات حدود الثقة",
+  "silent_ai": "ضمان الذكاء الصامت"
 }

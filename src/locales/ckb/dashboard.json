@@ -12,5 +12,13 @@
   "upload_document": "بارکردنی بەڵگەنامە",
   "client_companies": "کۆمپانیا کڕیارەکان",
   "template_editor": "دەستکاریکەری داڕێژە",
-  "maintenance_log": "تۆماری چاککردنەوە"
+  "maintenance_log": "تۆماری چاککردنەوە",
+  "trust_index": "نیشاندەری متمانە",
+  "opportunity_map": "نەخشەی دەرفەتەکان",
+  "action_plan": "پلانی کار",
+  "activation": "دۆخی چالاککردن",
+  "portfolio": "پۆرفۆلیۆی کۆمپانیاکان",
+  "layer4_viewer": "بەڵگەنامەی ئەسڵی",
+  "isolation_proof": "سەلماندنی سنووری متمانە",
+  "silent_ai": "دڵنیاکردنەوەی زیرەکی بێدەنگ"
 }

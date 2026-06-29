@@ -9,12 +9,19 @@ type NavItem = { to: string; label: string; ns: Namespace; icon: any };
 const NAV: Record<Role, NavItem[]> = {
   owner: [
     { to: "/owner", label: "executive_view", ns: "dashboard", icon: LayoutDashboard },
-    { to: "/owner/departments", label: "departments", ns: "dashboard", icon: Building2 },
+    { to: "/owner/trust-index", label: "trust_index", ns: "dashboard", icon: ShieldCheck },
     { to: "/owner/waste-map", label: "waste_map", ns: "dashboard", icon: AlertTriangle },
+    { to: "/owner/opportunity-map", label: "opportunity_map", ns: "dashboard", icon: Sparkles },
     { to: "/owner/risk-map", label: "risk_map", ns: "dashboard", icon: AlertTriangle },
+    { to: "/owner/action-plan", label: "action_plan", ns: "dashboard", icon: ListTodo },
+    { to: "/owner/layer4", label: "layer4_viewer", ns: "dashboard", icon: FileCheck2 },
+    { to: "/owner/portfolio", label: "portfolio", ns: "dashboard", icon: Briefcase },
+    { to: "/owner/activation", label: "activation", ns: "dashboard", icon: Bell },
+    { to: "/owner/departments", label: "departments", ns: "dashboard", icon: Building2 },
     { to: "/owner/what-if", label: "decision_simulator", ns: "dashboard", icon: Sliders },
     { to: "/owner/ledger", label: "ledger", ns: "dashboard", icon: ScrollText },
     { to: "/owner/exports", label: "exports", ns: "dashboard", icon: FileBarChart },
+    { to: "/silent-ai", label: "silent_ai", ns: "dashboard", icon: ShieldCheck },
   ],
   gm: [
     { to: "/gm", label: "executive_view", ns: "dashboard", icon: LayoutDashboard },
@@ -37,6 +44,7 @@ const NAV: Record<Role, NavItem[]> = {
   ],
   appowner: [
     { to: "/appowner", label: "client_companies", ns: "admin", icon: Briefcase },
+    { to: "/appowner/isolation-proof", label: "isolation_proof", ns: "dashboard", icon: ShieldCheck },
     { to: "/appowner/templates", label: "template_editor", ns: "admin", icon: Sparkles },
     { to: "/appowner/maintenance", label: "maintenance_log", ns: "admin", icon: Settings2 },
   ],
