@@ -26,7 +26,7 @@ type FlagContext = {
 export type Flag = {
   key: string;
   enabled: boolean;
-  description: string;
+  description?: string;
   rollout_percentage?: number;
   allow_roles?: string[];
   allow_company_ids?: string[];
@@ -101,7 +101,7 @@ class FeatureFlagRegistry {
   async refresh(): Promise<void> {
     try {
       const res = await api.system.featureFlags();
-      this.overrides = new Map(Object.entries(res || {}));
+      this.overrides = new Map(Object.entries((res || {}) as Record<string, Flag>));
       this.lastFetchedAt = Date.now();
     } catch {
       // Tolerate — fall back to defaults

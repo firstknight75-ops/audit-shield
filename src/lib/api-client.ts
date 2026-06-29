@@ -52,6 +52,9 @@ let ACTIVE_COMPANY_ID: string | null = null;
 export function setActiveCompanyId(c: string | null) {
   ACTIVE_COMPANY_ID = c;
 }
+export function getActiveCompanyId(): string | null {
+  return ACTIVE_COMPANY_ID;
+}
 
 async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {
   const base = DEFAULT_BASE;
@@ -228,6 +231,11 @@ export const api = {
         method: "POST",
         body: { finding_id, finding_kind, rating, note },
       }),
+  },
+
+  // ── System ──
+  system: {
+    featureFlags: () => requestWithRetry<Record<string, unknown>>("/system/feature-flags"),
   },
 };
 

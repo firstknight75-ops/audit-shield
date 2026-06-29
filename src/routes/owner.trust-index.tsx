@@ -21,6 +21,7 @@ interface TrustIndexData {
   duplicate_documents: number;
   missing_fields_total: number;
   trend?: Array<{ cycle: string; score: number }>;
+  generatedAt?: string;
 }
 
 const COPY = {
