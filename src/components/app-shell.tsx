@@ -4,6 +4,7 @@ import { ShieldCheck, LayoutDashboard, FileCheck2, ListTodo, AlertTriangle, User
 import { Role, ROLE_LABELS, getCurrentUser, signOut, persistLanguageChange } from "@/lib/auth";
 import { getLocale, setLocale, t, type Namespace } from "@/lib/i18n";
 import { CompanySwitcher } from "@/components/company-switcher";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 type NavItem = { to: string; label: string; ns: Namespace; icon: any };
 
