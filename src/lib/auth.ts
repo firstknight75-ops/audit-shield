@@ -20,6 +20,8 @@ export interface SeededUser {
   role: Role;
   preferredLanguage: Locale;
   accessibleCompanies?: AccessibleCompany[];
+  branch?: string;
+  department?: string;
 }
 
 export const SEEDED_USERS: SeededUser[] = [
@@ -47,6 +49,39 @@ export const ROLE_HOME: Record<Role, string> = {
   auditor: "/auditor",
   admin: "/admin",
   appowner: "/appowner",
+};
+
+export interface Permission {
+  code: string;
+  description: string;
+  category: "owner" | "gm" | "manager" | "auditor" | "admin" | "app_owner";
+}
+
+export const PERMISSIONS: Permission[] = [
+  { code: "view_executive", description: "عرض اللوحة التنفيذية", category: "owner" },
+  { code: "view_waste_map", description: "عرض خريطة الهدر", category: "owner" },
+  { code: "view_risk_map", description: "عرض خريطة المخاطر", category: "owner" },
+  { code: "view_ledger", description: "عرض السجل غير القابل للتعديل", category: "owner" },
+  { code: "view_departments", description: "عرض كل الأقسام", category: "gm" },
+  { code: "view_own_department", description: "عرض القسم الخاص فقط", category: "manager" },
+  { code: "manage_tasks", description: "إدارة مهام التصحيح", category: "manager" },
+  { code: "certify_document", description: "اعتماد المستندات", category: "auditor" },
+  { code: "upload_document", description: "رفع مستندات", category: "auditor" },
+  { code: "manage_users", description: "إدارة المستخدمين", category: "admin" },
+  { code: "manage_permissions", description: "إدارة الصلاحيات", category: "admin" },
+  { code: "manage_branches", description: "إدارة الفروع", category: "admin" },
+  { code: "view_activity_log", description: "عرض سجل النشاط", category: "admin" },
+  { code: "manage_templates", description: "إدارة قوالب القطاعات", category: "app_owner" },
+  { code: "manage_client_companies", description: "إدارة الشركات العميلة", category: "app_owner" },
+];
+
+export const ROLE_DEFAULTS: Record<Role, string[]> = {
+  owner: ["view_executive", "view_waste_map", "view_risk_map", "view_ledger"],
+  gm: ["view_executive", "view_departments"],
+  manager: ["view_own_department", "manage_tasks"],
+  auditor: ["certify_document", "upload_document"],
+  admin: ["manage_users", "manage_permissions", "manage_branches", "view_activity_log"],
+  appowner: ["manage_templates", "manage_client_companies"],
 };
 
 const KEY = "auditcore.session.v1";
