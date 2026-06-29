@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "auditcore.fullname" . }}-backend
+  labels:
+    app: {{ include "auditcore.name" . }}
+    component: backend
+    tier: {{ .Values.deploymentMode }}
+spec:
+  {{- with .Values.autoscaling }}
+  replicas: {{ .minReplicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ include "auditcore.name" . }}
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: {{ include "auditcore.name" . }}
+        component: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: backend
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: DEPLOYMENT_MODE
+              value: {{ .Values.deploymentMode | quote }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: auditcore-secrets
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: auditcore-secrets
+                  key: redis-url
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: auditcore-secrets
+                  key: secret-key
+            - name: COMPANY_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: auditcore-secrets
+                  key: company-master-key
+            - name: LOG_LEVEL
+              value: {{ .Values.observability.logLevel | quote }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

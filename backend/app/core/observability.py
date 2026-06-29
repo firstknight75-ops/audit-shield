@@ -1,10 +1,13 @@
 """Structured logging configuration + Prometheus metrics + health checks.
 
 Enterprise-grade observability for AuditCore:
-- JSON-structured logs (one event per line, parseable in any log stack)
+- JSON-structured logs (one line per event, parseable in any log stack)
 - Prometheus metrics exposed at /metrics (no auth, intended for scraping)
 - Deep health checks at /ready and /health
 - OpenTelemetry-compatible traces (no-op exporter by default; wire your own)
+
+FastAPI imports are lazy so the logging/prometheus bits can be unit-tested
+without fastapi installed (e.g. in CI matrix builds or sandboxed envs).
 """
 from __future__ import annotations
 
@@ -15,12 +18,19 @@ import sys
 import time
 from typing import Any
 
-from fastapi import APIRouter, FastAPI, Response
 
 # ── Structured logging ────────────────────────────────────────────
 
 class JSONFormatter(logging.Formatter):
     """Render log records as one-line JSON for downstream log stacks."""
+
+    # Standard LogRecord attributes — never treat these as user-supplied extras.
+    _STD_ATTRS = frozenset({
+        'name', 'msg', 'args', 'levelname', 'levelno', 'pathname', 'filename',
+        'module', 'exc_info', 'exc_text', 'stack_info', 'lineno', 'funcName',
+        'created', 'msecs', 'relativeCreated', 'thread', 'threadName',
+        'processName', 'process', 'asctime', 'taskName',
+    })
 
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, Any] = {
@@ -29,12 +39,9 @@ class JSONFormatter(logging.Formatter):
             'logger': record.name,
             'message': record.getMessage(),
         }
-        # Pull from `extra` if present (logging convention)
+        # Pull `extra` if present (logging convention)
         for key, value in record.__dict__.items():
-            if key in ('args', 'asctime', 'created', 'exc_info', 'exc_text', 'filename',
-                      'funcName', 'levelname', 'levelno', 'lineno', 'module', 'msecs',
-                      'message', 'msg', 'name', 'pathname', 'process', 'processName',
-                      'relativeCreated', 'stack_info', 'thread', 'threadName', 'taskName'):
+            if key in self._STD_ATTRS:
                 continue
             try:
                 json.dumps(value)
@@ -55,12 +62,11 @@ def configure_logging(level: str | None = None) -> None:
     root.handlers.clear()
     root.addHandler(handler)
     root.setLevel(log_level)
-    # Quiet noisy libraries
     logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 
-# ── Prometheus metrics (using prometheus_client if available) ─────
+# ── Prometheus metrics (optional; degrades if package missing) ────
 
 try:
     from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
@@ -92,67 +98,67 @@ if _METRICS_AVAILABLE:
     OCR_PROCESSED = Counter(
         'auditcore_ocr_processed_total',
         'OCR documents processed',
-        ['status'],  # certified | pending | rejected
+        ['status'],
     )
 
 
-# ── Health checks ──────────────────────────────────────────────────
+# ── FastAPI integration (lazy) ───────────────────────────────────
 
-router = APIRouter(tags=['health'])
+def install_observability(app) -> None:
+    """Wire structured logging, health checks, and metrics into the app."""
+    configure_logging()
+    # Lazy imports so this module is importable without fastapi
+    from fastapi import APIRouter
 
+    router = APIRouter(tags=['health'])
 
-@router.get('/health')
-async def health_liveness() -> dict:
-    """Liveness probe — answers as long as the process is up."""
-    return {
-        'status': 'ok',
-        'deployment_mode': os.environ.get('DEPLOYMENT_MODE', 'onpremise'),
-    }
+    @router.get('/health')
+    async def health_liveness() -> dict:
+        """Liveness probe — answers as long as the process is up."""
+        return {
+            'status': 'ok',
+            'deployment_mode': os.environ.get('DEPLOYMENT_MODE', 'onpremise'),
+        }
 
-
-@router.get('/ready')
-async def health_readiness() -> dict:
-    """Readiness probe — verifies downstream dependencies are reachable."""
-    from app.core.config import get_settings
-    settings = get_settings()
-
-    checks: dict[str, Any] = {'status': 'ok'}
-    # DB check (lightweight)
-    try:
+    @router.get('/ready')
+    async def health_readiness() -> dict:
+        """Readiness probe — verifies downstream dependencies are reachable."""
         from sqlalchemy import text
-        from app.db.session import SessionLocal
-        async with SessionLocal() as session:
-            await session.execute(text('SELECT 1'))
-        checks['database'] = 'ok'
-    except Exception as exc:
-        checks['status'] = 'degraded'
-        checks['database'] = f'error: {exc!r}'
+        checks: dict[str, Any] = {'status': 'ok'}
+        try:
+            from app.db.session import SessionLocal
+            async with SessionLocal() as session:
+                await session.execute(text('SELECT 1'))
+            checks['database'] = 'ok'
+        except Exception as exc:
+            checks['status'] = 'degraded'
+            checks['database'] = f'error: {exc!r}'
 
-    # Redis check
-    try:
-        from app.db.session import engine  # if redis URL configured
-        # Attempt a no-op call; if Redis is unreachable, surface it
-        # without taking the whole readiness probe down.
-        if hasattr(engine.sync_engine.pool, '_invoke_create_connect'):
-            checks['redis'] = 'ok'
-        else:
-            checks['redis'] = 'ok'
-    except Exception as exc:
-        checks['redis'] = f'error: {exc!r}'
+        try:
+            from app.db.session import engine
+            if hasattr(engine.sync_engine.pool, '_invoke_create_connect'):
+                checks['redis'] = 'ok'
+            else:
+                checks['redis'] = 'ok'
+        except Exception as exc:
+            checks['redis'] = f'error: {exc!r}'
 
-    return checks
+        return checks
 
+    @router.get('/metrics')
+    async def metrics_endpoint() -> 'Response':  # type: ignore[name-defined]
+        from fastapi import Response
+        if not _METRICS_AVAILABLE:
+            return Response(content='# prometheus_client not installed\n', media_type='text/plain')
+        return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
-@router.get('/metrics')
-async def metrics_endpoint() -> Response:
-    """Prometheus scrape endpoint."""
-    if not _METRICS_AVAILABLE:
-        return Response(content='# prometheus_client not installed\n', media_type='text/plain')
-    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+    app.include_router(router)
+    if _METRICS_AVAILABLE:
+        app.add_middleware(PrometheusMetricsMiddleware)
 
 
 class PrometheusMetricsMiddleware:
-    """Per-request Prometheus metrics."""
+    """Per-request Prometheus metrics middleware."""
 
     def __init__(self, app) -> None:
         self.app = app
@@ -162,7 +168,6 @@ class PrometheusMetricsMiddleware:
             return await self.app(scope, receive, send)
         method = scope.get('method', 'GET')
         path = scope.get('path', '/')
-        # Strip query string and normalize to endpoint label
         endpoint = path.split('?')[0]
         started = time.perf_counter()
         status_holder = {'code': 500}
@@ -176,11 +181,3 @@ class PrometheusMetricsMiddleware:
             duration = time.perf_counter() - started
             HTTP_REQUEST_DURATION.labels(method=method, endpoint=endpoint).observe(duration)
             HTTP_REQUESTS.labels(method=method, endpoint=endpoint, status=status_holder['code']).inc()
-
-
-def install_observability(app: FastAPI) -> None:
-    """Wire structured logging, health checks, and metrics into the app."""
-    configure_logging()
-    app.include_router(router)
-    if _METRICS_AVAILABLE:
-        app.add_middleware(PrometheusMetricsMiddleware)

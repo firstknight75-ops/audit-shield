@@ -1,0 +1,16 @@
+apiVersion: v2
+name: auditcore
+description: AuditCore — sovereign audit intelligence platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: AuditCore Team
+keywords:
+  - audit
+  - intelligence
+  - sovereigned
+  - enterprise
+home: https://github.com/firstknight75-ops/audit-shield
+sources:
+  - https://github.com/firstknight75-ops/audit-shield

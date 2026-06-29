@@ -136,7 +136,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="text-sm text-muted-foreground hidden md:block">{new Date().toLocaleDateString(locale === "ar" ? "ar-IQ" : "ku", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
           <div className="flex items-center gap-3"><button className="relative w-9 h-9 rounded-md bg-card border border-border flex items-center justify-center hover:border-primary transition"><Bell className="w-4 h-4" /><span className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-danger text-[10px] text-white flex items-center justify-center">3</span></button></div>
         </header>
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-6 overflow-auto">
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </main>
       </div>
     </div>
   );
