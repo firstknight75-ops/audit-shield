@@ -1,11 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/app-shell";
-import { TrendingDown, ShieldCheck, AlertTriangle, Wallet, Users, ArrowLeft, Briefcase } from "lucide-react";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { ExecutiveSkeleton, AnalyzingMessage } from "@/components/loading-skeleton";
+import { TrendingDown, ShieldCheck, AlertTriangle, Wallet, Users, ArrowLeft, Briefcase, RefreshCw } from "lucide-react";
 import { getLocale, type Locale } from "@/lib/i18n";
-import { ownerKpis, formatIQD } from "@/lib/mock-data";
+import { api, getActiveCompanyId } from "@/lib/api-client";
+import { useApiData } from "@/lib/use-api-data";
 
 export const Route = createFileRoute("/owner/")({ component: OwnerHome });
+
+interface ExecutiveKpis {
+  monthlyWaste: number;
+  trustIndex: number;
+  criticalAlerts: number;
+  predictedCash: number;
+  auditorEfficiency: number;
+  narrative?: string;
+  generatedAt?: string;
+}
 
 const COPY = {
   ar: {
@@ -19,6 +32,10 @@ const COPY = {
     detail: "التفاصيل",
     multi_company_note: "لديك أكثر من شركة. اضغط على اسم الشركة في الأعلى للتنقل الجانبي.",
     single_company_note: "كل الأرقام التالية خاصة بهذه الشركة فقط.",
+    retraining: "إعادة التحليل",
+    analyzing: "جاري تحليل البيانات...",
+    error: "تعذّر تحميل البيانات. تحقق من اتصال الشبكة.",
+    retry: "إعادة المحاولة",
   },
   ckb: {
     title: "وێنەی ڕاستەقینە",
@@ -31,6 +48,10 @@ const COPY = {
     detail: "وردەکاری",
     multi_company_note: "زیاتر لە یەک کۆمپانیات هەیە. پەنجە لە ناوی کۆمپانیاکە لە سەرەوە بکە بۆ گەشتکردنی لاتەنیشت.",
     single_company_note: "هەموو ژمارەکانی خوارەوە تایبەتن بەم کۆمپانیایە تەنها.",
+    retraining: "دووبەرەکرنەوەی شیکاری",
+    analyzing: "لە شیکردنەوەی داتاکاندا...",
+    error: "بارکردنی داتاکان سەرکەوتوو نەبوو. پەیوەندی خۆت بپشکنە.",
+    retry: "هەوڵکردنەوە",
   },
 } as const;
 
@@ -41,69 +62,140 @@ const toneClass: Record<string, string> = {
   primary: "text-primary border-primary/30 bg-primary/5",
 };
 
+function formatIQD(n: number, locale: Locale): string {
+  return new Intl.NumberFormat(locale === "ar" ? "ar-IQ" : "ku-IQ", {
+    style: "decimal",
+    maximumFractionDigits: 0,
+  }).format(n) + " د.ع";
+}
+
 function OwnerHome() {
   const [locale, setLocale] = useState<Locale>(getLocale());
+  const [companyId, setCompanyId] = useState<string | null>(null);
+
   useEffect(() => {
     const onStorage = () => setLocale(getLocale());
     window.addEventListener("storage", onStorage);
+    setCompanyId(getActiveCompanyId());
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   const t = COPY[locale];
 
+  // ── Real API integration ────────────────────────────────────────
+  const { data, error, isLoading, refetch, isStale } = useApiData<ExecutiveKpis | null>(
+    async () => {
+      if (!companyId) return null;
+      const me = await api.auth.me();
+      if (me.accessible_companies.length === 0) return null;
+      const cid = companyId || me.accessible_companies[0].company_id;
+      const picture = await api.owner.picture(cid) as Record<string, unknown>;
+      return {
+        monthlyWaste: Number(picture.monthly_waste_iqd ?? 0),
+        trustIndex: Number(picture.trust_index_score ?? 0),
+        criticalAlerts: Number(picture.critical_alerts ?? 0),
+        predictedCash: Number(picture.predicted_cash_outflow_iqd ?? 0),
+        auditorEfficiency: Number(picture.auditor_efficiency ?? 0),
+        narrative: picture.narrative as string | undefined,
+        generatedAt: picture.generated_at as string | undefined,
+      };
+    },
+    [companyId, locale],
+    { enabled: !!companyId, staleTime: 60_000 },
+  );
+
   // Executive layer — exactly 5 cards per Phase 3 spec
-  const cards = [
-    { key: "waste", label: t.monthly_waste, value: formatIQD(ownerKpis.monthlyWaste), icon: TrendingDown, tone: "danger", to: "/owner/waste-map" },
-    { key: "trust", label: t.trust_index, value: `${ownerKpis.trustIndex} / 100`, icon: ShieldCheck, tone: "success", to: "/owner/trust-index" },
-    { key: "alerts", label: t.critical_alerts, value: String(ownerKpis.criticalAlerts), icon: AlertTriangle, tone: "warning", to: "/owner/risk-map" },
-    { key: "cash", label: t.predicted_cash, value: formatIQD(ownerKpis.predictedCash), icon: Wallet, tone: "primary", to: "/owner/what-if" },
-    { key: "eff", label: t.auditor_efficiency, value: `${ownerKpis.auditorEfficiency}%`, icon: Users, tone: "primary", to: "/owner/ledger" },
-  ];
+  const cards = data
+    ? [
+        { key: "waste", label: t.monthly_waste, value: formatIQD(data.monthlyWaste, locale), icon: TrendingDown, tone: "danger", to: "/owner/waste-map" },
+        { key: "trust", label: t.trust_index, value: `${data.trustIndex} / 100`, icon: ShieldCheck, tone: data.trustIndex >= 80 ? "success" : data.trustIndex >= 60 ? "warning" : "danger", to: "/owner/trust-index" },
+        { key: "alerts", label: t.critical_alerts, value: String(data.criticalAlerts), icon: AlertTriangle, tone: "warning", to: "/owner/risk-map" },
+        { key: "cash", label: t.predicted_cash, value: formatIQD(data.predictedCash, locale), icon: Wallet, tone: "primary", to: "/owner/what-if" },
+        { key: "eff", label: t.auditor_efficiency, value: `${data.auditorEfficiency}%`, icon: Users, tone: "primary", to: "/owner/ledger" },
+      ]
+    : [];
+
+  if (error) {
+    return (
+      <div>
+        <PageHeader title={t.title} subtitle={t.subtitle} />
+        <div className="p-6 rounded-xl bg-danger/5 border border-danger/30">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <div className="font-bold text-danger">{t.error}</div>
+              {error instanceof Error && "request_id" in error && (error as { request_id: string | null }).request_id && (
+                <div className="text-xs text-muted-foreground mt-1 font-mono">
+                  request_id: {(error as { request_id: string | null }).request_id}
+                </div>
+              )}
+              <button onClick={() => void refetch()} className="mt-3 flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-bold">
+                <RefreshCw className="w-4 h-4" /> {t.retry}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
       <PageHeader title={t.title} subtitle={t.subtitle} />
 
-      {/* Note for multi-company owners */}
       <div className="mb-6 p-4 rounded-xl bg-primary/5 border border-primary/30 flex items-center gap-3 text-sm">
         <Briefcase className="w-4 h-4 text-primary shrink-0" />
         <span>{t.multi_company_note}</span>
       </div>
 
-      {/* EXACTLY 5 CARDS — Phase 3 Executive layer */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 mb-8">
-        {cards.map((c) => {
-          const Icon = c.icon;
-          return (
-            <Link
-              key={c.key}
-              to={c.to}
-              className={`group p-5 rounded-2xl bg-card border border-border hover:border-primary transition relative overflow-hidden`}
-            >
-              <div className={`inline-flex p-2 rounded-lg border ${toneClass[c.tone]}`}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div className="text-sm text-muted-foreground mt-4">{c.label}</div>
-              <div className="text-2xl font-bold font-display mt-2">{c.value}</div>
-              <div className="flex items-center gap-1 text-xs text-primary mt-4 opacity-0 group-hover:opacity-100 transition">
-                {t.detail} <ArrowLeft className="w-3 h-3" />
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Reuse the existing chart/recommendations structure */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 p-6 rounded-xl bg-card border border-border">
-          <h3 className="font-bold mb-4">
-            {locale === "ar" ? "التدفق النقدي — آخر 6 أشهر (مليون د.ع)" : "ڕەوتی نەقدی — ٦ مانگی دواین (ملیۆن د.ع)"}
-          </h3>
-          <div className="text-sm text-muted-foreground">{t.single_company_note}</div>
+      {isLoading || isStale ? <ExecutiveSkeleton /> : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 mb-8">
+          {cards.map((c) => {
+            const Icon = c.icon;
+            return (
+              <Link
+                key={c.key}
+                to={c.to}
+                className={`group p-5 rounded-2xl bg-card border border-border hover:border-primary transition relative overflow-hidden`}
+              >
+                <div className={`inline-flex p-2 rounded-lg border ${toneClass[c.tone]}`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div className="text-sm text-muted-foreground mt-4">{c.label}</div>
+                <div className="text-2xl font-bold font-display mt-2">{c.value}</div>
+                <div className="flex items-center gap-1 text-xs text-primary mt-4 opacity-0 group-hover:opacity-100 transition">
+                  {t.detail} <ArrowLeft className="w-3 h-3" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
-        <div className="p-6 rounded-xl bg-card border border-border">
+      )}
+
+      {/* AI narrative — strategic for Owner */}
+      {data?.narrative && (
+        <div className="p-6 rounded-2xl bg-card border border-border mb-6">
+          <div className="flex items-start gap-3">
+            <Briefcase className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                {locale === "ar" ? "ملخص استراتيجي للمالك" : "کورتی ستراتژی بۆ خاوەن"}
+              </div>
+              <p className="text-base leading-relaxed">{data.narrative}</p>
+              {data.generatedAt && (
+                <div className="text-xs text-muted-foreground mt-3 font-mono">
+                  {locale === "ar" ? "آخر تحديث:" : "نوێکردنەوەی دواین:"} {data.generatedAt}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && (
+        <div className="p-5 rounded-xl bg-card border border-border">
           <h3 className="font-bold mb-4">
-            {locale === "ar" ? "المسار الموصى به" : "ڕێڕەوی پێشنیارکراو"}
+            {locale === "ar" ? "الإجراءات التالية الموصى بها" : "کارەکانی دواتر پێشنیارکراو"}
           </h3>
           <ol className="space-y-4 text-sm">
             {[
@@ -119,7 +211,7 @@ function OwnerHome() {
             ))}
           </ol>
         </div>
-      </div>
+      )}
     </div>
   );
 }
