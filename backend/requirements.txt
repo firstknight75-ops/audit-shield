@@ -25,8 +25,6 @@ pandas==2.2.2
 numpy==1.26.4
 scikit-learn==1.5.1
 prometheus-client==0.20.0
-redis==5.0.8
-email-validator==2.2.0
 python-slugify==8.0.4
 limits==3.13.0
 structlog==24.4.0
@@ -35,3 +33,18 @@ opentelemetry-sdk==1.27.0
 opentelemetry-instrumentation-fastapi==0.48b0
 prometheus-fastapi-instrumentator==7.0.0
 aiofiles==24.1.0
+
+# Export engine dependencies — imported eagerly via app.api.phase4.
+# Bug #1 fix: without this, a clean `pip install -r requirements.txt`
+# followed by `python -c "import app.main"` raises ModuleNotFoundError
+# and the entire API fails to boot, not just the export feature.
+openpyxl==3.1.5
+
+# PDF export — falls back to HTML if not installed (already wrapped in
+# try/except in app.exports.engine). Declared so a clean install doesn't
+# silently miss the optional dep.
+weasyprint==62.3
+
+# Reporting watermarks — optional, falls back to "no overlay" if missing.
+reportlab==4.2.5
+pypdf==5.1.0
