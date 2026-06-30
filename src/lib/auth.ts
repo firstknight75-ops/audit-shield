@@ -25,7 +25,41 @@ export interface SeededUser {
 }
 
 export const SEEDED_USERS: SeededUser[] = [
-  { id: "u-owner", email: "owner@auditcore.local", password: "Owner123!", fullName: "المالك — أبو محمد", role: "owner", preferredLanguage: "ar" },
+  {
+    id: "u-owner",
+    email: "owner@auditcore.local",
+    password: "Owner123!",
+    fullName: "المالك — أبو محمد",
+    role: "owner",
+    preferredLanguage: "ar",
+    accessibleCompanies: [
+      {
+        company_id: "c1",
+        name: "مجموعة الفرات للتجارة",
+        branches: [
+          { branch_id: "b1", name: "الفرع الرئيسي — بغداد" },
+          { branch_id: "b2", name: "فرع البصرة" },
+        ],
+      },
+      {
+        company_id: "c2",
+        name: "مصنع الفرات للصناعات الغذائية",
+        branches: [
+          { branch_id: "b3", name: "المعمل — كربلاء" },
+          { branch_id: "b4", name: "مستودع النجف" },
+        ],
+      },
+      {
+        company_id: "c3",
+        name: "مطاعم بغداد العريقة",
+        branches: [
+          { branch_id: "b5", name: "فرع الكرادة" },
+          { branch_id: "b6", name: "فرع المنصور" },
+          { branch_id: "b7", name: "فرع زيونة" },
+        ],
+      },
+    ],
+  },
   { id: "u-gm", email: "gm@auditcore.local", password: "Gm123!", fullName: "بەڕێوەبەری گشتی — سالم الجبوري", role: "gm", preferredLanguage: "ckb" },
   { id: "u-manager", email: "manager@auditcore.local", password: "Manager123!", fullName: "مدير المشتريات — حسن العاني", role: "manager", preferredLanguage: "ar" },
   { id: "u-auditor", email: "auditor@auditcore.local", password: "Auditor123!", fullName: "ژمێریار — زينب الكاظمي", role: "auditor", preferredLanguage: "ckb" },
