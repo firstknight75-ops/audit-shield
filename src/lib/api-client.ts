@@ -51,9 +51,17 @@ export function setAccessToken(t: string | null) {
 let ACTIVE_COMPANY_ID: string | null = null;
 export function setActiveCompanyId(c: string | null) {
   ACTIVE_COMPANY_ID = c;
+  if (typeof window !== "undefined") {
+    if (c) window.localStorage.setItem("auditcore.active.company", c);
+    else window.localStorage.removeItem("auditcore.active.company");
+  }
 }
 export function getActiveCompanyId(): string | null {
-  return ACTIVE_COMPANY_ID;
+  if (ACTIVE_COMPANY_ID) return ACTIVE_COMPANY_ID;
+  if (typeof window !== "undefined") {
+    return window.localStorage.getItem("auditcore.active.company");
+  }
+  return null;
 }
 
 async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {
