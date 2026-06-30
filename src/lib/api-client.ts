@@ -166,6 +166,8 @@ export const api = {
       requestWithRetry<unknown>(`/analytics/run/${company_id}`, { method: "POST" }),
     verifyLedger: (company_id: string) =>
       requestWithRetry<unknown>(`/owner/ledger/verify?company_id=${company_id}`),
+    aiAdvisor: (company_id: string) =>
+      requestWithRetry<unknown>(`/owner/ai-advisor?company_id=${company_id}`),
   },
 
   // ── Auditor ──

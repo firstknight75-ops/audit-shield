@@ -7,7 +7,8 @@ import {
 } from "lucide-react";
 import { getLocale, type Locale } from "@/lib/i18n";
 import { getCurrentUser, type AccessibleCompany } from "@/lib/auth";
-import { getActiveCompanyId, setActiveCompanyId } from "@/lib/api-client";
+import { getActiveCompanyId, setActiveCompanyId, api } from "@/lib/api-client";
+import { useApiData } from "@/lib/use-api-data";
 import { formatIQD } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/owner/advisor")({ component: OwnerAdvisorPage });
@@ -304,9 +305,60 @@ function OwnerAdvisorPage() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  const { data: backendAdvisorData } = useApiData<{
+    narrative: { ar: string; ckb: string };
+    auditor_metrics: {
+      efficiency: number;
+      accuracy: number;
+      bypass_rate: number;
+      demerits: number;
+      ledger_verified: boolean;
+      ledger_message: string;
+      verified_entries_count: number;
+    };
+    key_issues: Array<any>;
+  } | null>(
+    async () => {
+      try {
+        if (!activeCompanyId) return null;
+        const res = await api.owner.aiAdvisor(activeCompanyId);
+        return res as any;
+      } catch (e) {
+        console.warn("Could not fetch backend advisor data, falling back to mock:", e);
+        return null;
+      }
+    },
+    [activeCompanyId],
+    { enabled: !!activeCompanyId }
+  );
+
   const activeCompanyProfile = useMemo(() => {
-    return ADV_COMPANIES_DATA[activeCompanyId] || ADV_COMPANIES_DATA["c1"];
-  }, [activeCompanyId]);
+    const fallback = ADV_COMPANIES_DATA[activeCompanyId] || ADV_COMPANIES_DATA["c1"];
+    if (backendAdvisorData) {
+      return {
+        ...fallback,
+        narrative: backendAdvisorData.narrative,
+        auditorMetrics: {
+          efficiency: backendAdvisorData.auditor_metrics.efficiency,
+          accuracy: backendAdvisorData.auditor_metrics.accuracy,
+          bypassRate: backendAdvisorData.auditor_metrics.bypass_rate,
+          demerits: backendAdvisorData.auditor_metrics.demerits,
+          violationsList: fallback.auditorMetrics.violationsList,
+          verifiedLedgerEntriesCount: backendAdvisorData.auditor_metrics.verified_entries_count
+        },
+        keyIssues: backendAdvisorData.key_issues.map((issue: any) => ({
+          title: issue.title,
+          techDetail: issue.tech_detail,
+          translation: issue.translation,
+          risk: issue.risk,
+          action: issue.action,
+          impact: issue.impact,
+          severity: issue.severity
+        }))
+      };
+    }
+    return fallback;
+  }, [activeCompanyId, backendAdvisorData]);
 
   const selectCompany = (id: string) => {
     setActiveId(id);
