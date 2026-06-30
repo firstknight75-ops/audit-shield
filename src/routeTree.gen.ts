@@ -36,6 +36,7 @@ import { Route as OwnerLedgerRouteImport } from './routes/owner.ledger'
 import { Route as OwnerLayer4RouteImport } from './routes/owner.layer4'
 import { Route as OwnerExportsRouteImport } from './routes/owner.exports'
 import { Route as OwnerDepartmentsRouteImport } from './routes/owner.departments'
+import { Route as OwnerAdvisorRouteImport } from './routes/owner.advisor'
 import { Route as OwnerActivationRouteImport } from './routes/owner.activation'
 import { Route as OwnerActionPlanRouteImport } from './routes/owner.action-plan'
 import { Route as ManagerTasksRouteImport } from './routes/manager.tasks'
@@ -184,6 +185,11 @@ const OwnerDepartmentsRoute = OwnerDepartmentsRouteImport.update({
   path: '/departments',
   getParentRoute: () => OwnerRoute,
 } as any)
+const OwnerAdvisorRoute = OwnerAdvisorRouteImport.update({
+  id: '/advisor',
+  path: '/advisor',
+  getParentRoute: () => OwnerRoute,
+} as any)
 const OwnerActivationRoute = OwnerActivationRouteImport.update({
   id: '/activation',
   path: '/activation',
@@ -269,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/manager/tasks': typeof ManagerTasksRoute
   '/owner/action-plan': typeof OwnerActionPlanRoute
   '/owner/activation': typeof OwnerActivationRoute
+  '/owner/advisor': typeof OwnerAdvisorRoute
   '/owner/departments': typeof OwnerDepartmentsRoute
   '/owner/exports': typeof OwnerExportsRoute
   '/owner/layer4': typeof OwnerLayer4Route
@@ -304,6 +311,7 @@ export interface FileRoutesByTo {
   '/manager/tasks': typeof ManagerTasksRoute
   '/owner/action-plan': typeof OwnerActionPlanRoute
   '/owner/activation': typeof OwnerActivationRoute
+  '/owner/advisor': typeof OwnerAdvisorRoute
   '/owner/departments': typeof OwnerDepartmentsRoute
   '/owner/exports': typeof OwnerExportsRoute
   '/owner/layer4': typeof OwnerLayer4Route
@@ -346,6 +354,7 @@ export interface FileRoutesById {
   '/manager/tasks': typeof ManagerTasksRoute
   '/owner/action-plan': typeof OwnerActionPlanRoute
   '/owner/activation': typeof OwnerActivationRoute
+  '/owner/advisor': typeof OwnerAdvisorRoute
   '/owner/departments': typeof OwnerDepartmentsRoute
   '/owner/exports': typeof OwnerExportsRoute
   '/owner/layer4': typeof OwnerLayer4Route
@@ -389,6 +398,7 @@ export interface FileRouteTypes {
     | '/manager/tasks'
     | '/owner/action-plan'
     | '/owner/activation'
+    | '/owner/advisor'
     | '/owner/departments'
     | '/owner/exports'
     | '/owner/layer4'
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/manager/tasks'
     | '/owner/action-plan'
     | '/owner/activation'
+    | '/owner/advisor'
     | '/owner/departments'
     | '/owner/exports'
     | '/owner/layer4'
@@ -465,6 +476,7 @@ export interface FileRouteTypes {
     | '/manager/tasks'
     | '/owner/action-plan'
     | '/owner/activation'
+    | '/owner/advisor'
     | '/owner/departments'
     | '/owner/exports'
     | '/owner/layer4'
@@ -688,6 +700,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerDepartmentsRouteImport
       parentRoute: typeof OwnerRoute
     }
+    '/owner/advisor': {
+      id: '/owner/advisor'
+      path: '/advisor'
+      fullPath: '/owner/advisor'
+      preLoaderRoute: typeof OwnerAdvisorRouteImport
+      parentRoute: typeof OwnerRoute
+    }
     '/owner/activation': {
       id: '/owner/activation'
       path: '/activation'
@@ -852,6 +871,7 @@ const ManagerRouteWithChildren =
 interface OwnerRouteChildren {
   OwnerActionPlanRoute: typeof OwnerActionPlanRoute
   OwnerActivationRoute: typeof OwnerActivationRoute
+  OwnerAdvisorRoute: typeof OwnerAdvisorRoute
   OwnerDepartmentsRoute: typeof OwnerDepartmentsRoute
   OwnerExportsRoute: typeof OwnerExportsRoute
   OwnerLayer4Route: typeof OwnerLayer4Route
@@ -868,6 +888,7 @@ interface OwnerRouteChildren {
 const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerActionPlanRoute: OwnerActionPlanRoute,
   OwnerActivationRoute: OwnerActivationRoute,
+  OwnerAdvisorRoute: OwnerAdvisorRoute,
   OwnerDepartmentsRoute: OwnerDepartmentsRoute,
   OwnerExportsRoute: OwnerExportsRoute,
   OwnerLayer4Route: OwnerLayer4Route,
@@ -899,3 +920,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

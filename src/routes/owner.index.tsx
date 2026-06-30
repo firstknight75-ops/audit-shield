@@ -123,6 +123,7 @@ function OwnerHome() {
   ];
 
   const modules = [
+    { to: "/owner/advisor" as const, label: locale === "ar" ? "مستشار المالك الآلي" : "ڕاوێژکاری خۆکار", sub: locale === "ar" ? "تدقيق المدقق وتفسير التقارير" : "پشکنینی پشکنەر و وەرگێڕان", icon: Sparkles },
     { to: "/owner/trust-index" as const, label: locale === "ar" ? "مؤشر الثقة" : "نیشاندەری متمانە", sub: locale === "ar" ? "صحة بياناتك" : "تەندروستی داتاکانت", icon: ShieldCheck },
     { to: "/owner/waste-map" as const, label: locale === "ar" ? "خريطة الهدر" : "نەخشەی بەفڕین", sub: locale === "ar" ? "أين تخسر المال" : "لەکوێ پارە ون دەکەیت", icon: TrendingDown },
     { to: "/owner/risk-map" as const, label: locale === "ar" ? "خريطة المخاطر" : "نەخشەی مەترسی", sub: locale === "ar" ? "ما يحتاج قراراً" : "ئەوەی پێویستی بە بڕیارە", icon: AlertTriangle },
@@ -203,14 +204,23 @@ function OwnerHome() {
         })}
       </div>
 
-      <div className="p-5 rounded-2xl bg-gradient-to-bl from-primary/10 to-card border border-primary/25 mb-6 flex items-start gap-3">
-        <div className="inline-flex p-2 rounded-xl border border-primary/30 bg-primary/15 text-primary shrink-0">
-          <Sparkles className="w-5 h-5" />
+      <div className="p-5 rounded-2xl bg-gradient-to-bl from-primary/10 to-card border border-primary/25 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-start gap-3 flex-1">
+          <div className="inline-flex p-2 rounded-xl border border-primary/30 bg-primary/15 text-primary shrink-0">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-wide text-primary/80 font-bold mb-1">{t.narrative}</div>
+            <p className="text-sm leading-relaxed">{t.narrativeBody}</p>
+          </div>
         </div>
-        <div className="flex-1">
-          <div className="text-xs uppercase tracking-wide text-primary/80 font-bold mb-1">{t.narrative}</div>
-          <p className="text-sm leading-relaxed">{t.narrativeBody}</p>
-        </div>
+        <Link
+          to="/owner/advisor"
+          className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/95 font-bold text-xs rounded-xl shrink-0 flex items-center gap-1.5 transition self-end md:self-auto"
+        >
+          <span>{locale === "ar" ? "افتح المستشار الآلي وتدقيق المدقق" : "ڕاوێژکاری خۆکار بکەرەوە"}</span>
+          <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">

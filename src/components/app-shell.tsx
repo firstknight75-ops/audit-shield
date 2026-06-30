@@ -11,6 +11,7 @@ type NavItem = { to: string; label: string; ns: Namespace; icon: any };
 const NAV: Record<Role, NavItem[]> = {
   owner: [
     { to: "/owner", label: "executive_view", ns: "dashboard", icon: LayoutDashboard },
+    { to: "/owner/advisor", label: "owner_advisor", ns: "dashboard", icon: Sparkles },
     { to: "/owner/trust-index", label: "trust_index", ns: "dashboard", icon: ShieldCheck },
     { to: "/owner/waste-map", label: "waste_map", ns: "dashboard", icon: AlertTriangle },
     { to: "/owner/opportunity-map", label: "opportunity_map", ns: "dashboard", icon: Sparkles },
