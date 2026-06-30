@@ -64,7 +64,21 @@ function Tile({ label, value, sub, tone }: { label: string; value: string; sub: 
 function TrustIndexPage() {
   const [locale, setLocale] = useState<Locale>(getLocale());
   const [companyId, setCompanyId] = useState<string | null>(null);
-  useEffect(() => { setCompanyId(getActiveCompanyId()); }, []);
+  
+  useEffect(() => {
+    const onStorage = () => setLocale(getLocale());
+    const onCompanyChanged = () => {
+      setCompanyId(getActiveCompanyId());
+    };
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("auditcore.active_company_changed", onCompanyChanged);
+    onCompanyChanged();
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("auditcore.active_company_changed", onCompanyChanged);
+    };
+  }, []);
+
   const t = COPY[locale];
   void setLocale;
 
