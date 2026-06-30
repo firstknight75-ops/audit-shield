@@ -20,6 +20,7 @@ import { Route as AuditorRouteImport } from './routes/auditor'
 import { Route as AppownerRouteImport } from './routes/appowner'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as ManagerIndexRouteImport } from './routes/manager.index'
 import { Route as GmIndexRouteImport } from './routes/gm.index'
 import { Route as AuditorIndexRouteImport } from './routes/auditor.index'
@@ -102,6 +103,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerIndexRoute = OwnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OwnerRoute,
 } as any)
 const ManagerIndexRoute = ManagerIndexRouteImport.update({
   id: '/',
@@ -278,11 +284,11 @@ export interface FileRoutesByFullPath {
   '/auditor/': typeof AuditorIndexRoute
   '/gm/': typeof GmIndexRoute
   '/manager/': typeof ManagerIndexRoute
+  '/owner/': typeof OwnerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/owner': typeof OwnerRouteWithChildren
   '/silent-ai': typeof SilentAiRoute
   '/status': typeof StatusRoute
   '/trust': typeof TrustRoute
@@ -313,6 +319,7 @@ export interface FileRoutesByTo {
   '/auditor': typeof AuditorIndexRoute
   '/gm': typeof GmIndexRoute
   '/manager': typeof ManagerIndexRoute
+  '/owner': typeof OwnerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -354,6 +361,7 @@ export interface FileRoutesById {
   '/auditor/': typeof AuditorIndexRoute
   '/gm/': typeof GmIndexRoute
   '/manager/': typeof ManagerIndexRoute
+  '/owner/': typeof OwnerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -396,11 +404,11 @@ export interface FileRouteTypes {
     | '/auditor/'
     | '/gm/'
     | '/manager/'
+    | '/owner/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/owner'
     | '/silent-ai'
     | '/status'
     | '/trust'
@@ -431,6 +439,7 @@ export interface FileRouteTypes {
     | '/auditor'
     | '/gm'
     | '/manager'
+    | '/owner'
   id:
     | '__root__'
     | '/'
@@ -471,6 +480,7 @@ export interface FileRouteTypes {
     | '/auditor/'
     | '/gm/'
     | '/manager/'
+    | '/owner/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -565,6 +575,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/owner/': {
+      id: '/owner/'
+      path: '/'
+      fullPath: '/owner/'
+      preLoaderRoute: typeof OwnerIndexRouteImport
+      parentRoute: typeof OwnerRoute
     }
     '/manager/': {
       id: '/manager/'
@@ -845,6 +862,7 @@ interface OwnerRouteChildren {
   OwnerTrustIndexRoute: typeof OwnerTrustIndexRoute
   OwnerWasteMapRoute: typeof OwnerWasteMapRoute
   OwnerWhatIfRoute: typeof OwnerWhatIfRoute
+  OwnerIndexRoute: typeof OwnerIndexRoute
 }
 
 const OwnerRouteChildren: OwnerRouteChildren = {
@@ -860,6 +878,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerTrustIndexRoute: OwnerTrustIndexRoute,
   OwnerWasteMapRoute: OwnerWasteMapRoute,
   OwnerWhatIfRoute: OwnerWhatIfRoute,
+  OwnerIndexRoute: OwnerIndexRoute,
 }
 
 const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
