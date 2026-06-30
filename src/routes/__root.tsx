@@ -16,6 +16,12 @@ import "@fontsource/cairo/600.css";
 import "@fontsource/cairo/700.css";
 import "@fontsource/tajawal/500.css";
 import "@fontsource/tajawal/700.css";
+import "@fontsource/space-grotesk/500.css";
+import "@fontsource/space-grotesk/600.css";
+import "@fontsource/space-grotesk/700.css";
+import "@fontsource/dm-sans/400.css";
+import "@fontsource/dm-sans/500.css";
+import "@fontsource/dm-sans/700.css";
 
 function NotFoundComponent() {
   return (
