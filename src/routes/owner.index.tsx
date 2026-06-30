@@ -89,15 +89,22 @@ function OwnerHome() {
 
   useEffect(() => {
     const onStorage = () => setLocale(getLocale());
+    const onCompanyChanged = () => {
+      const active = getActiveCompanyId();
+      const companies = (user?.accessibleCompanies as AccessibleCompany[] | undefined) ?? [];
+      const initial = active && companies.some((c) => c.company_id === active)
+        ? active
+        : companies[0]?.company_id ?? null;
+      if (initial && initial !== active) setActiveCompanyId(initial);
+      setCompanyId(initial);
+    };
     window.addEventListener("storage", onStorage);
-    const active = getActiveCompanyId();
-    const companies = (user?.accessibleCompanies as AccessibleCompany[] | undefined) ?? [];
-    const initial = active && companies.some((c) => c.company_id === active)
-      ? active
-      : companies[0]?.company_id ?? null;
-    if (initial && initial !== active) setActiveCompanyId(initial);
-    setCompanyId(initial);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener("auditcore.active_company_changed", onCompanyChanged);
+    onCompanyChanged();
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("auditcore.active_company_changed", onCompanyChanged);
+    };
   }, [user]);
 
   const companies = (user?.accessibleCompanies as AccessibleCompany[] | undefined) ?? [];

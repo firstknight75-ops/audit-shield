@@ -40,6 +40,7 @@ CORE_OUTPUT_TITLES = {
     'action_plan': 'خطة العمل',
     'dashboards': 'لوحات القيادة',
     'what_if': 'محاكاة ماذا لو',
+    'ai_advisor': 'ملخص مستشار المالك الآلي وتدقيق المدقق',
 }
 
 
@@ -103,6 +104,9 @@ def export_pdf(path: str, title: str, rows: list[dict], ledger_hash: str, cert: 
 
     The header/footer render in RTL with direction:rtl.
     """
+    from datetime import datetime, timezone
+    gen_date = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+    
     if cert is None:
         cert = tamper_proof_certificate({'title': title, 'rows_count': len(rows)}, ledger_hash)
     headers = list(rows[0].keys()) if rows else []
@@ -130,6 +134,7 @@ def export_pdf(path: str, title: str, rows: list[dict], ledger_hash: str, cert: 
         <strong>report_id:</strong> <span dir='ltr'>{report_id}</span><br>
         <strong>verify_url:</strong> <span dir='ltr'>{verify_url}</span><br>
         <strong>generated_language:</strong> {language}<br>
+        <strong>generation_date:</strong> <span dir='ltr'>{gen_date}</span><br>
         <strong>rows:</strong> {len(rows)}
       </div>
       <table>

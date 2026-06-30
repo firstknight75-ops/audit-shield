@@ -65,6 +65,44 @@ async def run_export(
     rows = []
     if payload.output_code == 'waste_map':
         rows = [{'category': r.category, 'description': r.description, 'impact_score': r.impact_score, 'iqd_amount': r.iqd_amount} for r in (await db.execute(select(WasteMapItem).where(WasteMapItem.company_id == company_id))).scalars().all()]
+    elif payload.output_code == 'ai_advisor':
+        from app.api.owner_outputs import owner_ai_advisor
+        advisor_data = await owner_ai_advisor(company_id=company_id, current_user=current_user, db=db)
+        rows = [
+            {
+                "المؤشر / المشكلة": "كفاءة المدقق (Auditor Efficiency)",
+                "القيمة / التفاصيل الفنية": f"{advisor_data['auditor_metrics']['efficiency']}%",
+                "تفسير المالك المبسط": "التزام المحاسب بالمواعيد وجداول تصحيح الفواتير.",
+                "مستوى الخطر": "عادي",
+                "الخطوة المقترحة": "اسأل مدققك عند انخفاض كفاءته عن 85% ليعرف أنك تراقبه.",
+                "الأثر المالي": "N/A"
+            },
+            {
+                "المؤشر / المشكلة": "تجاوز التنبيهات الذكية (Alert Bypass)",
+                "القيمة / التفاصيل الفنية": f"{advisor_data['auditor_metrics']['bypass_rate']}%",
+                "تفسير المالك المبسط": "نسبة تنبيهات الذكاء الاصطناعي التي مررها المدقق دون تدقيق.",
+                "مستوى الخطر": "متوسط",
+                "الخطوة المقترحة": "الزم المدقق بمراجعة الفواتير ذات الثقة الضعيفة يدوياً.",
+                "الأثر المالي": "N/A"
+            },
+            {
+                "المؤشر / المشكلة": "سلامة سجل البيانات (Tamper Check)",
+                "القيمة / التفاصيل الفنية": "سليم وآمن 100%" if advisor_data['auditor_metrics']['ledger_verified'] else "تحذير من تلاعب خفي!",
+                "تفسير المالك المبسط": "فحص بصمة التشفير للتأكد من عدم تعديل القيود بعد التسجيل.",
+                "مستوى الخطر": "آمن" if advisor_data['auditor_metrics']['ledger_verified'] else "حرج جداً",
+                "الخطوة المقترحة": "لا حاجة لإجراء، صمام الأمان الإلكتروني نشط ومطابق.",
+                "الأثر المالي": "N/A"
+            }
+        ]
+        for issue in advisor_data['key_issues']:
+            rows.append({
+                "المؤشر / المشكلة": issue['title']['ar'],
+                "القيمة / التفاصيل الفنية": issue['tech_detail'],
+                "تفسير المالك المبسط": issue['translation']['ar'],
+                "مستوى الخطر": "حرج" if issue['severity'] == "danger" else "تحذيري",
+                "الخطوة المقترحة": issue['action']['ar'],
+                "الأثر المالي": f"{issue['impact']:,} د.ع"
+            })
     elif payload.output_code in {'true_picture', 'trust_index', 'risk_map', 'opportunity_map', 'action_plan', 'dashboards'}:
         analytics = (await db.execute(select(AnalyticsOutput).where(AnalyticsOutput.company_id == company_id).order_by(AnalyticsOutput.created_at.desc()))).scalars().first()
         rows = [analytics.payload] if analytics else []

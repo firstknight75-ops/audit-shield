@@ -61,8 +61,15 @@ router = APIRouter(prefix='/owner', tags=['owner-outputs'])
 # ── Shared helpers ───────────────────────────────────────────────────
 async def _ensure_company_access(user: User, db: AsyncSession, company_id: str) -> str:
     lang = user.preferred_language.value if hasattr(user.preferred_language, 'value') else str(user.preferred_language)
+    
+    # 1. Enforce explicit company access logic (Owner validation)
     if not await require_company_access(user, db, company_id):
         raise HTTPException(status_code=403, detail=tr('permissions.denied', lang))
+        
+    # 2. Hard-set PostgreSQL RLS session variables to double-guarantee data isolation
+    from app.db.session import set_session_context
+    await set_session_context(db, role=user.role.value, tenant_id=str(user.company_group_id))
+    
     return lang
 
 

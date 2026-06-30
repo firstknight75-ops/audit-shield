@@ -46,6 +46,7 @@ export function CompanySwitcher() {
     if (typeof window !== "undefined") {
       window.localStorage.setItem("auditcore.active.company", cid);
       window.localStorage.removeItem("auditcore.active.branch");
+      window.dispatchEvent(new Event("auditcore.active_company_changed"));
     }
     setOpen(false);
   };
@@ -54,6 +55,7 @@ export function CompanySwitcher() {
     if (typeof window !== "undefined") {
       if (bid) window.localStorage.setItem("auditcore.active.branch", bid);
       else window.localStorage.removeItem("auditcore.active.branch");
+      window.dispatchEvent(new Event("auditcore.active_company_changed"));
     }
     setOpen(false);
   };
