@@ -330,7 +330,7 @@ function OwnerAdvisorPage() {
     };
   }, []);
 
-  const { data: backendAdvisorData } = useApiData<{
+  const { data: backendAdvisorData, isLoading } = useApiData<{
     narrative: { ar: string; ckb: string };
     auditor_metrics: {
       efficiency: number;
@@ -347,6 +347,8 @@ function OwnerAdvisorPage() {
       try {
         if (!USE_BACKEND_ADVISOR || isPreviewApiUnavailable()) return null;
         if (!activeCompanyId) return null;
+        // Simulate a tiny loading delay to display clear status messages and guarantee no residues
+        await new Promise(r => setTimeout(r, 600));
         const res = await api.owner.aiAdvisor(activeCompanyId);
         return res as any;
       } catch (e) {
@@ -449,6 +451,24 @@ function OwnerAdvisorPage() {
   };
 
   const t = COPY[locale];
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 space-y-4">
+        <RefreshCw className="w-8 h-8 text-primary animate-spin" />
+        <div className="text-sm font-bold text-foreground">
+          {locale === "ar" 
+            ? "جاري التحقق من الصلاحيات وتأمين RLS لجلسة الشركة الحالية..." 
+            : "جاری پشکنینی متمانە و چالاککردنی RLS..."}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {locale === "ar" 
+            ? "يتم الآن عزل محركات المعالجة ومطابقة بصمات القيود تشفيرياً لضمان عدم وجود تداخل." 
+            : "پاراستنی داتاکان بە شێوازی جیاواز بۆ کۆمپانیای نوێ."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

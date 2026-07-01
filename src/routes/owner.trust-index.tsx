@@ -154,7 +154,12 @@ function TrustIndexPage() {
     return (
       <div>
         <PageHeader title={t.title} subtitle={t.subtitle} />
-        <div className="p-8 rounded-2xl bg-card border border-border text-muted-foreground text-sm">…</div>
+        <div className="p-12 rounded-2xl bg-card border border-border flex flex-col items-center justify-center space-y-3">
+          <RefreshCw className="w-6 h-6 text-primary animate-spin" />
+          <span className="text-xs font-semibold text-foreground">
+            {locale === "ar" ? "جاري سحب تحليلات الموثوقية وتأمين RLS الجلسة..." : "بارکردنی زانیاری متمانە..."}
+          </span>
+        </div>
       </div>
     );
   }

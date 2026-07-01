@@ -107,17 +107,56 @@ async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {
     headers["Content-Type"] = "application/json";
   }
 
-  const res = await fetch(url.toString(), init);
-  const requestId = res.headers.get("x-request-id");
+  const registerLog = (status: number, detail: string, success: boolean) => {
+    if (typeof window !== "undefined") {
+      const g = window as any;
+      g.__AUDITCORE_API_LOGS__ = g.__AUDITCORE_API_LOGS__ || [];
+      g.__AUDITCORE_API_FAILURES__ = g.__AUDITCORE_API_FAILURES__ || 0;
+      g.__AUDITCORE_API_SUCCESS__ = g.__AUDITCORE_API_SUCCESS__ || 0;
+      
+      g.__AUDITCORE_API_LOGS__.unshift({
+        path,
+        method: opts.method ?? "GET",
+        status,
+        timestamp: new Date().toLocaleTimeString(),
+        detail,
+        success
+      });
+      if (success) {
+        g.__AUDITCORE_API_SUCCESS__++;
+      } else {
+        g.__AUDITCORE_API_FAILURES__++;
+      }
+      if (g.__AUDITCORE_API_LOGS__.length > 50) {
+        g.__AUDITCORE_API_LOGS__.pop();
+      }
+      window.dispatchEvent(new Event("auditcore.api_counters_updated"));
+    }
+  };
 
-  if (!res.ok) {
-    let body: ApiEnvelope<unknown> | null = null;
-    try { body = (await res.json()) as ApiEnvelope<unknown>; } catch { /* not JSON */ }
-    throw new ApiError(res.status, body, requestId);
+  try {
+    const res = await fetch(url.toString(), init);
+    const requestId = res.headers.get("x-request-id");
+
+    if (!res.ok) {
+      let body: ApiEnvelope<unknown> | null = null;
+      try { body = (await res.json()) as ApiEnvelope<unknown>; } catch { /* not JSON */ }
+      const err = new ApiError(res.status, body, requestId);
+      registerLog(res.status, body?.detail ?? "HTTP Error Response", false);
+      throw err;
+    }
+    registerLog(res.status, "Success", true);
+    if (opts.raw) return (await res.blob()) as unknown as T;
+    if (res.status === 204) return undefined as T;
+    return (await res.json()) as T;
+  } catch (err) {
+    if (err instanceof ApiError) {
+      throw err;
+    }
+    const errMsg = err instanceof Error ? err.message : String(err);
+    registerLog(0, `Network / Offline connection failure: ${errMsg}`, false);
+    throw err;
   }
-  if (opts.raw) return (await res.blob()) as unknown as T;
-  if (res.status === 204) return undefined as T;
-  return (await res.json()) as T;
 }
 
 /** Retry-on-5xx with exponential backoff. Idempotent for GETs. */

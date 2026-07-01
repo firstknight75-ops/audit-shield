@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useEffect, useState } from "react";
-import { ShieldCheck, LayoutDashboard, FileCheck2, ListTodo, AlertTriangle, Users, KeyRound, Building2, ScrollText, Boxes, Settings2, FileBarChart, LogOut, Bell, Briefcase, Sparkles, Sliders, Server } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, FileCheck2, ListTodo, AlertTriangle, Users, KeyRound, Building2, ScrollText, Boxes, Settings2, FileBarChart, LogOut, Bell, Briefcase, Sparkles, Sliders, Server, X, CheckCircle2, Terminal } from "lucide-react";
 import { Role, ROLE_LABELS, getCurrentUser, signOut, persistLanguageChange, type SeededUser } from "@/lib/auth";
 import { getLocale, setLocale, t, type Namespace } from "@/lib/i18n";
 import { CompanySwitcher } from "@/components/company-switcher";
@@ -53,6 +53,101 @@ const NAV: Record<Role, NavItem[]> = {
     { to: "/appowner/maintenance", label: "maintenance_log", ns: "admin", icon: Settings2 },
   ],
 };
+
+function ApiMonitor() {
+  const [open, setOpen] = useState(false);
+  const [successCount, setSuccessCount] = useState(0);
+  const [failureCount, setFailureCount] = useState(0);
+  const [logs, setLogs] = useState<Array<{ path: string; method: string; status: number; timestamp: string; detail: string; success: boolean }>>([]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      const g = window as any;
+      setSuccessCount(g.__AUDITCORE_API_SUCCESS__ || 0);
+      setFailureCount(g.__AUDITCORE_API_FAILURES__ || 0);
+      setLogs(g.__AUDITCORE_API_LOGS__ || []);
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("auditcore.api_counters_updated", handleUpdate);
+      handleUpdate();
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("auditcore.api_counters_updated", handleUpdate);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="fixed bottom-4 left-4 z-50 flex flex-col items-end">
+      {/* Floating Pill Toggle Button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 px-3 py-2 rounded-full border bg-card/90 backdrop-blur border-border text-[11px] font-bold shadow-lg hover:border-primary/50 transition cursor-pointer text-foreground"
+      >
+        <div className={`w-2 h-2 rounded-full ${failureCount > 0 ? "bg-warning animate-pulse" : "bg-success"}`} />
+        <span>مراقب الـ API</span>
+        <span className="font-mono text-muted-foreground">({successCount} / {failureCount})</span>
+      </button>
+
+      {/* Floating Logs Drawer */}
+      {open && (
+        <div className="mt-2 w-96 max-h-[360px] bg-card border border-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 text-right overflow-hidden text-xs text-foreground">
+          <div className="flex items-center justify-between border-b border-border pb-2 shrink-0">
+            <span className="font-bold flex items-center gap-1">
+              <Terminal className="w-3.5 h-3.5 text-primary" />
+              مراقب اتصالات السيرفر والمعاينة
+            </span>
+            <button onClick={() => setOpen(false)} className="p-1 rounded hover:bg-muted text-muted-foreground">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Status Indicators */}
+          <div className="grid grid-cols-2 gap-2 shrink-0">
+            <div className="p-2.5 rounded-xl bg-success/5 border border-success/15 flex items-center justify-between">
+              <span className="text-muted-foreground text-[10px]">استعلامات ناجحة:</span>
+              <span className="font-mono font-bold text-success text-sm">{successCount}</span>
+            </div>
+            <div className="p-2.5 rounded-xl bg-warning/5 border border-warning/15 flex items-center justify-between">
+              <span className="text-muted-foreground text-[10px]">أخطاء / ارتداد محلي:</span>
+              <span className="font-mono font-bold text-warning text-sm">{failureCount}</span>
+            </div>
+          </div>
+
+          {/* Logs scrollable container */}
+          <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+            {logs.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground text-[11px]">
+                لا توجد طلبات جارية حالياً في هذه الجلسة.
+              </div>
+            ) : (
+              logs.map((log, idx) => (
+                <div key={idx} className="p-2.5 rounded-lg border border-border bg-muted/30 space-y-1.5 font-mono text-[10px] text-right">
+                  <div className="flex items-center justify-between">
+                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${log.success ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}>
+                      {log.status === 0 ? "OFFLINE" : log.status}
+                    </span>
+                    <span className="text-muted-foreground">{log.timestamp}</span>
+                  </div>
+                  <div className="text-foreground font-semibold break-all leading-relaxed text-right">
+                    <span className="text-primary font-bold mr-1">{log.method}</span>
+                    {log.path}
+                  </div>
+                  {!log.success && (
+                    <div className="text-danger leading-relaxed mt-1 border-t border-border/40 pt-1 text-[9px] text-right">
+                      {log.detail}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -142,6 +237,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <ErrorBoundary>{children}</ErrorBoundary>
         </main>
       </div>
+      <ApiMonitor />
     </div>
   );
 }
