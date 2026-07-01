@@ -12,6 +12,7 @@ import { useApiData } from "@/lib/use-api-data";
 import { formatIQD } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/owner/advisor")({ component: OwnerAdvisorPage });
+const USE_BACKEND_ADVISOR = false;
 
 const COPY = {
   ar: {
@@ -344,7 +345,7 @@ function OwnerAdvisorPage() {
   } | null>(
     async () => {
       try {
-        if (isPreviewApiUnavailable()) return null;
+        if (!USE_BACKEND_ADVISOR || isPreviewApiUnavailable()) return null;
         if (!activeCompanyId) return null;
         const res = await api.owner.aiAdvisor(activeCompanyId);
         return res as any;
@@ -354,7 +355,7 @@ function OwnerAdvisorPage() {
       }
     },
     [activeCompanyId],
-    { enabled: !!activeCompanyId && !isPreviewApiUnavailable(), staleTime: Infinity }
+    { enabled: USE_BACKEND_ADVISOR && !!activeCompanyId && !isPreviewApiUnavailable(), staleTime: Infinity }
   );
 
   const activeCompanyProfile = useMemo(() => {
