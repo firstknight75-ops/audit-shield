@@ -26,7 +26,9 @@ AuditCore is a sovereign audit intelligence platform designed for the Iraqi busi
 ## Deployment modes
 
 ### On-premise
+
 Uses:
+
 - Postgres 15
 - Redis 7
 - FastAPI backend
@@ -34,18 +36,22 @@ Uses:
 - `baileys-bridge`
 
 Command:
+
 ```bash
 ./scripts/setup.sh
 ```
 
 ### Cloud
+
 Uses same backend/frontend images, but cloud-selected services:
+
 - managed Postgres
 - managed Redis
 - `whatsapp-cloud-gateway`
 - Vault
 
 Provision cloud resources/manifests with:
+
 ```bash
 ./scripts/deploy-cloud.sh tenant-name essential tenant_schema_name
 ```
@@ -55,11 +61,13 @@ Provision cloud resources/manifests with:
 ## Quick start
 
 ### 1. Start on-premise stack
+
 ```bash
 ./scripts/setup.sh
 ```
 
 ### 2. Seeded accounts
+
 ```text
 owner@auditcore.local    / Owner123!
 gm@auditcore.local       / Gm123!
@@ -70,13 +78,15 @@ appowner@auditcore.local / Appowner123!
 ```
 
 ### 3. Health check
+
 ```bash
 curl http://localhost:8000/health
 ```
 
 Expected:
+
 ```json
-{"status":"ok","deployment_mode":"onpremise"}
+{ "status": "ok", "deployment_mode": "onpremise" }
 ```
 
 ---
@@ -84,6 +94,7 @@ Expected:
 ## Authentication API
 
 ### Login
+
 ```bash
 curl -X POST http://localhost:8000/api/auth/login \
   -H 'Content-Type: application/json' \
@@ -93,16 +104,19 @@ curl -X POST http://localhost:8000/api/auth/login \
 Expected: access + refresh tokens.
 
 ### Current user
+
 ```bash
 curl http://localhost:8000/api/auth/me \
   -H "Authorization: Bearer <ACCESS_TOKEN>"
 ```
 
 Expected:
+
 - role
 - effective permissions list
 
 Acceptance target:
+
 - each of the 6 seeded users returns a different effective permission set.
 
 ---
@@ -110,6 +124,7 @@ Acceptance target:
 ## Document upload / OCR certification flow
 
 ### Upload document
+
 ```bash
 curl -X POST http://localhost:8000/api/documents/upload \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
@@ -117,6 +132,7 @@ curl -X POST http://localhost:8000/api/documents/upload \
 ```
 
 Accepted formats:
+
 - `.xlsx`
 - `.csv`
 - `.docx`
@@ -127,6 +143,7 @@ Accepted formats:
 - `.json`
 
 Rules:
+
 - max 50MB
 - MIME must match extension
 - renamed `.exe` as `.pdf` must be rejected
@@ -134,12 +151,14 @@ Rules:
 - OCR is queued for worker processing
 
 ### Fetch next certification item
+
 ```bash
 curl http://localhost:8000/api/certification/next \
   -H "Authorization: Bearer <AUDITOR_ACCESS_TOKEN>"
 ```
 
 Expected:
+
 - oldest pending document
 - extracted fields
 - confidence values
@@ -149,6 +168,7 @@ Expected:
   - red < 60 or missing
 
 ### Certify corrected OCR
+
 ```bash
 curl -X POST http://localhost:8000/api/certification/<EXTRACTION_ID>/certify \
   -H "Authorization: Bearer <AUDITOR_ACCESS_TOKEN>" \
@@ -165,12 +185,14 @@ curl -X POST http://localhost:8000/api/certification/<EXTRACTION_ID>/certify \
 ```
 
 Expected:
+
 - success message
 - next pending document payload if available
 - ledger append event created
 - linked task marked done
 
 Rule:
+
 - yellow/red fields must be corrected before certification is accepted.
 
 ---
@@ -178,28 +200,37 @@ Rule:
 ## Auditor analytics boundary verification
 
 Auditor must never see:
+
 - `analytics_outputs`
 - `waste_map_items`
 - `risk_alerts`
 
 ### API-level expectation
+
 Even after successful document certification, Auditor still must not access analytics endpoints/tables.
 
 ### DB-level RLS check
+
 Run inside Postgres:
+
 ```sql
 SELECT set_config('app.current_user_role', 'auditor', true);
 SELECT * FROM analytics_outputs;
 ```
+
 Expected:
+
 - `0 rows`
 
 Then:
+
 ```sql
 SELECT set_config('app.current_user_role', 'owner', true);
 SELECT * FROM analytics_outputs;
 ```
+
 Expected:
+
 - normal rows returned
 
 ---
@@ -207,12 +238,14 @@ Expected:
 ## Immutable ledger verification
 
 ### Verify chain via API
+
 ```bash
 curl http://localhost:8000/api/owner/ledger/verify \
   -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
 ```
 
 Expected clean response:
+
 ```json
 {
   "valid": true,
@@ -222,18 +255,21 @@ Expected clean response:
 ```
 
 ### Tamper test
+
 ```bash
 curl -X POST http://localhost:8000/api/owner/ledger/tamper/<ENTRY_ID> \
   -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
 ```
 
 Re-run verify:
+
 ```bash
 curl http://localhost:8000/api/owner/ledger/verify \
   -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
 ```
 
 Expected:
+
 - `valid: false`
 - exact broken entry id returned
 
@@ -242,25 +278,30 @@ Expected:
 ## SLA / daily task engine
 
 Schedules:
+
 - daily generation at **08:00 Baghdad time**
 - demerit sweep every **15 minutes**
 
 SLAs:
+
 - OCR: 4h
 - statements: 24h
 - reversals: 2h
 - branch backlog: configured normal path
 
 Demerits:
+
 - critical: 3
 - normal: 1
 
 Efficiency formula:
+
 ```text
 (on_time / total) * 100 - (demerits * 5)
 ```
 
 Owner-only endpoint:
+
 ```bash
 curl http://localhost:8000/api/owner/auditor-efficiency \
   -H "Authorization: Bearer <OWNER_ACCESS_TOKEN>"
@@ -271,17 +312,20 @@ curl http://localhost:8000/api/owner/auditor-efficiency \
 ## Validation scripts
 
 ### On-prem setup
+
 ```bash
 ./scripts/setup.sh
 ```
 
 ### Cloud tenant deploy
+
 ```bash
 ./scripts/deploy-cloud.sh tenant-a essential tenant_a
 ./scripts/deploy-cloud.sh tenant-b elite dedicated_db_placeholder
 ```
 
 ### Integration guidance
+
 ```bash
 ./scripts/run-integration-checks.sh
 ```
@@ -293,6 +337,7 @@ This prints the Docker-enabled validation flow to run on a machine with Docker.
 ## Test inventory
 
 ### Regression tests
+
 ```bash
 pytest -q backend/app/tests/test_phase2.py backend/app/tests/test_integration_api.py
 ```
@@ -316,6 +361,7 @@ pytest -q backend/app/tests/test_phase2.py backend/app/tests/test_integration_ap
 ## Operator runbook
 
 ### On-prem runbook
+
 1. Ensure Docker/Compose installed
 2. Run `./scripts/setup.sh`
 3. Verify `/health`
@@ -323,6 +369,7 @@ pytest -q backend/app/tests/test_phase2.py backend/app/tests/test_integration_ap
 5. Verify Auditor queue and ledger endpoints
 
 ### Cloud runbook
+
 1. Apply `k8s/` manifests or use provision workflow
 2. Set `DEPLOYMENT_MODE=cloud`
 3. Ensure managed Postgres/Redis and Vault are reachable
@@ -344,6 +391,7 @@ pytest -q backend/app/tests/test_phase2.py backend/app/tests/test_integration_ap
 ## Known current gaps
 
 This repository now contains a strong scaffold, but a production-hardening pass is still recommended for:
+
 - full end-to-end live integration tests against running Docker services
 - stronger dedicated-DB cloud provisioning for Elite tier
 - fully live frontend-to-backend wiring replacing remaining mock UX pieces

@@ -19,19 +19,16 @@ Maps to the 8 acceptance criteria from the AuditCore Phase 3 spec:
 from __future__ import annotations
 
 import asyncio
-import os
 import pathlib
 import re
 from unittest.mock import AsyncMock, MagicMock
 
 import pandas as pd
-import pytest
 
 from app.ai.cross_reference import run_cross_reference
 from app.ai.data_quality import run_data_quality
 from app.ai.impact import findings_to_waste_items
 from app.ai.narrative import generate_narrative, narrative_hash
-from app.services.ledger import _hash
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
 APP = pathlib.Path(__file__).resolve().parents[1]
@@ -373,9 +370,7 @@ def test_acceptance_7_rls_blocks_auditor_at_db_level():
 
 def test_acceptance_8_require_company_access_default_deny():
     """Manager with no UserCompanyAccess rows for a company must be denied."""
-    import asyncio
     from app.services.access import require_company_access
-    from unittest.mock import AsyncMock, MagicMock
 
     async def run():
         user = MagicMock()
@@ -392,9 +387,7 @@ def test_acceptance_8_require_company_access_default_deny():
 def test_acceptance_8_manager_branch_mismatch_denied():
     """A manager with UserCompanyAccess for company A must be denied access
     to company B, even within the same tenant."""
-    import asyncio
     from app.services.access import require_company_access
-    from unittest.mock import AsyncMock, MagicMock
 
     async def run():
         user = MagicMock()

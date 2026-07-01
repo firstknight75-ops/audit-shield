@@ -8,10 +8,34 @@ export const Route = createFileRoute("/owner/opportunity-map")({ component: Oppo
 // Opportunity Map — IQD-priced upside (untapped capability).
 // Distinct from Waste Map (which shows downside / leakage).
 const opportunities = [
-  { kind: "vendor_underutilized", description: "مورّد بحجم منخفض: شركة النور للتوريدات", iqd_amount: 2_400_000, confidence: "medium", basis: { current_iqd: 800_000, avg_iqd: 3_200_000 } },
-  { kind: "branch_underutilized", description: "فرع بأداء منخفض: الفرع الثاني (البصرة)", iqd_amount: 5_100_000, confidence: "medium", basis: { current_iqd: 1_200_000, avg_iqd: 6_300_000 } },
-  { kind: "timing_mismatch", description: "نافذة استرداد جزئية من غرامات التأخير", iqd_amount: 1_800_000, confidence: "low", basis: { recoverable_fraction: 0.4 } },
-  { kind: "vendor_underutilized", description: "مورّد بحجم منخفض: مطبعة الأمل", iqd_amount: 950_000, confidence: "medium", basis: { current_iqd: 350_000, avg_iqd: 1_300_000 } },
+  {
+    kind: "vendor_underutilized",
+    description: "مورّد بحجم منخفض: شركة النور للتوريدات",
+    iqd_amount: 2_400_000,
+    confidence: "medium",
+    basis: { current_iqd: 800_000, avg_iqd: 3_200_000 },
+  },
+  {
+    kind: "branch_underutilized",
+    description: "فرع بأداء منخفض: الفرع الثاني (البصرة)",
+    iqd_amount: 5_100_000,
+    confidence: "medium",
+    basis: { current_iqd: 1_200_000, avg_iqd: 6_300_000 },
+  },
+  {
+    kind: "timing_mismatch",
+    description: "نافذة استرداد جزئية من غرامات التأخير",
+    iqd_amount: 1_800_000,
+    confidence: "low",
+    basis: { recoverable_fraction: 0.4 },
+  },
+  {
+    kind: "vendor_underutilized",
+    description: "مورّد بحجم منخفض: مطبعة الأمل",
+    iqd_amount: 950_000,
+    confidence: "medium",
+    basis: { current_iqd: 350_000, avg_iqd: 1_300_000 },
+  },
 ];
 
 const kindMeta = {
@@ -38,8 +62,8 @@ function OpportunityMap() {
       <div className="p-5 rounded-xl bg-success/5 border border-success/30 mb-6 flex items-start gap-3">
         <Sparkles className="w-5 h-5 text-success shrink-0 mt-0.5" />
         <div className="text-sm leading-relaxed">
-          <strong>هذه ليست خريطة الهدر.</strong> الهدر = ضرر/تسرّب. الفرص = قدرة غير مستغلة يمكن تحويلها إلى قيمة.
-          كل بند هنا مبني على بيانات فعلية من مستندات معتمدة، مع أساس الحساب مرئي.
+          <strong>هذه ليست خريطة الهدر.</strong> الهدر = ضرر/تسرّب. الفرص = قدرة غير مستغلة يمكن
+          تحويلها إلى قيمة. كل بند هنا مبني على بيانات فعلية من مستندات معتمدة، مع أساس الحساب مرئي.
         </div>
       </div>
 
@@ -48,24 +72,41 @@ function OpportunityMap() {
           const meta = kindMeta[o.kind as keyof typeof kindMeta];
           const Icon = meta.icon;
           return (
-            <div key={i} className="p-5 rounded-xl bg-card border border-border hover:border-success/40 transition">
+            <div
+              key={i}
+              className="p-5 rounded-xl bg-card border border-border hover:border-success/40 transition"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <div className={`p-2 rounded-lg bg-${meta.tone}/10 text-${meta.tone} border border-${meta.tone}/30`}>
+                  <div
+                    className={`p-2 rounded-lg bg-${meta.tone}/10 text-${meta.tone} border border-${meta.tone}/30`}
+                  >
                     <Icon className="w-4 h-4" />
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-md bg-${meta.tone}/15 text-${meta.tone}`}>{meta.label}</span>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-md bg-${meta.tone}/15 text-${meta.tone}`}
+                  >
+                    {meta.label}
+                  </span>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-md bg-secondary text-muted-foreground">ثقة: {o.confidence}</span>
+                <span className="text-xs px-2 py-1 rounded-md bg-secondary text-muted-foreground">
+                  ثقة: {o.confidence}
+                </span>
               </div>
               <div className="mt-3 font-medium leading-relaxed">{o.description}</div>
               <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
                 <div className="text-lg font-bold text-success">{formatIQD(o.iqd_amount)}</div>
-                <button className="text-xs text-primary hover:underline">عرض الأساس الحسابي ←</button>
+                <button className="text-xs text-primary hover:underline">
+                  عرض الأساس الحسابي ←
+                </button>
               </div>
               <details className="mt-2">
-                <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">الأساس الحسابي</summary>
-                <pre className="text-[10px] bg-secondary p-2 rounded mt-2 overflow-auto" dir="ltr">{JSON.stringify(o.basis, null, 2)}</pre>
+                <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                  الأساس الحسابي
+                </summary>
+                <pre className="text-[10px] bg-secondary p-2 rounded mt-2 overflow-auto" dir="ltr">
+                  {JSON.stringify(o.basis, null, 2)}
+                </pre>
               </details>
             </div>
           );

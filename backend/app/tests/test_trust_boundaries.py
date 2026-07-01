@@ -24,7 +24,7 @@ from app.services.silent_ai import (
     list_local_modules,
     run_silent_ai_self_test,
 )
-from app.services.trust_index import compute_trust_index, merge_findings_into_trust
+from app.services.trust_index import compute_trust_index
 
 
 # ── Principle 2: Zero-Knowledge Audit ────────────────────────────────

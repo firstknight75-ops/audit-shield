@@ -2,10 +2,30 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/app-shell";
 
 const events = [
-  { at: "2026-06-27 23:14", action: "دفع قالب جديد", target: "مجموعة النخيل التجارية", who: "App Owner" },
-  { at: "2026-06-27 14:02", action: "تحديث النسخة → v2.4.1", target: "مطاعم بغداد العريقة", who: "App Owner" },
-  { at: "2026-06-26 09:30", action: "ترقية الباقة → النخبة", target: "العقارية المتحدة", who: "App Owner" },
-  { at: "2026-06-25 19:00", action: "تجديد رخصة سنوية", target: "مصنع الفرات للأغذية", who: "App Owner" },
+  {
+    at: "2026-06-27 23:14",
+    action: "دفع قالب جديد",
+    target: "مجموعة النخيل التجارية",
+    who: "App Owner",
+  },
+  {
+    at: "2026-06-27 14:02",
+    action: "تحديث النسخة → v2.4.1",
+    target: "مطاعم بغداد العريقة",
+    who: "App Owner",
+  },
+  {
+    at: "2026-06-26 09:30",
+    action: "ترقية الباقة → النخبة",
+    target: "العقارية المتحدة",
+    who: "App Owner",
+  },
+  {
+    at: "2026-06-25 19:00",
+    action: "تجديد رخصة سنوية",
+    target: "مصنع الفرات للأغذية",
+    who: "App Owner",
+  },
 ];
 
 export const Route = createFileRoute("/appowner/maintenance")({
@@ -25,7 +45,9 @@ export const Route = createFileRoute("/appowner/maintenance")({
           <tbody>
             {events.map((e, i) => (
               <tr key={i} className="border-t border-border">
-                <td className="p-3 text-muted-foreground" dir="ltr">{e.at}</td>
+                <td className="p-3 text-muted-foreground" dir="ltr">
+                  {e.at}
+                </td>
                 <td className="p-3">{e.action}</td>
                 <td className="p-3 font-medium">{e.target}</td>
                 <td className="p-3 text-muted-foreground">{e.who}</td>

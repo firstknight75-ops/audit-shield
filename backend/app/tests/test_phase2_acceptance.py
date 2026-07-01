@@ -13,9 +13,7 @@ Maps directly to the 6 acceptance criteria from the AuditCore Phase 2 spec:
 from __future__ import annotations
 
 import asyncio
-import os
 import pathlib
-from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -238,7 +236,6 @@ def test_acceptance_4_daily_tasks_generated_at_08_baghdad():
 def test_acceptance_5_hash_chain_clean_returns_intact():
     """A clean chain returns (True, intact_message, None)."""
     async def run():
-        from app.services.ledger import verify_ledger_integrity
         session = AsyncMock()
         rows = []
         for i in range(3):
@@ -261,7 +258,6 @@ def test_acceptance_5_hash_chain_clean_returns_intact():
 def test_acceptance_5_hash_chain_tampered_names_exact_entry():
     """If one entry's hash is altered, verify returns (False, broken_msg, broken_id)."""
     async def run():
-        from app.services.ledger import verify_ledger_integrity
         session = AsyncMock()
         rows = []
         for i in range(3):
@@ -290,7 +286,6 @@ def test_acceptance_5_reverse_entry_does_not_modify_original():
     serialization of the entry body.
     """
     async def run():
-        from app.services.ledger import append_ledger_entry, append_reverse_entry
 
         # Build a simple in-memory mock that returns the right things.
         # Use real dicts so JSON serialization works.
@@ -349,7 +344,6 @@ def test_acceptance_5_reverse_entry_does_not_modify_original():
 def test_acceptance_5_reverse_entry_required_reason():
     """A reverse entry without a reason must raise ValueError."""
     async def run():
-        from app.services.ledger import append_reverse_entry
 
         session = AsyncMock()
         # No target found
@@ -449,7 +443,7 @@ def test_acceptance_6_auditor_index_uses_i18n_not_hardcoded():
             continue  # good, found one
     # At least one Sorani-specific letter must appear in the page (Sorani text)
     page_sorani_letters = set(c for c in page if c in sorani_chars)
-    assert len(page_sorani_letters) >= 1, f'No Sorani-specific letters found in auditor index page'
+    assert len(page_sorani_letters) >= 1, 'No Sorani-specific letters found in auditor index page'
 
 
 def test_acceptance_6_auditor_tasks_page_bilingual():

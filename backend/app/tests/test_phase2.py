@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-import pytest
 
-from app.services.ledger import verify_ledger_integrity
 
 
 def calc_efficiency(tasks):
@@ -17,7 +15,8 @@ def can_auditor_see_analytics(role: str) -> bool:
 
 
 def verify_chain(rows):
-    import hashlib, json
+    import hashlib
+    import json
     previous_hash = 'GENESIS'
     for row in rows:
         body = row['entry_body']
@@ -44,7 +43,8 @@ def test_ledger_verification_names_tampered_entry():
         {'id': '1', 'entry_body': {'a': 1}, 'entry_hash': 'dummy'},
         {'id': '2', 'entry_body': {'a': 2}, 'entry_hash': 'dummy2'},
     ]
-    import hashlib, json
+    import hashlib
+    import json
     rows[0]['entry_hash'] = hashlib.sha256(('GENESIS' + json.dumps(rows[0]['entry_body'], ensure_ascii=False, sort_keys=True, separators=(',', ':'))).encode('utf-8')).hexdigest()
     rows[1]['entry_hash'] = hashlib.sha256((rows[0]['entry_hash'] + json.dumps(rows[1]['entry_body'], ensure_ascii=False, sort_keys=True, separators=(',', ':'))).encode('utf-8')).hexdigest()
     ok, broken = verify_chain(rows)

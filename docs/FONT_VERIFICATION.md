@@ -11,13 +11,13 @@ Sorani-specific characters and Persian glyphs.
 The following Sorani-specific letters must render correctly in the application UI:
 
 | Glyph | Unicode | Name                     |
-|-------|---------|--------------------------|
+| ----- | ------- | ------------------------ |
 | ھ     | U+06BE  | HEH DOACHASHMEE          |
-| ێ     | U+06CE  | KURDISH YEH               |
+| ێ     | U+06CE  | KURDISH YEH              |
 | ۆ     | U+06C6  | WAW WITH HAMZA ABOVE     |
-| ڵ     | U+06B5  | LAM WITH VERTICAL STROKE  |
-| ڕ     | U+0695  | REH WITH SMALL V BELOW    |
-| ە     | U+06D5  | HEH WITH YEH ABOVE        |
+| ڵ     | U+06B5  | LAM WITH VERTICAL STROKE |
+| ڕ     | U+0695  | REH WITH SMALL V BELOW   |
+| ە     | U+06D5  | HEH WITH YEH ABOVE       |
 
 ## Test String
 
@@ -36,6 +36,7 @@ deploy with no internet, the UI fell through to the OS default sans-serif which
 does NOT guarantee Sorani glyph rendering.
 
 **Now (post-fix):**
+
 - `public/fonts/NotoSansArabic-Regular.woff2` — Regular weight (400), bundled in repo
 - `public/fonts/NotoSansArabic-Bold.woff2` — Bold weight (700), bundled in repo
 - `src/styles.css` declares matching `@font-face` rules
@@ -50,6 +51,7 @@ share glyph coverage decisions — if a glyph renders in one, it renders in the
 other.
 
 Source files (downloaded once, vendored in the repo, no CDN dependency):
+
 - Google Fonts: https://fonts.google.com/noto/specimen/Noto+Sans+Arabic
 - SIL Open Font License
 
@@ -67,6 +69,7 @@ Source files (downloaded once, vendored in the repo, no CDN dependency):
 ## Build-time guard
 
 The test `test_font_assets.py` enforces:
+
 - Both woff2 files exist at `public/fonts/`
 - `src/styles.css` declares `@font-face` for "Noto Sans Arabic" with both weights
 - The CSS `--font-sans` and `--font-display` reference "Noto Sans Arabic" as

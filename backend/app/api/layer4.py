@@ -17,7 +17,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import require_permission
 from app.db.session import get_db
 from app.models.entities import Document, User
-from app.models.enums import UserRole
 from app.services.access import require_company_access
 from app.services.encryption import decrypt_bytes_to_memory
 from app.services.i18n import tr

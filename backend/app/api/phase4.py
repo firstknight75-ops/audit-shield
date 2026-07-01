@@ -14,7 +14,7 @@ from app.inventory.models import AppOwnerAuditEvent, ClientInventory, CraasReque
 from app.models.entities import AnalyticsOutput, AuditLedger, ReportCertificate, User, WasteMapItem
 from app.models.enums import UserRole
 from app.schemas.phase4 import ExportRequest, WhatIfRequest
-from app.services.access import get_accessible_company_ids, require_company_access
+from app.services.access import require_company_access
 from app.services.i18n import tr
 from app.services.ledger import append_ledger_entry
 from app.templates.builder import SECTOR_PRESETS, build_template

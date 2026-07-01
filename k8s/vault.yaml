@@ -21,7 +21,7 @@ spec:
               value: dev-token
             - name: VAULT_DEV_LISTEN_ADDRESS
               value: 0.0.0.0:8200
-          args: ['server', '-dev']
+          args: ["server", "-dev"]
           ports:
             - containerPort: 8200
 ---

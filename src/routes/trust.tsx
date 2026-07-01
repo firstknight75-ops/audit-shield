@@ -2,7 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/app-shell";
 import { getLocale, type Locale } from "@/lib/i18n";
-import { ShieldCheck, Database, Lock, EyeOff, Server, Cpu, CheckCircle2, XCircle, ExternalLink, FileText } from "lucide-react";
+import {
+  ShieldCheck,
+  Database,
+  Lock,
+  EyeOff,
+  Server,
+  Cpu,
+  CheckCircle2,
+  XCircle,
+  ExternalLink,
+  FileText,
+} from "lucide-react";
 
 export const Route = createFileRoute("/trust")({ component: TrustCenter });
 
@@ -13,7 +24,8 @@ const COPY = {
     deploymentMode: "وضع النشر الحالي",
     onpremise: "بياناتك في صندوقك المادي داخل شركتك. لا تخرج.",
     cloud: "بياناتك في قاعدة مخصصة أو مخطط معزول، بمفاتيح تُدار في Vault الخاص بك.",
-    noExternalAi: "لا يوجد استدعاء لأي ذكاء اصطناعي خارجي. كل شيء يعمل محلياً. هذا مُثَبَت بسجل CI للبناء.",
+    noExternalAi:
+      "لا يوجد استدعاء لأي ذكاء اصطناعي خارجي. كل شيء يعمل محلياً. هذا مُثَبَت بسجل CI للبناء.",
     deniedCount: "محاولات وصول مُنعت بواسطة RLS في هذه الجلسة",
     noAccess: "لا محاولات وصول مرفوضة في هذه الجلسة.",
     auditorHidden: "المدقق محظور من رؤية المخرجات التحليلية",
@@ -31,11 +43,13 @@ const COPY = {
   },
   ckb: {
     title: "ناوەندی متمانە",
-    subtitle: "هەر دڵنیاکردنەوەیەک لێرەدا بە داتای ڕاستەقینەی ئەم دانیشتنە سەلماندووە — تەنها بانگەشە نییە.",
+    subtitle:
+      "هەر دڵنیاکردنەوەیەک لێرەدا بە داتای ڕاستەقینەی ئەم دانیشتنە سەلماندووە — تەنها بانگەشە نییە.",
     deploymentMode: "دۆخی بڵاوکردنەوەی ئێستا",
     onpremise: "داتاکانت لە سندوقی فیزیایی تۆ لە ناو کۆمپانیاکەتدا. هەرگیز نادەرن.",
     cloud: "داتاکانت لە بنکەیەکی تایبەت یان سکیمەیەکی جیاکراو، بە کلیلەکان لە Vault ی تایبەتی تۆ.",
-    noExternalAi: "هیچ پەیوەندییەک بە هیچ زیرەکی دروستکراوێکی دەرەکی نییە. هەموو شت لە ناوخۆدا کاردەکات. ئەمە بە لۆگی CI ی بیناسازی سەلماندووە.",
+    noExternalAi:
+      "هیچ پەیوەندییەک بە هیچ زیرەکی دروستکراوێکی دەرەکی نییە. هەموو شت لە ناوخۆدا کاردەکات. ئەمە بە لۆگی CI ی بیناسازی سەلماندووە.",
     deniedCount: "هەوڵی دەستگەیشتن لەلایەن RLS لەم دانیشتنەدا ڕێگری لێکرا",
     noAccess: "هیچ هەوڵێکی دەستگەیشتن لەم دانیشتنەدا ڕێگری لێنەکراوە.",
     auditorHidden: "پشکنەر لە بینینی دەرەنجامە شیکارییەکان بەربەست کراوە",
@@ -47,7 +61,8 @@ const COPY = {
     ledgerIntact: "زنجیرەی تۆمار سالمە و دەتوانرێت پشتڕاست بکرێتەوە",
     ledgerNote: "ئێستا پشتڕاست دەکرێتەوە — زنجیرەی SHA-256 سالمە.",
     runAgain: "پشتڕاستکردنەوە",
-    publicNote: "وەشانی گشتی — پێویستی بە چوونەژوورەوە نییە. هەر دڵنیاکردنەوەیەک لێرەدا بە لۆگی CI و RLS ی زیندوو سەلماندووە.",
+    publicNote:
+      "وەشانی گشتی — پێویستی بە چوونەژوورەوە نییە. هەر دڵنیاکردنەوەیەک لێرەدا بە لۆگی CI و RLS ی زیندوو سەلماندووە.",
     visitCi: "لۆگی پشکنینی نەبوونی زیرەکی دروستکراوی دەرەکی",
     trust_pct_label: "٪٩٠ متمانەی کارپێکردن — بەرزترین ئاستی سیستەم",
   },
@@ -91,10 +106,13 @@ function TrustCenter() {
         const data = (await res.json()) as TrustProofs;
         setProofs(data);
         // Compute denied-attempt count from the auditor probe detail
-        const auditorProbe = data.proofs.find((p) => p.guarantee === "auditor_blocked_from_analytics");
+        const auditorProbe = data.proofs.find(
+          (p) => p.guarantee === "auditor_blocked_from_analytics",
+        );
         if (auditorProbe) {
           const detail = auditorProbe.detail as Record<string, number>;
-          const total = (detail.analytics_outputs_visible ?? 0) +
+          const total =
+            (detail.analytics_outputs_visible ?? 0) +
             (detail.waste_map_items_visible ?? 0) +
             (detail.risk_alerts_visible ?? 0);
           setDeniedCount(total);
@@ -105,16 +123,49 @@ function TrustCenter() {
         setProofs({
           overall_passed: true,
           proofs: [
-            { guarantee: "auditor_blocked_from_analytics", passed: true, detail: { analytics_outputs_visible: 0, waste_map_items_visible: 0, risk_alerts_visible: 0 } },
-            { guarantee: "appowner_zero_visibility_to_tenant_data", passed: true, detail: { tenant_finance_hidden: { analytics_outputs_visible: 0, waste_map_items_visible: 0, risk_alerts_visible: 0, audit_ledger_visible: 0, document_visible: 0 } } },
-            { guarantee: "tenant_isolation", passed: true, detail: { my_tenant_rows: 0, cross_tenant_rows_visible: 0 } },
-            { guarantee: "ledger_chain_intact", passed: true, detail: { message: locale === "ar" ? "السجل سليم 100%" : "تۆمارەکە ١٠٠٪ سالمە", broken_entry_id: null } },
+            {
+              guarantee: "auditor_blocked_from_analytics",
+              passed: true,
+              detail: {
+                analytics_outputs_visible: 0,
+                waste_map_items_visible: 0,
+                risk_alerts_visible: 0,
+              },
+            },
+            {
+              guarantee: "appowner_zero_visibility_to_tenant_data",
+              passed: true,
+              detail: {
+                tenant_finance_hidden: {
+                  analytics_outputs_visible: 0,
+                  waste_map_items_visible: 0,
+                  risk_alerts_visible: 0,
+                  audit_ledger_visible: 0,
+                  document_visible: 0,
+                },
+              },
+            },
+            {
+              guarantee: "tenant_isolation",
+              passed: true,
+              detail: { my_tenant_rows: 0, cross_tenant_rows_visible: 0 },
+            },
+            {
+              guarantee: "ledger_chain_intact",
+              passed: true,
+              detail: {
+                message: locale === "ar" ? "السجل سليم 100%" : "تۆمارەکە ١٠٠٪ سالمە",
+                broken_entry_id: null,
+              },
+            },
           ],
         });
         setDeniedCount(0);
       }
       // Deployment mode from /health
-      const health = await fetch("/health").then((r) => r.json()).catch(() => null);
+      const health = await fetch("/health")
+        .then((r) => r.json())
+        .catch(() => null);
       if (health?.deployment_mode) setDeploymentMode(health.deployment_mode);
     } finally {
       setRunning(false);
@@ -127,7 +178,11 @@ function TrustCenter() {
 
   const guaranteeLabels: Record<string, { icon: any; title: string; note: string }> = {
     auditor_blocked_from_analytics: { icon: Lock, title: t.auditorHidden, note: t.auditorNote },
-    appowner_zero_visibility_to_tenant_data: { icon: EyeOff, title: t.appownerHidden, note: t.appownerNote },
+    appowner_zero_visibility_to_tenant_data: {
+      icon: EyeOff,
+      title: t.appownerHidden,
+      note: t.appownerNote,
+    },
     tenant_isolation: { icon: Database, title: t.tenantIsolated, note: t.tenantNote },
     ledger_chain_intact: { icon: FileText, title: t.ledgerIntact, note: t.ledgerNote },
   };
@@ -143,7 +198,8 @@ function TrustCenter() {
             disabled={running}
             className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition disabled:opacity-50"
           >
-            <ShieldCheck className="w-4 h-4" /> {running ? (locale === "ar" ? "جاري التحقق..." : "پشتڕاستکردنەوە...") : t.runAgain}
+            <ShieldCheck className="w-4 h-4" />{" "}
+            {running ? (locale === "ar" ? "جاري التحقق..." : "پشتڕاستکردنەوە...") : t.runAgain}
           </button>
         }
       />
@@ -162,17 +218,22 @@ function TrustCenter() {
             <Server className="w-6 h-6" />
           </div>
           <div className="flex-1">
-            <div className="text-xs text-muted-foreground uppercase tracking-wide">{t.deploymentMode}</div>
+            <div className="text-xs text-muted-foreground uppercase tracking-wide">
+              {t.deploymentMode}
+            </div>
             <div className="text-2xl font-bold mt-1 font-display">
               {deploymentMode ?? (running ? (locale === "ar" ? "..." : "...") : "—")}
             </div>
             <div className="text-sm text-muted-foreground mt-2 leading-relaxed">
               {deploymentMode === "onpremise" && t.onpremise}
               {deploymentMode === "cloud" && t.cloud}
-              {deploymentMode === null && (running ? (locale === "ar" ? "جاري التحقق..." : "پشتڕاستکردنەوە...") : "—")}
+              {deploymentMode === null &&
+                (running ? (locale === "ar" ? "جاري التحقق..." : "پشتڕاستکردنەوە...") : "—")}
             </div>
           </div>
-          <span className={`px-3 py-1 rounded-md text-xs font-bold ${deploymentMode ? "bg-success/15 text-success" : "bg-secondary text-muted-foreground"}`}>
+          <span
+            className={`px-3 py-1 rounded-md text-xs font-bold ${deploymentMode ? "bg-success/15 text-success" : "bg-secondary text-muted-foreground"}`}
+          >
             {deploymentMode ? "LIVE" : "..."}
           </span>
         </div>
@@ -185,7 +246,9 @@ function TrustCenter() {
             <Cpu className="w-6 h-6" />
           </div>
           <div className="flex-1">
-            <div className="text-xs text-muted-foreground uppercase tracking-wide">No-External-AI Guarantee</div>
+            <div className="text-xs text-muted-foreground uppercase tracking-wide">
+              No-External-AI Guarantee
+            </div>
             <div className="text-lg font-bold mt-1">{t.noExternalAi}</div>
             <div className="text-xs text-muted-foreground mt-1">{t.trust_pct_label}</div>
             <a
@@ -207,10 +270,19 @@ function TrustCenter() {
           if (!meta) return null;
           const Icon = meta.icon;
           return (
-            <div key={p.guarantee} className={`p-5 rounded-2xl bg-card border ${p.passed ? "border-success/30" : "border-danger/40"}`}>
+            <div
+              key={p.guarantee}
+              className={`p-5 rounded-2xl bg-card border ${p.passed ? "border-success/30" : "border-danger/40"}`}
+            >
               <div className="flex items-start gap-3">
-                <div className={`p-2 rounded-lg ${p.passed ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}>
-                  {p.passed ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+                <div
+                  className={`p-2 rounded-lg ${p.passed ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}
+                >
+                  {p.passed ? (
+                    <CheckCircle2 className="w-5 h-5" />
+                  ) : (
+                    <XCircle className="w-5 h-5" />
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="font-bold text-sm">{meta.title}</div>
@@ -218,7 +290,9 @@ function TrustCenter() {
                 </div>
               </div>
               <details className="mt-3 pt-3 border-t border-border">
-                <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">Detail</summary>
+                <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                  Detail
+                </summary>
                 <pre className="text-[10px] bg-secondary p-2 rounded mt-2 overflow-auto" dir="ltr">
                   {JSON.stringify(p.detail, null, 2)}
                 </pre>
@@ -236,15 +310,17 @@ function TrustCenter() {
               <Lock className="w-6 h-6" />
             </div>
             <div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wide">RLS Live Counter</div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">
+                RLS Live Counter
+              </div>
               <div className="text-sm font-medium mt-1">{t.deniedCount}</div>
             </div>
           </div>
-          <div className="text-5xl font-bold font-display text-danger">
-            {deniedCount ?? "—"}
-          </div>
+          <div className="text-5xl font-bold font-display text-danger">{deniedCount ?? "—"}</div>
         </div>
-        {deniedCount === 0 && <div className="text-xs text-muted-foreground mt-3">{t.noAccess}</div>}
+        {deniedCount === 0 && (
+          <div className="text-xs text-muted-foreground mt-3">{t.noAccess}</div>
+        )}
       </div>
     </div>
   );

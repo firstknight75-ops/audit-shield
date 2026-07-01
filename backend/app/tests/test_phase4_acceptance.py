@@ -20,17 +20,10 @@ Maps to the 7 acceptance criteria from the AuditCore Phase 4 spec:
 """
 from __future__ import annotations
 
-import asyncio
-import hashlib
-import hmac
-import json
-import os
 import pathlib
 import re
 from datetime import datetime, timedelta, timezone
-from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 
 from app.exports.certificates import tamper_proof_certificate, verify_certificate
 
@@ -58,7 +51,8 @@ def test_acceptance_1_pdf_html_contains_sorani_specific_letters_when_data_is_sor
     We verify by directly inspecting the rendered HTML that gets passed
     to WeasyPrint — the text payload itself is what the PDF embeds."""
     from app.exports.engine import export_pdf
-    import tempfile, os
+    import tempfile
+    import os
 
     # Construct waste map rows in Kurdish Sorani
     sorani_rows = [
@@ -91,9 +85,9 @@ def test_acceptance_1_pdf_html_contains_sorani_specific_letters_when_data_is_sor
                 pass
             # Our Sorani test data uses ڕ and ە (e.g. "ڕەخنەیی")
             assert 'ڕ' in content or 'ە' in content, \
-                f'PDF source HTML must contain Sorani-specific glyphs from the input; not found'
+                'PDF source HTML must contain Sorani-specific glyphs from the input; not found'
             assert 'خريطة' in content or 'باب' in content, \
-                f'PDF source must echo the input title or category column'
+                'PDF source must echo the input title or category column'
         # else: WeasyPrint produced the PDF directly — the test is still
         # valid because the engine code path runs the same template.
 

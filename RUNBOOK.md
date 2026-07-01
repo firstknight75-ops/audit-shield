@@ -3,6 +3,7 @@
 ## Common Operations
 
 ### Health check
+
 ```bash
 curl http://localhost:8000/health
 # {"status":"ok","deployment_mode":"onpremise"}
@@ -15,6 +16,7 @@ curl http://localhost:8000/metrics | head -50
 ```
 
 ### Manual daily analysis trigger
+
 ```bash
 TOKEN=$(curl -s -X POST http://localhost:8000/api/auth/login \
   -H 'Content-Type: application/json' \
@@ -28,6 +30,7 @@ curl -X POST "http://localhost:8000/api/analytics/run/${COMPANY_ID}" \
 ```
 
 ### Verify ledger integrity
+
 ```bash
 curl "http://localhost:8000/api/owner/ledger/verify?company_id=${COMPANY_ID}" \
   -H "Authorization: Bearer $TOKEN"
@@ -35,6 +38,7 @@ curl "http://localhost:8000/api/owner/ledger/verify?company_id=${COMPANY_ID}" \
 ```
 
 ### Trigger tamper test (proves detection works)
+
 ```bash
 # Pick a recent ledger entry
 ENTRY_ID=$(...)
@@ -49,6 +53,7 @@ curl "http://localhost:8000/api/owner/ledger/verify?company_id=${COMPANY_ID}" \
 ```
 
 ### Add a reverse entry (production correction)
+
 ```bash
 curl -X POST "http://localhost:8000/api/owner/ledger/reverse/${ENTRY_ID}?company_id=${COMPANY_ID}" \
   -H "Authorization: Bearer $TOKEN" \
@@ -57,6 +62,7 @@ curl -X POST "http://localhost:8000/api/owner/ledger/reverse/${ENTRY_ID}?company
 ```
 
 ### Schedule a recurring report
+
 ```bash
 curl -X POST "http://localhost:8000/api/scheduled-reports" \
   -H "Authorization: Bearer $TOKEN" \
@@ -67,6 +73,7 @@ curl -X POST "http://localhost:8000/api/scheduled-reports" \
 ## Incident Response
 
 ### Suspected Auditor access to analytics
+
 1. Check the Trust Center `/trust` page — denied-attempt counter should show
    the actual blocked queries
 2. Verify the migration is applied: `alembic current` should show 0001 applied
@@ -74,6 +81,7 @@ curl -X POST "http://localhost:8000/api/scheduled-reports" \
 4. If violations are real, audit `/api/admin/activity` for permission changes
 
 ### Ledger chain breaks
+
 1. Run `verify` — get the exact `broken_entry_id`
 2. Inspect that entry's `action_payload` for the mutation
 3. **Do not edit the row directly.** Add a `reverse_entry` instead.
@@ -81,12 +89,14 @@ curl -X POST "http://localhost:8000/api/scheduled-reports" \
    most recent atomic backup (`scripts/backup.sh` output)
 
 ### Worker not processing OCR
+
 1. Check Celery worker logs: `docker logs auditcore-celery-worker-1`
 2. Inspect Redis: `docker exec -it auditcore-redis-1 redis-cli LLEN ocr`
 3. Verify Tesseract is installed: `docker exec auditcore-backend tesseract --version`
 4. Re-run a single document: `curl -X POST /api/admin/celery/reprocess/{doc_id}`
 
 ### 48-hour activation missed
+
 1. Inspect `/api/owner/activation-progress` — which stage stalled?
 2. App Owner dashboard `/appowner/overdue-installs` shows the install flagged
 3. Resolve and re-run the missing step manually
@@ -95,12 +105,14 @@ curl -X POST "http://localhost:8000/api/scheduled-reports" \
 ## Backup / Restore
 
 ### On-premise backup (atomic per company_group)
+
 ```bash
 ./scripts/backup.sh
 # Creates: backups/backup-<stamp>.enc — one file per company_group
 ```
 
 ### Restore from backup
+
 ```bash
 # Stop services first
 docker compose down
@@ -113,19 +125,20 @@ docker compose up -d
 ```
 
 ### Cloud snapshot
+
 Cloud mode uses automated snapshot backups + a downloadable
 encrypted export bundle per tenant. See `DEPLOYMENT.md` § Cloud.
 
 ## Capacity Planning
 
-| Resource | Per 10K tx/day | Scaling trigger |
-|---|---|---|
-| Postgres CPU | ~5% | > 30% sustained → consider read replica |
-| Postgres disk | +1 GB/day | > 80% → enable partitioning |
-| Redis memory | ~50 MB | > 80% → bump instance class |
-| Backend CPU | ~10% per worker | > 60% → add worker pod |
-| OCR throughput | 3 s/page | > 5 s/page → enable GPU tesseract |
-| API p50 | < 150 ms | > 300 ms → check indexes (Phase 5 migration) |
+| Resource       | Per 10K tx/day  | Scaling trigger                              |
+| -------------- | --------------- | -------------------------------------------- |
+| Postgres CPU   | ~5%             | > 30% sustained → consider read replica      |
+| Postgres disk  | +1 GB/day       | > 80% → enable partitioning                  |
+| Redis memory   | ~50 MB          | > 80% → bump instance class                  |
+| Backend CPU    | ~10% per worker | > 60% → add worker pod                       |
+| OCR throughput | 3 s/page        | > 5 s/page → enable GPU tesseract            |
+| API p50        | < 150 ms        | > 300 ms → check indexes (Phase 5 migration) |
 
 ## Migration safety
 

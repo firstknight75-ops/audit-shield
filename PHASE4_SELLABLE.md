@@ -10,22 +10,23 @@ on-premise Smart Boxes and cloud tenants.
 
 ## Acceptance criteria — all auto-tested
 
-| # | Criterion | Tests |
-|---|---|---|
-| 1 | PDF renders every Kurdish-Sorani-specific letter correctly | 3 |
-| 2 | `/verify/{report_id}` confirms untampered + flags tampered; no login; no content exposure | 7 |
-| 3 | What-If never merges two companies' figures | 4 |
-| 4 | App Owner Clients tab: zero financial-schema joins; pooled→elite migration no-data-loss | 5 |
-| 5 | 48-hour activation: stage-4 ≤ 48h → completion banner; overdue → App Owner flag | 7 |
-| 6 | Backup/restore atomic per company_group | 3 |
-| 7 | App Owner zero visibility preserved through all Phase 4 work | 4 |
-| Ops | DEPLOYMENT.md, SECURITY.md, install.sh, deploy-cloud.sh | 5 |
+| #   | Criterion                                                                                 | Tests |
+| --- | ----------------------------------------------------------------------------------------- | ----- |
+| 1   | PDF renders every Kurdish-Sorani-specific letter correctly                                | 3     |
+| 2   | `/verify/{report_id}` confirms untampered + flags tampered; no login; no content exposure | 7     |
+| 3   | What-If never merges two companies' figures                                               | 4     |
+| 4   | App Owner Clients tab: zero financial-schema joins; pooled→elite migration no-data-loss   | 5     |
+| 5   | 48-hour activation: stage-4 ≤ 48h → completion banner; overdue → App Owner flag           | 7     |
+| 6   | Backup/restore atomic per company_group                                                   | 3     |
+| 7   | App Owner zero visibility preserved through all Phase 4 work                              | 4     |
+| Ops | DEPLOYMENT.md, SECURITY.md, install.sh, deploy-cloud.sh                                   | 5     |
 
 **Result:** `38 passed` on `test_phase4_acceptance.py`, **221 passed, 1 skipped** total.
 
 ## What Phase 4 added
 
 ### 1. Export engine — Excel/PDF/PNG with tamper-proof certificates
+
 - `backend/app/exports/engine.py` — all three formats now accept a `cert` dict
   and emit `report_id`, `ledger_hash_at_generation`, `signature`, and
   `verify_url` on every output.
@@ -38,6 +39,7 @@ on-premise Smart Boxes and cloud tenants.
   the public `/verify/{report_id}` endpoint.
 
 ### 2. Public report verification `/verify/{report_id}` — NO LOGIN
+
 - `backend/app/api/verify.py` — POST endpoint, **no `get_current_user` dependency**.
 - Re-derives the HMAC-SHA256 signature from server-stored metadata and
   returns ONLY:
@@ -49,12 +51,14 @@ on-premise Smart Boxes and cloud tenants.
   prevent enumeration attacks.
 
 ### 3. What-If Decision Simulator
+
 - Single-company scope enforced: `company_id: str = Query(...)` is the
   only input — no `company_ids: list` parameter exists anywhere.
 - WasteMapItem lookup is explicitly scoped: `WasteMapItem.company_id == company_id`.
 - Both `/what-if/run` and `/what-if/export` endpoints preserved with this invariant.
 
 ### 4. No-Code Template Engine & CRaaS (already scaffolded, verified)
+
 - `backend/app/templates/builder.py` — `SECTOR_PRESETS` for Manufacturing,
   Restaurants, Real Estate, Trading; each preset is a list of widget codes.
 - Templates stored as JSON with `name`, `sector`, `widgets` — **language
@@ -64,6 +68,7 @@ on-premise Smart Boxes and cloud tenants.
 - `POST /appowner/craas` queues custom-report requests.
 
 ### 5. App Owner Admin Panel — clients + tier + templates + maintenance
+
 - **Clients tab:** every `company_group` (real tenant/Smart Box/cloud account).
   Tier, user_count vs. user_cap, deployment_mode, last health-check,
   last backup. **Zero financial-schema joins** — all queries are on
@@ -79,6 +84,7 @@ on-premise Smart Boxes and cloud tenants.
   their Trust Center (Phase 3) as proof of visibility.
 
 ### 6. 48-Hour Activation Tracker (4 stages)
+
 - `backend/app/services/activation_tracker.py` — `compute_activation_progress()`,
   `flag_overdue_installs()`.
 - 4 stages: تثبيت الجهاز → تهيئة المستخدمين → أول دفعة مستندات → أول تحليل وتقرير
@@ -88,6 +94,7 @@ on-premise Smart Boxes and cloud tenants.
   `GET /appowner/overdue-installs`.
 
 ### 7. Deployment & operations, both modes
+
 - `install.sh` — on-prem under 30 min to first login
 - `backup.sh` — atomic per company_group (all companies + branches)
 - `healthcheck.sh` — disk/RAM/UPS, alert on failure
@@ -100,12 +107,14 @@ on-premise Smart Boxes and cloud tenants.
 ## Migration added
 
 `backend/alembic/versions/20260629_0003_report_certificates_activation.py`:
+
 - `report_certificate` table — stores every exported report's certificate
 - `activation_milestone` table — records the 4 activation stages per group
 
 ## Files added (Phase 4 only)
 
 ### Backend
+
 - `backend/app/api/verify.py` — public verification endpoint
 - `backend/app/api/activation.py` — activation progress + overdue endpoints
 - `backend/app/services/activation_tracker.py` — 48h tracking logic
@@ -115,13 +124,16 @@ on-premise Smart Boxes and cloud tenants.
 - `backend/alembic/versions/20260629_0003_report_certificates_activation.py` — migration
 
 ### Backend tests
+
 - `backend/app/tests/test_phase4_acceptance.py` — 38 tests
 
 ### Frontend
+
 - The Phase 4 export/verify/activation UIs already exist (mock-data-driven);
   the backend contracts are now solid and ready for live wiring.
 
 ## Cumulative across all 4 phases + Principles Pass
+
 - **Acceptance tests:** 45 (Phase 1) + 38 (Phase 2) + 43 (Phase 3) + 38 (Phase 4) + 39 (trust boundaries) + 10 (owner outputs) = **213 acceptance + boundary tests**
 - Plus regression tests = **221 passing total, 1 skipped**
 - No-external-AI guard: **PASS**

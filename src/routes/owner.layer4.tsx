@@ -53,7 +53,10 @@ function Layer4() {
           </div>
           <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/30 text-xs flex items-start gap-2">
             <ShieldCheck className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-            <span>تم فك التشفير في الذاكرة فقط — لم يُحفظ النص الصريح على القرص. كل عملية وصول تُسجَّل في السجل غير القابل للتعديل.</span>
+            <span>
+              تم فك التشفير في الذاكرة فقط — لم يُحفظ النص الصريح على القرص. كل عملية وصول تُسجَّل
+              في السجل غير القابل للتعديل.
+            </span>
           </div>
         </div>
 
@@ -62,14 +65,20 @@ function Layer4() {
             <h3 className="font-bold mb-3">البيانات المعتمدة</h3>
             <dl className="space-y-2 text-sm">
               {Object.entries(trace.extracted).map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3 border-b border-border pb-2 last:border-0 last:pb-0">
+                <div
+                  key={k}
+                  className="flex justify-between gap-3 border-b border-border pb-2 last:border-0 last:pb-0"
+                >
                   <dt className="text-muted-foreground">{k}</dt>
-                  <dd className="font-medium text-left" dir="ltr">{Array.isArray(v) ? v.join("، ") : v}</dd>
+                  <dd className="font-medium text-left" dir="ltr">
+                    {Array.isArray(v) ? v.join("، ") : v}
+                  </dd>
                 </div>
               ))}
             </dl>
             <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
-              اعتمدها: {trace.certified_by}<br />
+              اعتمدها: {trace.certified_by}
+              <br />
               في: {trace.certified_at}
             </div>
           </div>

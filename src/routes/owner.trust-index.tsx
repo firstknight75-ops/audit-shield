@@ -8,7 +8,10 @@ import { useApiData } from "@/lib/use-api-data";
 
 export const Route = createFileRoute("/owner/trust-index")({ component: TrustIndexPage });
 
-interface TrendPoint { cycle: string; score: number }
+interface TrendPoint {
+  cycle: string;
+  score: number;
+}
 interface TrustIndexData {
   score: number;
   coverage_pct: number;
@@ -48,9 +51,22 @@ const COPY = {
   },
 } as const;
 
-function Tile({ label, value, sub, tone }: { label: string; value: string; sub: string; tone: string }) {
+function Tile({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  tone: string;
+}) {
   const toneText: Record<string, string> = {
-    primary: "text-primary", success: "text-success", warning: "text-warning", danger: "text-danger",
+    primary: "text-primary",
+    success: "text-success",
+    warning: "text-warning",
+    danger: "text-danger",
   };
   return (
     <div className="p-5 rounded-2xl bg-card border border-border">
@@ -64,7 +80,7 @@ function Tile({ label, value, sub, tone }: { label: string; value: string; sub: 
 function TrustIndexPage() {
   const [locale, setLocale] = useState<Locale>(getLocale());
   const [companyId, setCompanyId] = useState<string | null>(null);
-  
+
   useEffect(() => {
     const onStorage = () => setLocale(getLocale());
     const onCompanyChanged = () => {
@@ -108,7 +124,7 @@ function TrustIndexPage() {
         };
       }
       try {
-        const res = await api.owner.trustIndex(companyId) as Record<string, unknown>;
+        const res = (await api.owner.trustIndex(companyId)) as Record<string, unknown>;
         return {
           score: Number(res.score ?? 0),
           coverage_pct: Number(res.coverage_pct ?? 0),
@@ -123,7 +139,10 @@ function TrustIndexPage() {
           generatedAt: res.generated_at as string | undefined,
         };
       } catch (err) {
-        console.warn("FastAPI backend is unreachable. Falling back to high-fidelity frontend mock data:", err);
+        console.warn(
+          "FastAPI backend is unreachable. Falling back to high-fidelity frontend mock data:",
+          err,
+        );
         return {
           score: 78,
           coverage_pct: 92.5,
@@ -157,20 +176,32 @@ function TrustIndexPage() {
         <div className="p-12 rounded-2xl bg-card border border-border flex flex-col items-center justify-center space-y-3">
           <RefreshCw className="w-6 h-6 text-primary animate-spin" />
           <span className="text-xs font-semibold text-foreground">
-            {locale === "ar" ? "جاري سحب تحليلات الموثوقية وتأمين RLS الجلسة..." : "بارکردنی زانیاری متمانە..."}
+            {locale === "ar"
+              ? "جاري سحب تحليلات الموثوقية وتأمين RLS الجلسة..."
+              : "بارکردنی زانیاری متمانە..."}
           </span>
         </div>
       </div>
     );
   }
 
-  const meta = data.score >= 80
-    ? { color: "success", label: locale === "ar" ? "ممتاز" : "نایاب", ring: "border-success/30" }
-    : data.score >= 60
-    ? { color: "warning", label: locale === "ar" ? "جيد" : "باش", ring: "border-warning/30" }
-    : { color: "danger", label: locale === "ar" ? "يحتاج تحسين" : "پێویستی بە باشترکردن هەیە", ring: "border-danger/30" };
+  const meta =
+    data.score >= 80
+      ? { color: "success", label: locale === "ar" ? "ممتاز" : "نایاب", ring: "border-success/30" }
+      : data.score >= 60
+        ? { color: "warning", label: locale === "ar" ? "جيد" : "باش", ring: "border-warning/30" }
+        : {
+            color: "danger",
+            label: locale === "ar" ? "يحتاج تحسين" : "پێویستی بە باشترکردن هەیە",
+            ring: "border-danger/30",
+          };
 
-  const ringStroke = meta.color === "success" ? "var(--success)" : meta.color === "warning" ? "var(--warning)" : "var(--danger)";
+  const ringStroke =
+    meta.color === "success"
+      ? "var(--success)"
+      : meta.color === "warning"
+        ? "var(--warning)"
+        : "var(--danger)";
 
   return (
     <div>
@@ -179,27 +210,66 @@ function TrustIndexPage() {
         <div className="lg:col-span-1 p-8 rounded-2xl bg-card border border-border flex flex-col items-center justify-center">
           <div className="relative w-44 h-44">
             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-              <circle cx="50" cy="50" r="42" fill="none" stroke="oklch(0.32 0.03 250)" strokeWidth="10" />
-              <circle cx="50" cy="50" r="42" fill="none" stroke={ringStroke} strokeWidth="10"
-                strokeDasharray={`${(data.score / 100) * 264} 264`} strokeLinecap="round" />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="oklch(0.32 0.03 250)"
+                strokeWidth="10"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke={ringStroke}
+                strokeWidth="10"
+                strokeDasharray={`${(data.score / 100) * 264} 264`}
+                strokeLinecap="round"
+              />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-4xl font-bold font-display">{data.score}</div>
               <div className="text-xs text-muted-foreground">{t.score_label}</div>
             </div>
           </div>
-          <div className={`inline-flex items-center gap-1 mt-3 px-3 py-1 rounded-full bg-${meta.color}/15 text-${meta.color} border ${meta.ring} text-sm font-bold`}>
+          <div
+            className={`inline-flex items-center gap-1 mt-3 px-3 py-1 rounded-full bg-${meta.color}/15 text-${meta.color} border ${meta.ring} text-sm font-bold`}
+          >
             <ShieldCheck className="w-3 h-3" /> {meta.label}
           </div>
           {data.generatedAt && (
-            <div className="text-xs text-muted-foreground mt-3 font-mono">{t.last_run}: {data.generatedAt}</div>
+            <div className="text-xs text-muted-foreground mt-3 font-mono">
+              {t.last_run}: {data.generatedAt}
+            </div>
           )}
         </div>
         <div className="lg:col-span-2 grid grid-cols-2 gap-4">
-          <Tile label={t.coverage_label} value={`${data.coverage_pct}%`} sub={`${data.total_documents} ${locale === "ar" ? "مستند" : "بەڵگەنامە"}`} tone="primary" />
-          <Tile label={t.certified_label} value={`${data.certified_pct}%`} sub={`${data.certified_documents} / ${data.total_documents}`} tone="success" />
-          <Tile label={t.missing_label} value={`${data.missing_field_pct}%`} sub={`${data.missing_fields_total} ${locale === "ar" ? "حقل" : "خانە"}`} tone="warning" />
-          <Tile label={t.duplicate_label} value={`${data.duplicate_pct}%`} sub={`${data.duplicate_documents} ${locale === "ar" ? "مستند" : "بەڵگەنامە"}`} tone="danger" />
+          <Tile
+            label={t.coverage_label}
+            value={`${data.coverage_pct}%`}
+            sub={`${data.total_documents} ${locale === "ar" ? "مستند" : "بەڵگەنامە"}`}
+            tone="primary"
+          />
+          <Tile
+            label={t.certified_label}
+            value={`${data.certified_pct}%`}
+            sub={`${data.certified_documents} / ${data.total_documents}`}
+            tone="success"
+          />
+          <Tile
+            label={t.missing_label}
+            value={`${data.missing_field_pct}%`}
+            sub={`${data.missing_fields_total} ${locale === "ar" ? "حقل" : "خانە"}`}
+            tone="warning"
+          />
+          <Tile
+            label={t.duplicate_label}
+            value={`${data.duplicate_pct}%`}
+            sub={`${data.duplicate_documents} ${locale === "ar" ? "مستند" : "بەڵگەنامە"}`}
+            tone="danger"
+          />
         </div>
       </div>
       <div className="p-6 rounded-2xl bg-card border border-border">
@@ -208,11 +278,16 @@ function TrustIndexPage() {
           {(data.trend ?? []).map((point, i) => (
             <div key={i} className="text-center">
               <div className="text-xs text-muted-foreground mb-1">{point.cycle}</div>
-              <div className={`text-2xl font-bold font-display ${point.score >= 80 ? "text-success" : point.score >= 60 ? "text-warning" : "text-danger"}`}>
+              <div
+                className={`text-2xl font-bold font-display ${point.score >= 80 ? "text-success" : point.score >= 60 ? "text-warning" : "text-danger"}`}
+              >
                 {point.score}
               </div>
               <div className="h-2 rounded-full bg-secondary overflow-hidden mt-2">
-                <div className={`h-full bg-${point.score >= 80 ? "success" : point.score >= 60 ? "warning" : "danger"}`} style={{ width: `${point.score}%` }} />
+                <div
+                  className={`h-full bg-${point.score >= 80 ? "success" : point.score >= 60 ? "warning" : "danger"}`}
+                  style={{ width: `${point.score}%` }}
+                />
               </div>
             </div>
           ))}

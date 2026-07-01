@@ -135,7 +135,7 @@ def test_noto_sans_arabic_woff2_contains_all_sorani_glyphs():
             missing.append(f'{ch} (U+{code:04X}, {name})')
 
     assert not missing, (
-        f'Noto Sans Arabic is missing required Sorani glyphs:\n  - '
+        'Noto Sans Arabic is missing required Sorani glyphs:\n  - '
         + '\n  - '.join(missing)
         + '\n\nRe-download from '
         'https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/'

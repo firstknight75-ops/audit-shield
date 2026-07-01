@@ -12,10 +12,12 @@ test suite. Every addition is testable — many are auto-tested.
 ## What Was Added (mapped to your principles)
 
 ### Principle 1 — Data Sovereignty
+
 - ✅ Existing scaffold already provides Smart Box / cloud / Vault split.
   No change required — verified via factory tests.
 
 ### Principle 2 — Zero-Knowledge Audit (auditor blocked architecturally)
+
 - ✅ **New test:** `test_principle2_auditor_role_has_no_view_analytics_permission`
   asserts that the auditor role's permission set contains NONE of
   `view_analytics`, `view_waste_map`, `view_risk_alerts`.
@@ -28,6 +30,7 @@ test suite. Every addition is testable — many are auto-tested.
   and returns the row count (must be 0).
 
 ### Principle 3 — Immutability (hash-chained ledger)
+
 - ✅ **New test:** `test_principle3_hash_chain_detects_tampering`
   asserts that mutating any ledger entry body produces a different hash.
 - ✅ **New live proof endpoint:** `GET /api/trust-proof/run` calls
@@ -35,6 +38,7 @@ test suite. Every addition is testable — many are auto-tested.
   exact broken entry id if tampered.
 
 ### Principle 4 — Silent AI, Locally Run
+
 - ✅ **New service:** `app/services/silent_ai.py` with three runtime checks:
   1. All local AI modules import successfully.
   2. No registered FastAPI route contains `/chat`, `/assistant`, `/llm`,
@@ -50,6 +54,7 @@ test suite. Every addition is testable — many are auto-tested.
   guarantee holds under static + runtime inspection.
 
 ### Principle 5 — Truth From Data (4-layer drill + portfolio)
+
 - ✅ **New endpoint:** `GET /api/owner/dashboard/layer4/{document_id}/image`
   decrypts the encrypted invoice blob in-memory only and streams it
   back to the Owner's browser. The plaintext bytes exist only inside
@@ -64,6 +69,7 @@ test suite. Every addition is testable — many are auto-tested.
   explicit warning that totals are a sum, not a blend.
 
 ### Principle 6 — App Owner zero visibility (provable inside the product)
+
 - ✅ **New live proof endpoint:** `GET /api/trust-proof/run` simulates
   the `appowner` session context against tenant tables
   (`analytics_outputs`, `waste_map_items`, `risk_alerts`,
@@ -79,6 +85,7 @@ test suite. Every addition is testable — many are auto-tested.
   query details.
 
 ### Principle 7 — Activation within 48 hours (tracked)
+
 - ✅ **New service:** `app/services/activation.py` computes the
   activation status against install time:
   install → first upload → first certified → first dashboard.
@@ -90,6 +97,7 @@ test suite. Every addition is testable — many are auto-tested.
   milestone checklist, and pass/fail banner.
 
 ### Principle 8 — Adapts to client sector and size
+
 - ✅ **New service:** `app/services/action_plan.py` produces
   Adaptation-path recommendations that respond to trust level,
   coverage percentage, duplicate density, and timing-mismatch
@@ -104,17 +112,18 @@ test suite. Every addition is testable — many are auto-tested.
 
 ## The 7 Owner Outputs (per your explicit list)
 
-| # | Output (Arabic) | Output (English) | Endpoint | Frontend |
-|---|---|---|---|---|
-| 1 | الصورة الحقيقية | The True Picture | `GET /api/owner/picture` | `/owner` (executive view) |
-| 2 | مؤشر الموثوقية | Trust Index (first-class) | `GET /api/owner/trust-index` | `/owner/trust-index` |
-| 3 | خريطة الهدر | Waste Map | `GET /api/owner/waste-map` | `/owner/waste-map` |
-| 4 | خريطة المخاطر | Risk Map | `GET /api/owner/risk-map` | `/owner/risk-map` |
-| 5 | خريطة الفرص | Opportunity Map (NEW) | `GET /api/owner/opportunity-map` | `/owner/opportunity-map` |
-| 6 | خطة العمل | Action Plan (NEW: Change + Adaptation) | `GET /api/owner/action-plan` | `/owner/action-plan` |
-| 7 | لوحات القيادة | Role-based dashboards | existing | existing |
+| #   | Output (Arabic) | Output (English)                       | Endpoint                         | Frontend                  |
+| --- | --------------- | -------------------------------------- | -------------------------------- | ------------------------- |
+| 1   | الصورة الحقيقية | The True Picture                       | `GET /api/owner/picture`         | `/owner` (executive view) |
+| 2   | مؤشر الموثوقية  | Trust Index (first-class)              | `GET /api/owner/trust-index`     | `/owner/trust-index`      |
+| 3   | خريطة الهدر     | Waste Map                              | `GET /api/owner/waste-map`       | `/owner/waste-map`        |
+| 4   | خريطة المخاطر   | Risk Map                               | `GET /api/owner/risk-map`        | `/owner/risk-map`         |
+| 5   | خريطة الفرص     | Opportunity Map (NEW)                  | `GET /api/owner/opportunity-map` | `/owner/opportunity-map`  |
+| 6   | خطة العمل       | Action Plan (NEW: Change + Adaptation) | `GET /api/owner/action-plan`     | `/owner/action-plan`      |
+| 7   | لوحات القيادة   | Role-based dashboards                  | existing                         | existing                  |
 
 Plus operational:
+
 - Activation tracker — `/api/owner/activation` → `/owner/activation`
 - Portfolio (multi-company) — `/api/owner/portfolio` → `/owner/portfolio`
 - Layer 4 image — `/api/owner/dashboard/layer4/{id}/image` → `/owner/layer4`
@@ -124,6 +133,7 @@ Plus operational:
 ## Files Added
 
 ### Backend services
+
 - `backend/app/services/trust_index.py` — standalone Trust Index
 - `backend/app/services/opportunity_map.py` — IQD-priced upside
 - `backend/app/services/action_plan.py` — Change + Adaptation paths
@@ -132,16 +142,19 @@ Plus operational:
 - `backend/app/services/portfolio.py` — multi-company portfolio
 
 ### Backend API routes
+
 - `backend/app/api/owner_outputs.py` — all 7 outputs
 - `backend/app/api/trust_proof.py` — App Owner zero-visibility + ledger
 - `backend/app/api/layer4.py` — original invoice image drill-down
 - `backend/app/api/silent_ai.py` — silent AI self-test endpoint
 
 ### Backend tests
+
 - `backend/app/tests/test_trust_boundaries.py` — 39 trust-boundary tests
 - `backend/app/tests/test_owner_outputs.py` — 10 owner-output tests
 
 ### Frontend pages
+
 - `src/routes/owner.trust-index.tsx`
 - `src/routes/owner.opportunity-map.tsx`
 - `src/routes/owner.action-plan.tsx`
@@ -152,17 +165,20 @@ Plus operational:
 - `src/routes/silent-ai.tsx`
 
 ### Frontend config
+
 - `src/locales/{ar,ckb}/dashboard.json` — added 8 new nav keys
 - `src/components/app-shell.tsx` — added new nav items
 - `src/routeTree.gen.ts` — registered 8 new routes
 
 ### i18n keys (backend)
+
 - 60+ new translation keys added to `backend/app/i18n/translations.py`,
   both Arabic (ar) and Kurdish Sorani (ckb), covering:
-  trust_index.*, opportunity_map.*, action_plan.*, activation.*,
-  silent_ai.*, trust_proof.*, portfolio.*, layer4.*, ledger.appended_*
+  trust_index._, opportunity_map._, action_plan._, activation._,
+  silent_ai._, trust_proof._, portfolio._, layer4._, ledger.appended_*
 
 ### Modified
+
 - `backend/app/main.py` — wires 4 new routers
 - `backend/app/i18n/translations.py` — 60+ new keys
 
@@ -177,6 +193,7 @@ $ PYTHONPATH=backend python -m pytest backend/app/tests/
 ```
 
 Of those:
+
 - **39 trust-boundary tests** (new) — every principle has at least one
   test that will fail if the principle is broken.
 - **10 owner-output tests** (new) — one assertion per output.
@@ -226,13 +243,13 @@ curl http://localhost:8000/api/silent-ai/self-test
 
 ## Mapping: your principle → the test that proves it
 
-| Principle | Test(s) |
-|---|---|
-| 1. Data Sovereignty | factory tests (existing) |
-| 2. Zero-Knowledge Audit | `test_principle2_auditor_role_has_no_view_analytics_permission`, `test_principle2_auditor_rls_policy_targets_all_hidden_tables`, `test_principle6_appowner_role_permissions_exclude_tenant_data` |
-| 3. Immutability | `test_principle3_hash_chain_detects_tampering`, `test_principle3_genesis_hash_is_well_known`, ledger proof in `/api/trust-proof/run` |
-| 4. Silent AI | `test_principle4_silent_ai_*` (5 tests), `/api/silent-ai/self-test` |
-| 5. Truth From Data | `test_principle5_portfolio_*` (3 tests), `/api/owner/portfolio`, `/api/owner/dashboard/layer4/{id}/image` |
-| 6. App Owner zero-visibility | `test_principle6_*` (2 tests), `/api/trust-proof/run` (live proof) |
-| 7. 48-hour activation | `test_principle7_activation_*` (3 tests), `/api/owner/activation` |
-| 8. Sector/size adaptation | `test_principle8_*` (2 tests), `/api/owner/action-plan` |
+| Principle                    | Test(s)                                                                                                                                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1. Data Sovereignty          | factory tests (existing)                                                                                                                                                                         |
+| 2. Zero-Knowledge Audit      | `test_principle2_auditor_role_has_no_view_analytics_permission`, `test_principle2_auditor_rls_policy_targets_all_hidden_tables`, `test_principle6_appowner_role_permissions_exclude_tenant_data` |
+| 3. Immutability              | `test_principle3_hash_chain_detects_tampering`, `test_principle3_genesis_hash_is_well_known`, ledger proof in `/api/trust-proof/run`                                                             |
+| 4. Silent AI                 | `test_principle4_silent_ai_*` (5 tests), `/api/silent-ai/self-test`                                                                                                                              |
+| 5. Truth From Data           | `test_principle5_portfolio_*` (3 tests), `/api/owner/portfolio`, `/api/owner/dashboard/layer4/{id}/image`                                                                                        |
+| 6. App Owner zero-visibility | `test_principle6_*` (2 tests), `/api/trust-proof/run` (live proof)                                                                                                                               |
+| 7. 48-hour activation        | `test_principle7_activation_*` (3 tests), `/api/owner/activation`                                                                                                                                |
+| 8. Sector/size adaptation    | `test_principle8_*` (2 tests), `/api/owner/action-plan`                                                                                                                                          |

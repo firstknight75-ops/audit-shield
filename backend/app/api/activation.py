@@ -10,9 +10,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, require_permission
+from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.models.entities import ActivationMilestone, AnalyticsOutput, Company, CompanyGroup, User
+from app.models.entities import Company, User
 from app.models.enums import UserRole
 from app.services.access import require_company_access
 from app.services.activation_tracker import compute_activation_progress, flag_overdue_installs

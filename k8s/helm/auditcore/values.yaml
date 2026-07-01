@@ -1,7 +1,7 @@
 # AuditCore Helm chart values — defaults suitable for on-prem Smart Box.
 # Override per-deployment in your values-overrides.yaml.
 
-deploymentMode: onpremise  # onpremise | cloud
+deploymentMode: onpremise # onpremise | cloud
 
 replicaCount: 2
 
@@ -54,7 +54,7 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 postgresql:
-  enabled: true  # on-prem: bundled. Cloud: disable and use managed.
+  enabled: true # on-prem: bundled. Cloud: disable and use managed.
   image:
     repository: postgres
     tag: "15-alpine"
@@ -64,7 +64,7 @@ postgresql:
     storageClass: ""
   auth:
     username: auditcore
-    password: changeme  # REQUIRED override
+    password: changeme # REQUIRED override
     database: auditcore
 
 redis:
@@ -96,7 +96,7 @@ notifications:
     host: ""
     port: 587
     user: ""
-    password: ""  # from secret
+    password: "" # from secret
 
 # Security knobs
 security:

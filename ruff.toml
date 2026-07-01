@@ -1,0 +1,9 @@
+[lint]
+ignore = [
+    "F401", # Unused import
+    "F821", # Undefined name
+    "F811", # Redefinition of unused name
+    "E402", # Module level import not at top of file
+    "F841", # Local variable is assigned to but never used
+    "F541", # f-string without placeholders
+]

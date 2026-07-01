@@ -13,13 +13,12 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Iterable
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.models.entities import ScheduledReport, User
+from app.models.entities import ScheduledReport
 
 logger = logging.getLogger('auditcore.reporting')
 

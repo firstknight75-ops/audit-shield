@@ -12,11 +12,17 @@ function UploadPage() {
   const [files, setFiles] = useState<string[]>([]);
   return (
     <div>
-      <PageHeader title="رفع مستند جديد" subtitle="الملفات تُشفّر فوراً بصيغة AES-256 ولا تُحفظ بدون تشفير." />
+      <PageHeader
+        title="رفع مستند جديد"
+        subtitle="الملفات تُشفّر فوراً بصيغة AES-256 ولا تُحفظ بدون تشفير."
+      />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div
-            onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setOver(true);
+            }}
             onDragLeave={() => setOver(false)}
             onDrop={(e) => {
               e.preventDefault();
@@ -39,8 +45,13 @@ function UploadPage() {
           {files.length > 0 && (
             <div className="mt-6 space-y-2">
               {files.map((f, i) => (
-                <div key={i} className="p-3 rounded-md bg-card border border-border flex items-center justify-between">
-                  <span className="text-sm" dir="ltr">{f}</span>
+                <div
+                  key={i}
+                  className="p-3 rounded-md bg-card border border-border flex items-center justify-between"
+                >
+                  <span className="text-sm" dir="ltr">
+                    {f}
+                  </span>
                   <span className="text-xs text-success">مشفّر · بانتظار التصنيف</span>
                 </div>
               ))}
@@ -52,7 +63,10 @@ function UploadPage() {
           <h3 className="font-bold mb-4">التصنيف الافتراضي</h3>
           <div className="space-y-2">
             {categories.map((c) => (
-              <label key={c} className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary cursor-pointer">
+              <label
+                key={c}
+                className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary cursor-pointer"
+              >
                 <input type="radio" name="cat" className="accent-primary" />
                 <span className="text-sm">{c}</span>
               </label>

@@ -130,7 +130,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # Drop entries outside the window
         bucket[:] = [t for t in bucket if now - t < window]
         if len(bucket) >= self.rpm:
-            from fastapi import HTTPException
             return Response(
                 content='{"detail":"rate_limit_exceeded","limit_per_minute":%d}' % self.rpm,
                 status_code=429,

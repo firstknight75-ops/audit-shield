@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -12,7 +11,7 @@ from app.db.session import get_db
 from app.models.entities import AuditLedger, DailyTask, User, UserCompanyAccess
 from app.models.enums import UserRole
 from app.schemas.ledger import LedgerVerifyResponse
-from app.services.access import get_accessible_company_ids, require_company_access
+from app.services.access import require_company_access
 from app.services.i18n import tr
 from app.services.ledger import append_reverse_entry, verify_ledger_integrity
 

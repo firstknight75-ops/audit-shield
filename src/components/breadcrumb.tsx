@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { getCurrentUser, type AccessibleCompany } from "@/lib/auth";
 import { getLocale, type Locale } from "@/lib/i18n";
 
-const LABELS: Record<Locale, { group: string; company: string; branch: string; portfolio: string; dept: string }> = {
+const LABELS: Record<
+  Locale,
+  { group: string; company: string; branch: string; portfolio: string; dept: string }
+> = {
   ar: { group: "المجموعة", company: "الشركة", branch: "الفرع", portfolio: "محفظة", dept: "القسم" },
   ckb: { group: "گروپ", company: "کۆمپانیا", branch: "لق", portfolio: "پۆرفۆلیۆ", dept: "بەش" },
 };
@@ -29,7 +32,9 @@ export function Breadcrumb({ layer }: { layer?: string }) {
   if (!user) return null;
   const companies = (user.accessibleCompanies || []) as AccessibleCompany[];
   const currentCompany = companies.find((c) => c.company_id === activeCompany) || companies[0];
-  const currentBranch = activeBranch ? currentCompany?.branches.find((b) => b.branch_id === activeBranch) : null;
+  const currentBranch = activeBranch
+    ? currentCompany?.branches.find((b) => b.branch_id === activeBranch)
+    : null;
 
   return (
     <nav className="flex items-center gap-2 text-xs text-muted-foreground">

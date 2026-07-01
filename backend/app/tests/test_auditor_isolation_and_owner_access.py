@@ -7,9 +7,7 @@ This test file verifies:
 """
 from __future__ import annotations
 
-import pytest
 from app.services.permissions import ROLE_DEFAULTS
-from app.models.enums import UserRole
 
 
 def test_auditor_permissions_strictly_excludes_analytics_and_ledger():

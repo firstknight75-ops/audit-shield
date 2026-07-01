@@ -1,0 +1,1809 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AuditCore - لوحة معاينة المالك التفاعلية</title>
+    <!-- Cairo & Tajawal Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #c89a3b;
+        --primary-hover: #b08530;
+        --primary-light: rgba(200, 154, 59, 0.1);
+        --primary-border: rgba(200, 154, 59, 0.25);
+        --background: #0f111a;
+        --card: #151824;
+        --border: #222638;
+        --muted: #1c2033;
+        --muted-foreground: #8a94b5;
+        --foreground: #f3f4f6;
+        --success: #10b981;
+        --success-light: rgba(16, 185, 129, 0.1);
+        --warning: #f59e0b;
+        --warning-light: rgba(245, 158, 11, 0.1);
+        --danger: #ef4444;
+        --danger-light: rgba(239, 68, 68, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: "Cairo", "Tajawal", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+
+      /* Scrollbar Styling */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--background);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+      }
+
+      /* Layout */
+      .app-container {
+        display: flex;
+        flex-1: 1;
+        min-height: 100vh;
+        width: 100%;
+      }
+
+      /* Sidebar */
+      aside {
+        width: 260px;
+        background-color: #0c0e17;
+        border-left: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        flex-shrink: 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 20px;
+      }
+
+      .brand-icon {
+        color: var(--primary);
+        width: 32px;
+        height: 32px;
+      }
+
+      .brand-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--foreground);
+        letter-spacing: 0.5px;
+      }
+
+      .nav-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-grow: 1;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: var(--muted-foreground);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: 1px solid transparent;
+      }
+
+      .nav-item.active {
+        background-color: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary-border);
+      }
+
+      .nav-item:hover:not(.active) {
+        background-color: var(--muted);
+        color: var(--foreground);
+      }
+
+      /* Header */
+      header {
+        height: 70px;
+        border-bottom: 1px solid var(--border);
+        background-color: rgba(21, 24, 36, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        backdrop-filter: blur(8px);
+      }
+
+      .company-switcher {
+        position: relative;
+      }
+
+      .switcher-btn {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        color: var(--foreground);
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .switcher-btn:hover {
+        border-color: var(--primary);
+      }
+
+      .switcher-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+        width: 280px;
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        display: none;
+        padding: 8px;
+      }
+
+      .switcher-dropdown.show {
+        display: block;
+      }
+
+      .dropdown-title {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+        padding: 6px 12px;
+        font-weight: 700;
+      }
+
+      .dropdown-item {
+        width: 100%;
+        background: none;
+        border: none;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--foreground);
+        text-align: right;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s;
+      }
+
+      .dropdown-item:hover {
+        background-color: var(--muted);
+        color: var(--primary);
+      }
+
+      .dropdown-item.active {
+        background-color: var(--primary-light);
+        color: var(--primary);
+      }
+
+      /* Main Content */
+      main {
+        flex-grow: 1;
+        padding: 30px;
+        overflow-y: auto;
+      }
+
+      .page-title-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-info h1 {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--foreground);
+      }
+
+      .page-info p {
+        font-size: 13px;
+        color: var(--muted-foreground);
+        margin-top: 4px;
+      }
+
+      .action-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn-pdf {
+        background-color: var(--danger);
+        color: #fff;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+        transition: all 0.2s;
+      }
+
+      .btn-pdf:hover {
+        background-color: #e03131;
+        transform: translateY(-1px);
+      }
+
+      /* Alert Banner */
+      .success-banner {
+        background-color: var(--success-light);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: var(--success);
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .success-banner a {
+        background-color: var(--success);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 11px;
+        transition: background-color 0.2s;
+      }
+
+      .success-banner a:hover {
+        background-color: #059669;
+      }
+
+      /* Main Grid layout for advisor tab */
+      .advisor-grid {
+        display: grid;
+        grid-template-cols: 1200px;
+        gap: 24px;
+      }
+
+      @media (min-width: 1200px) {
+        .advisor-grid {
+          grid-template-cols: 7fr 5fr;
+        }
+      }
+
+      /* Cards */
+      .panel-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+
+      .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 14px;
+        margin-bottom: 20px;
+      }
+
+      .card-title {
+        font-size: 15px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* KPI Grid */
+      .kpi-grid {
+        display: grid;
+        grid-template-cols: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      @media (min-width: 768px) {
+        .kpi-grid {
+          grid-template-cols: repeat(4, 1fr);
+        }
+      }
+
+      .kpi-box {
+        background-color: rgba(28, 32, 51, 0.4);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+      }
+
+      .kpi-val {
+        font-size: 20px;
+        font-weight: 800;
+        margin-top: 6px;
+      }
+
+      /* Interactive chatbot */
+      .chat-box {
+        display: flex;
+        flex-direction: column;
+        height: 480px;
+      }
+
+      .chat-presets {
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .preset-btn {
+        width: 100%;
+        text-align: right;
+        background-color: rgba(200, 154, 59, 0.05);
+        border: 1px solid var(--primary-border);
+        color: var(--primary);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-bottom: 6px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .preset-btn:hover {
+        background-color: var(--primary-light);
+      }
+
+      .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding-right: 4px;
+      }
+
+      .message {
+        max-width: 85%;
+        padding: 12px 16px;
+        border-radius: 14px;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .message.user {
+        align-self: flex-start;
+        background-color: var(--muted);
+        color: var(--foreground);
+        border-top-right-radius: 0;
+      }
+
+      .message.ai {
+        align-self: flex-end;
+        background-color: var(--primary-light);
+        border: 1px solid var(--primary-border);
+        color: var(--foreground);
+        border-top-left-radius: 0;
+        font-weight: 600;
+      }
+
+      /* Table styles */
+      .ledger-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .ledger-table th {
+        background-color: var(--muted);
+        color: var(--muted-foreground);
+        padding: 12px;
+        font-weight: 700;
+        text-align: right;
+      }
+
+      .ledger-table td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .ledger-table tr:hover {
+        background-color: rgba(28, 32, 51, 0.3);
+      }
+
+      /* Filters Box */
+      .filter-section {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .filter-label {
+        font-size: 11px;
+        color: var(--muted-foreground);
+        font-weight: 700;
+        margin-left: 8px;
+      }
+
+      .pill-btn {
+        background-color: rgba(28, 32, 51, 0.5);
+        border: 1px solid var(--border);
+        color: var(--muted-foreground);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .pill-btn.active {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+
+      .search-input {
+        width: 100%;
+        background-color: var(--muted);
+        border: 1px solid var(--border);
+        color: var(--foreground);
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-family: inherit;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+
+      /* SVGs and Icons replacement */
+      .icon-svg {
+        display: inline-block;
+        vertical-align: middle;
+        fill: currentColor;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar Navigation -->
+      <aside>
+        <div class="brand">
+          <svg
+            class="brand-icon"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            stroke="currentColor"
+            stroke-width="2.5"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+          <span class="brand-title">AuditCore</span>
+        </div>
+
+        <nav class="nav-list">
+          <div class="nav-item active" onclick="switchTab('advisor')">
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+              class="icon-svg"
+            >
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              ></polygon>
+            </svg>
+            <span>مستشار المالك الآلي</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('trust')">
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+              class="icon-svg"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>مؤشر الموثوقية (Trust Index)</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('ledger')">
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+              class="icon-svg"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>سجل النشاطات المحمي</span>
+          </div>
+        </nav>
+
+        <div
+          style="
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+            font-size: 11px;
+            color: var(--muted-foreground);
+            text-align: center;
+          "
+        >
+          جلسة: أبو مصطفى (المالك)
+        </div>
+      </aside>
+
+      <!-- Main Wrapper -->
+      <div style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0">
+        <!-- Header bar with switches -->
+        <header>
+          <div class="company-switcher">
+            <button class="switcher-btn" onclick="toggleSwitcher()">
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+                class="icon-svg"
+              >
+                <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                <line x1="9" y1="22" x2="9" y2="16"></line>
+                <line x1="9" y1="16" x2="15" y2="16"></line>
+                <line x1="15" y1="16" x2="15" y2="22"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="9" y1="12" x2="15" y2="12"></line>
+              </svg>
+              <span id="active-company-name">مجموعة النخيل التجارية</span>
+              <svg
+                viewBox="0 0 24 24"
+                width="12"
+                height="12"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+                class="icon-svg"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            <div class="switcher-dropdown" id="switcher-dropdown">
+              <div class="dropdown-title">اختر الشركة للمتابعة الفورية</div>
+              <button
+                class="dropdown-item active"
+                onclick="selectCompany('c1', 'مجموعة النخيل التجارية')"
+              >
+                <span>مجموعة النخيل التجارية</span>
+                <span style="font-size: 10px; color: var(--success)">نشط</span>
+              </button>
+              <button class="dropdown-item" onclick="selectCompany('c2', 'مصنع الفرات للأغذية')">
+                <span>مصنع الفرات للأغذية</span>
+              </button>
+              <button class="dropdown-item" onclick="selectCompany('c3', 'مطاعم بغداد العريقة')">
+                <span>مطاعم بغداد العريقة</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="font-size: 12px; color: var(--muted-foreground); font-weight: 600">
+            التاريخ المالي الحالي: 30 حزيران 2026
+          </div>
+        </header>
+
+        <!-- Main viewport -->
+        <main>
+          <!-- ──────────────── 1. ADVISOR TAB ──────────────── -->
+          <div id="tab-advisor" class="tab-content" style="display: block">
+            <div class="page-title-section">
+              <div class="page-info">
+                <h1>مستشار المالك الآلي (تدقيق المدقق)</h1>
+                <p>تفسير فوري للمصطلحات والتقارير الفنية المعقدة إلى خطط وقرارات عمل عملية.</p>
+              </div>
+              <div class="action-group">
+                <button class="btn-pdf" onclick="triggerPDFExport()">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="14"
+                    height="14"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    fill="none"
+                    class="icon-svg"
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  <span id="pdf-btn-text">تصدير الملخص كملف PDF</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="success-banner" id="pdf-success-banner" style="display: none">
+              <div style="display: flex; align-items: center; gap: 8px">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  fill="none"
+                  class="icon-svg"
+                  style="color: var(--success)"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span id="pdf-banner-msg"
+                  >تم توليد تقرير "ملخص مستشار المالك الآلي وتدقيق المدقق" بنجاح!</span
+                >
+              </div>
+              <a
+                href="#"
+                onclick="
+                  alert('جاري تحميل التقرير المصدر الموثق بشهادة عدم التلاعب...');
+                  return false;
+                "
+                >تحميل ملف PDF</a
+              >
+            </div>
+
+            <!-- Strategic narrative -->
+            <div
+              style="
+                background: linear-gradient(
+                  135deg,
+                  rgba(200, 154, 59, 0.15) 0%,
+                  rgba(21, 24, 36, 0.6) 100%
+                );
+                border: 1px solid var(--primary-border);
+                border-radius: 16px;
+                padding: 24px;
+                display: flex;
+                gap: 20px;
+                align-items: flex-start;
+                margin-bottom: 24px;
+              "
+            >
+              <div
+                style="
+                  background-color: var(--primary-light);
+                  color: var(--primary);
+                  padding: 12px;
+                  border-radius: 12px;
+                  border: 1px solid var(--primary-border);
+                "
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  fill="none"
+                  class="icon-svg"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+              </div>
+              <div>
+                <h4
+                  style="
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    color: var(--primary);
+                    font-weight: 700;
+                    margin-bottom: 6px;
+                  "
+                >
+                  الملخص الاستراتيجي المبسط للمالك
+                </h4>
+                <p
+                  id="advisor-narrative-text"
+                  style="font-size: 14px; font-weight: 600; line-height: 1.6; color: #fff"
+                >
+                  أبو مصطفى، شركتك اليوم بأمان ولكن مبيعات الفروع فيها ثغرة. الهدر الإجمالي بلغ
+                  184.5 مليون دينار هذا الشهر، مدقق الحسابات كشف 12.4 مليون دينار منها قابلة
+                  للاسترداد فوراً من المورد 'شركة الرافدين' بسبب تكرار فواتير الشراء. أداء مدققك
+                  ممتاز (91%) لكنه ممرر فاتورة وحدة مشكوك بصحتها بدون تدقيق حقل الضريبة.
+                </p>
+              </div>
+            </div>
+
+            <div class="advisor-grid">
+              <!-- Left Side: Auditor audit -->
+              <div>
+                <div class="panel-card">
+                  <div class="card-header-row">
+                    <h3 class="card-title" style="color: var(--foreground)">
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        fill="none"
+                        class="icon-svg"
+                        style="color: var(--primary)"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                      تدقيق أداء المدقق والمحاسب البشري
+                    </h3>
+                    <span
+                      style="
+                        font-size: 10px;
+                        color: var(--muted-foreground);
+                        background-color: var(--muted);
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                      "
+                      >ID: SEED-KPI-01</span
+                    >
+                  </div>
+
+                  <div class="kpi-grid">
+                    <div class="kpi-box">
+                      <div style="font-size: 11px; color: var(--muted-foreground)">
+                        كفاءة المدقق
+                      </div>
+                      <div class="kpi-val" id="auditor-eff-val" style="color: var(--primary)">
+                        91%
+                      </div>
+                      <div style="font-size: 9px; color: var(--muted-foreground); margin-top: 4px">
+                        SLA vs Tasks
+                      </div>
+                    </div>
+                    <div class="kpi-box">
+                      <div style="font-size: 11px; color: var(--muted-foreground)">
+                        دقة المطابقة
+                      </div>
+                      <div class="kpi-val" id="auditor-acc-val" style="color: var(--success)">
+                        94%
+                      </div>
+                      <div style="font-size: 9px; color: var(--muted-foreground); margin-top: 4px">
+                        No post-errors
+                      </div>
+                    </div>
+                    <div class="kpi-box">
+                      <div style="font-size: 11px; color: var(--muted-foreground)">
+                        تجاوز التنبيهات
+                      </div>
+                      <div class="kpi-val" id="auditor-bypass-val" style="color: var(--warning)">
+                        8%
+                      </div>
+                      <div style="font-size: 9px; color: var(--muted-foreground); margin-top: 4px">
+                        Ignored Flags
+                      </div>
+                    </div>
+                    <div class="kpi-box">
+                      <div style="font-size: 11px; color: var(--muted-foreground)">
+                        المخالفات المسجلة
+                      </div>
+                      <div class="kpi-val" id="auditor-demerits-val" style="color: var(--danger)">
+                        1
+                      </div>
+                      <div style="font-size: 9px; color: var(--muted-foreground); margin-top: 4px">
+                        Penalty points
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Violations list -->
+                  <div style="margin-top: 15px">
+                    <div
+                      style="
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: var(--muted-foreground);
+                        margin-bottom: 8px;
+                      "
+                    >
+                      سجل هفوات المدقق المكتشفة:
+                    </div>
+                    <div
+                      id="violations-list-container"
+                      class="message user"
+                      style="
+                        max-width: 100%;
+                        border: 1px solid rgba(239, 68, 68, 0.2);
+                        background-color: rgba(239, 68, 68, 0.05);
+                        color: var(--danger);
+                        padding: 12px;
+                        border-radius: 8px;
+                      "
+                    >
+                      <strong>تنبيه حرج:</strong> تجاوز تنبيه تكرار الفاتورة INV-2026-0481 واعتمادها
+                      كفاتورة فريدة بالخطأ قبل مراجعة المستند المرفق.
+                    </div>
+                  </div>
+
+                  <!-- Hash check integrity -->
+                  <div
+                    style="
+                      background: linear-gradient(
+                        135deg,
+                        rgba(16, 185, 129, 0.05) 0%,
+                        rgba(21, 24, 36, 0.5) 100%
+                      );
+                      border: 1px solid rgba(16, 185, 129, 0.2);
+                      border-radius: 12px;
+                      padding: 16px;
+                      margin-top: 20px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                    "
+                  >
+                    <div>
+                      <h4
+                        style="
+                          font-size: 12px;
+                          font-weight: 700;
+                          display: flex;
+                          align-items: center;
+                          gap: 6px;
+                          color: var(--success);
+                        "
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="14"
+                          height="14"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          fill="none"
+                          class="icon-svg"
+                        >
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        مقاومة التلاعب بالأرقام بالخلفية
+                      </h4>
+                      <p style="font-size: 10px; color: var(--muted-foreground); margin-top: 4px">
+                        يتحقق النظام باستمرار من تطابق تشفير القيود لضمان نزاهة المدقق.
+                      </p>
+                    </div>
+                    <button
+                      onclick="runHashScan()"
+                      style="
+                        background-color: var(--success);
+                        color: white;
+                        border: none;
+                        padding: 8px 14px;
+                        border-radius: 8px;
+                        font-size: 11px;
+                        font-weight: 700;
+                        cursor: pointer;
+                      "
+                    >
+                      ابدأ الفحص تشفيرياً
+                    </button>
+                  </div>
+                  <div
+                    id="hash-scan-success"
+                    style="
+                      display: none;
+                      background-color: var(--success-light);
+                      border: 1px solid rgba(16, 185, 129, 0.3);
+                      color: var(--success);
+                      padding: 10px;
+                      border-radius: 8px;
+                      font-size: 11px;
+                      font-weight: 600;
+                      margin-top: 10px;
+                      text-align: center;
+                    "
+                  >
+                    ✓ تم مطابقة كافة بصمات القيود المحمية: السجل المالي سليم وموثوق 100%!
+                  </div>
+                </div>
+
+                <!-- Main Key Issues translated -->
+                <h3
+                  style="
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: var(--muted-foreground);
+                    margin-bottom: 12px;
+                  "
+                >
+                  أبرز المشاكل الحالية مترجمة لقرار المالك:
+                </h3>
+
+                <div id="issues-container">
+                  <!-- Dynamic issues generated by company switcher -->
+                </div>
+              </div>
+
+              <!-- Right Side: AI Chatbot & Translator -->
+              <div>
+                <!-- Translator -->
+                <div class="panel-card" style="padding: 20px">
+                  <div class="card-header-row" style="margin-bottom: 15px; padding-bottom: 10px">
+                    <h3 class="card-title">
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        fill="none"
+                        class="icon-svg"
+                        style="color: var(--primary)"
+                      >
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                        <line x1="4" y1="22" x2="4" y2="15"></line>
+                      </svg>
+                      مترجم المصطلحات والمخاطر للمالك
+                    </h3>
+                  </div>
+                  <div class="chat-presets" style="padding: 0; border: none">
+                    <button class="preset-btn" onclick="translateTerm('rls')">
+                      <strong>PostgreSQL RLS Active on Schema</strong>
+                      <span
+                        style="font-size: 9px; color: var(--muted-foreground); margin-right: auto"
+                        >حاجب البيانات الذاتي نشط (RLS)</span
+                      >
+                    </button>
+                    <button class="preset-btn" onclick="translateTerm('sla')">
+                      <strong>Demerit Sweep Overdue Overrides</strong>
+                      <span
+                        style="font-size: 9px; color: var(--muted-foreground); margin-right: auto"
+                        >عقوبات إهمال المدقق المالي</span
+                      >
+                    </button>
+                    <button class="preset-btn" onclick="translateTerm('ocr')">
+                      <strong>OCR Confidence Range Yellow Certified</strong>
+                      <span
+                        style="font-size: 9px; color: var(--muted-foreground); margin-right: auto"
+                        >اعتماد فواتير غير واضحة</span
+                      >
+                    </button>
+                  </div>
+                  <div
+                    id="translator-output"
+                    style="
+                      background-color: var(--muted);
+                      border: 1px solid var(--border);
+                      border-radius: 12px;
+                      padding: 14px;
+                      font-size: 11px;
+                      margin-top: 10px;
+                      display: none;
+                    "
+                  >
+                    <!-- Dynamic translated text -->
+                  </div>
+                </div>
+
+                <!-- AI chatbot -->
+                <div class="panel-card chat-box">
+                  <div class="card-header-row" style="margin-bottom: 12px; padding-bottom: 10px">
+                    <h3 class="card-title">
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        fill="none"
+                        class="icon-svg"
+                        style="color: var(--primary)"
+                      >
+                        <path
+                          d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                        ></path>
+                      </svg>
+                      المستشار المالي الآلي المساعد
+                    </h3>
+                  </div>
+
+                  <div class="chat-presets">
+                    <div
+                      style="font-size: 10px; color: var(--muted-foreground); margin-bottom: 6px"
+                    >
+                      اضغط على الأسئلة الأكثر شيوعاً للمالك:
+                    </div>
+                    <button class="preset-btn" onclick="askPreset(0)">
+                      هل المدقق المالي يشتغل بضمير وبسرعة؟
+                    </button>
+                    <button class="preset-btn" onclick="askPreset(1)">
+                      وين قاعد يروح الكاش الحين في الشركة؟
+                    </button>
+                    <button class="preset-btn" onclick="askPreset(2)">
+                      شلون أتأكد إن المدقق ما متلاعب بالأرقام؟
+                    </button>
+                  </div>
+
+                  <div class="chat-messages" id="chat-messages-container">
+                    <!-- Conversational messages -->
+                  </div>
+
+                  <!-- Input box -->
+                  <form
+                    id="chat-form"
+                    onsubmit="sendCustomMessage(event)"
+                    style="
+                      display: flex;
+                      gap: 8px;
+                      margin-top: 12px;
+                      border-t: 1px solid var(--border);
+                      padding-top: 10px;
+                    "
+                  >
+                    <input
+                      type="text"
+                      id="chat-input"
+                      placeholder="اكتب سؤالاً للمستشار المالي المساعد الحين..."
+                      style="
+                        flex-grow: 1;
+                        padding: 8px 12px;
+                        border-radius: 8px;
+                        border: 1px solid var(--border);
+                        background-color: var(--muted);
+                        color: white;
+                        font-size: 11px;
+                      "
+                    />
+                    <button
+                      type="submit"
+                      style="
+                        background-color: var(--primary);
+                        color: white;
+                        border: none;
+                        padding: 8px 14px;
+                        border-radius: 8px;
+                        font-size: 11px;
+                        font-weight: 700;
+                        cursor: pointer;
+                      "
+                    >
+                      إرسال
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ──────────────── 2. TRUST INDEX TAB ──────────────── -->
+          <div id="tab-trust" class="tab-content" style="display: none">
+            <div class="page-title-section">
+              <div class="page-info">
+                <h1>مؤشر الموثوقية (Trust Index)</h1>
+                <p>قياس دقة وصحة ونقاء مدخلات شركتك في رقم واحد Deterministic دقيق.</p>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-cols: 1fr; gap: 24px; margin-bottom: 24px">
+              <div
+                style="
+                  background-color: var(--card);
+                  border: 1px solid var(--border);
+                  border-radius: 16px;
+                  padding: 30px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  text-align: center;
+                "
+              >
+                <div style="position: relative; width: 180px; height: 180px; margin-bottom: 20px">
+                  <svg
+                    viewBox="0 0 100 100"
+                    style="width: 100%; height: 100%; transform: rotate(-90deg)"
+                  >
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="42"
+                      fill="none"
+                      stroke="#222638"
+                      stroke-width="8"
+                    ></circle>
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="42"
+                      fill="none"
+                      stroke="var(--primary)"
+                      stroke-width="8"
+                      stroke-dasharray="245 264"
+                      stroke-linecap="round"
+                    ></circle>
+                  </svg>
+                  <div
+                    style="
+                      position: absolute;
+                      inset: 0;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <span style="font-size: 44px; font-weight: 800; color: white">78</span>
+                    <span style="font-size: 11px; color: var(--muted-foreground); margin-top: -6px"
+                      >النقاط من 100</span
+                    >
+                  </div>
+                </div>
+                <span
+                  style="
+                    background-color: var(--warning-light);
+                    color: var(--warning);
+                    border: 1px solid rgba(245, 158, 11, 0.3);
+                    padding: 6px 14px;
+                    border-radius: 100px;
+                    font-size: 12px;
+                    font-weight: 700;
+                  "
+                  >جودة جيدة - معدل آمن</span
+                >
+              </div>
+            </div>
+
+            <!-- Component Breakdown Grid -->
+            <div
+              style="
+                display: grid;
+                grid-template-cols: repeat(2, 1fr);
+                gap: 16px;
+                margin-bottom: 24px;
+              "
+            >
+              <div class="kpi-box" style="padding: 20px; text-align: right">
+                <div style="font-size: 11px; color: var(--muted-foreground)">
+                  تغطية الحقول (Coverage)
+                </div>
+                <div
+                  style="font-size: 28px; font-weight: 800; color: var(--success); margin-top: 6px"
+                >
+                  92.5%
+                </div>
+                <div style="font-size: 10px; color: var(--muted-foreground); margin-top: 4px">
+                  120 مستند مكتمل البيانات
+                </div>
+              </div>
+              <div class="kpi-box" style="padding: 20px; text-align: right">
+                <div style="font-size: 11px; color: var(--muted-foreground)">
+                  الفواتير المعتمدة (Certified)
+                </div>
+                <div
+                  style="font-size: 28px; font-weight: 800; color: var(--primary); margin-top: 6px"
+                >
+                  84%
+                </div>
+                <div style="font-size: 10px; color: var(--muted-foreground); margin-top: 4px">
+                  101 فواتير مصدق عليها يدوياً
+                </div>
+              </div>
+              <div class="kpi-box" style="padding: 20px; text-align: right">
+                <div style="font-size: 11px; color: var(--muted-foreground)">
+                  أخطاء الحقول المفقودة
+                </div>
+                <div
+                  style="font-size: 28px; font-weight: 800; color: var(--warning); margin-top: 6px"
+                >
+                  2.8%
+                </div>
+                <div style="font-size: 10px; color: var(--muted-foreground); margin-top: 4px">
+                  14 حقل فارغ مفقود بالفواتير
+                </div>
+              </div>
+              <div class="kpi-box" style="padding: 20px; text-align: right">
+                <div style="font-size: 11px; color: var(--muted-foreground)">
+                  الفواتير المكررة المكتشفة
+                </div>
+                <div
+                  style="font-size: 28px; font-weight: 800; color: var(--danger); margin-top: 6px"
+                >
+                  4.2%
+                </div>
+                <div style="font-size: 10px; color: var(--muted-foreground); margin-top: 4px">
+                  5 فواتير مكررة معلقة بالنظام
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ──────────────── 3. LEDGER TAB ──────────────── -->
+          <div id="tab-ledger" class="tab-content" style="display: none">
+            <div class="page-title-section">
+              <div class="page-info">
+                <h1>سجل النشاطات المحمي (Immutable Ledger)</h1>
+                <p>
+                  مقاومة تامة للتلاعب - لا يجوز تعديل أو حذف أي قيد، والتغييرات تتم بـ قيود معاكسة
+                  فقط.
+                </p>
+              </div>
+            </div>
+
+            <!-- Active filters for activity ledger -->
+            <div class="filter-section">
+              <div class="relative">
+                <input
+                  type="text"
+                  id="ledger-search-box"
+                  oninput="filterLedgerTable()"
+                  placeholder="ابحث باسم المستخدم، أو نوع الإجراء، أو المستند، أو هاش القيود التشفيرية..."
+                  class="search-input"
+                />
+              </div>
+
+              <div class="filter-row" style="margin-top: 8px">
+                <span class="filter-label">فلترة حسب القسم:</span>
+                <button class="pill-btn active" id="btn-dept-all" onclick="filterDept('الكل')">
+                  الكل
+                </button>
+                <button class="pill-btn" id="btn-dept-proc" onclick="filterDept('المشتريات')">
+                  المشتريات
+                </button>
+                <button class="pill-btn" id="btn-dept-fin" onclick="filterDept('المالية')">
+                  المالية
+                </button>
+                <button class="pill-btn" id="btn-dept-ware" onclick="filterDept('المخازن')">
+                  المخازن
+                </button>
+              </div>
+
+              <div class="filter-row" style="margin-top: 4px">
+                <span class="filter-label">الفترة الزمنية:</span>
+                <button class="pill-btn active" id="btn-period-all" onclick="filterPeriod('all')">
+                  كل الأوقات
+                </button>
+                <button class="pill-btn" id="btn-period-today" onclick="filterPeriod('today')">
+                  اليوم
+                </button>
+                <button class="pill-btn" id="btn-period-week" onclick="filterPeriod('week')">
+                  آخر 7 أيام
+                </button>
+              </div>
+            </div>
+
+            <!-- Ledger Table -->
+            <div class="panel-card" style="padding: 0; overflow: hidden; border-radius: 14px">
+              <table class="ledger-table" id="ledger-table-element">
+                <thead>
+                  <tr>
+                    <th style="padding-right: 18px">التاريخ والوقت</th>
+                    <th>المستخدم / الموظف</th>
+                    <th>الإجراء المحاسبي</th>
+                    <th>الهدف والمستند</th>
+                    <th>القسم</th>
+                    <th style="padding-left: 18px">هاش SHA-256</th>
+                  </tr>
+                </thead>
+                <tbody id="ledger-table-body">
+                  <!-- Seeded ledger entries row -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Interactive JavaScript logic -->
+    <script>
+      // Seeding company profiles
+      const COMPANIES_DATA = {
+        "c1": {
+          name: "مجموعة النخيل التجارية",
+          narrative: "أبو مصطفى، شركتك اليوم بأمان ولكن مبيعات الفروع فيها ثغرة. الهدر الإجمالي بلغ 184.5 مليون دينار هذا الشهر، مدقق الحسابات كشف 12.4 مليون دينار منها قابلة للاسترداد فوراً من المورد 'شركة الرافدين' بسبب تكرار فواتير الشراء. أداء مدققك ممتاز (91%) لكنه ممرر فاتورة وحدة مشكوك بصحتها بدون تدقيق حقل الضريبة.",
+          efficiency: "91%",
+          accuracy: "94%",
+          bypass: "8%",
+          demerits: "1",
+          violations: "<strong>تنبيه حرج:</strong> تجاوز تنبيه تكرار الفاتورة INV-2026-0481 واعتمادها كفاتورة فريدة بالخطأ قبل مراجعة المستند المرفق.",
+          issues: [
+            {
+              title: "فاتورة شراء مكررة مع شركة الرافدين",
+              tech: "duplicate_invoice_hash_match (INV-2026-0481)",
+              translation: "السيستم كشف أن المحاسب أدخل نفس الفاتورة مرتين بحسابين مختلفين، مما يعني إنك كنت راح تدفع 12.4 مليون دينار زيادة للمورد بدون ما تدري.",
+              risk: "خسارة كاش فوري بقيمة 12.4 مليون دينار عراقي يروح للمورد بدون وجه حق وبصعوبة يتم استرجاعه محاسبياً لاحقاً.",
+              action: "أوقف أي دفعة مالية معلقة لشركة الرافدين هذا الأسبوع، ووجّه المدقق بخصم الـ 12.4 مليون من المعاملة القادمة فوراً.",
+              impact: "12,400,000 د.ع",
+              severity: "danger"
+            },
+            {
+              title: "تفاوت بين المشتريات والمخزن بالفروع",
+              tech: "inventory_mismatch_item_variance_8_items",
+              translation: "المدقق اعتمد استلام البضائع بالكامل، لكن كشف الجرد الإلكتروني يوضح وجود 8 أصناف مكتوبة في الفواتير ولم تدخل المخازن فعلياً.",
+              risk: "احتمالية سرقة أو تسريب بضائع عند البوابة الخلفية للمخزن، أو إهمال في مطابقة الاستلام الفعلي.",
+              action: "اطلب فوراً كشف الكاميرات ليوم 22 حزيران لبوابة مخزن الكرادة للتأكد من حمولة شاحنة الدفعة ج.",
+              impact: "6,800,000 د.ع",
+              severity: "warning"
+            }
+          ],
+          chatResponses: [
+            "في مجموعة النخيل التجارية، نسبة كفاءة المدقق تبلغ 91%. التزامه بمطابقة الفواتير على الوقت جيد، لكن تم تسجيل مخالفة واحدة عليه هذا الشهر لمرور تنبيه حرج بخصوص فاتورة مكررة. أداؤه العام موثوق لكن يوصى بالرقابة الحثيثة.",
+            "أكبر تسريب كاش في مجموعة النخيل حالياً هو الفاتورة المكررة بقيمة 12.4 مليون دينار لشركة الرافدين، إضافة لتفاوت شحنة المواد الأولية بالمخازن بقيمة 6.8 مليون دينار. الأثر الكلي المعرض للخطر هو 19.2 مليون دينار عراقي.",
+            "أبو مصطفى، منصتنا تستخدم السجل الرقمي المحمي (Immutable Ledger). لا يمكن لأي مدقق تعديل أو حذف أي معاملة مالية. قمنا للتو بمطابقة السجل بالكامل وتأكدنا أنه محمي وآمن 100% ولم يحدث أي تغيير بالخلفية."
+          ]
+        },
+        "c2": {
+          name: "مصنع الفرات للأغذية",
+          narrative: "أبو مصطفى، في مصنع الفرات جودة الإدخال منخفضة بنسبة (82%). المدقق المحاسبي متأخر في إغلاق ومطابقة 3 كشوفات بنكية حزيران، وتراكمت 4 مخالفات (Demerits) عليه. نوصي بسحب صلاحيات التعديل الليلي لتجنب تكرار فروقات الأسعار العشوائية بالمواد الخام.",
+          efficiency: "82%",
+          accuracy: "78%",
+          bypass: "22%",
+          demerits: "4",
+          violations: "<strong>مخالفة حرجة:</strong> تعديل أسعار شراء السكر يدوياً في السجل المالي بعد الاستلام وتجاوز تنبيه الفروقات السعرية بدون تبرير معتمد.",
+          issues: [
+            {
+              title: "تعديل عشوائي لأسعار السكر والقمح المعتمدة",
+              tech: "post_audit_manual_override_price_variance",
+              translation: "المدقق قام بتعديل السعر المعتمد لشحنة السكر يدوياً في النظام من 850 دينار للكيلو إلى 920 دينار بعد يومين من الاستلام دون مستند تبرير.",
+              risk: "خطر تواطؤ أو عمولات مخفية خلف التعديل اليدوي للأسعار لتعويض الفروق للموردين نقداً بالخفاء.",
+              action: "امنع أي تعديل يدوي لأسعار المواد الخام في النظام بدون توقيعك الشخصي المباشر بالبصمة الحية أو موافقة شفوية موثقة.",
+              impact: "18,400,000 د.ع",
+              severity: "danger"
+            }
+          ],
+          chatResponses: [
+            "في مصنع الفرات للأغذية، كفاءة المدقق منخفضة (82%) بسبب تأخر مطابقة الكشوف المصرفية وتراكم 4 مخالفات. نوصي بجلسة محاسبة عاجلة لمدقق الحسابات لتوضيح الخلل.",
+            "هناك تسريب كاش خطير ناتج عن فروقات أسعار الشراء المعدلة يدوياً بقيمة 18.4 مليون دينار عراقي. نقترح مراجعة فورية لأسعار الاستلام ومطابقة الفواتير مع الدفعات المصرفية.",
+            "في مصنع الفرات للأغذية، السجل الرقمي المشفر بالكامل سليم ولم يتم تلاعب تشفيري فيه، لكن المشكلة هي في الإدخالات اليدوية الخاطئة التي يقوم بها المدقق بموجب صلاحياته الحالية."
+          ]
+        },
+        "c3": {
+          name: "مطاعم بغداد العريقة",
+          narrative: "أبو مصطفى، كفاءة التدقيق هنا نموذجية بنسبة (98%). لا يوجد هدر مالي مرصود في مطاعم بغداد، والمشكلة الوحيدة المكتشفة هي تأخر محاسب فرع الجادرية في رفع فواتير غاز الطهي الأسبوعية بمتوسط 5 أيام عمل.",
+          efficiency: "98%",
+          accuracy: "99%",
+          bypass: "2%",
+          demerits: "0",
+          violations: "لا توجد أي مخالفات مسجلة على المدقق في هذا الفرع هذا الشهر. التزام كامل وممتاز بالـ SLA.",
+          issues: [
+            {
+              title: "تأخر مستمر في فواتير غاز الطهي الأسبوعية",
+              tech: "late_doc_processing_gas_invoices",
+              translation: "الفواتير تصل متأخرة للنظام بمتوسط 5 أيام، مما يؤدي إلى عدم مطابقة حساب الأرباح الحقيقي للفرع بشكل يومي.",
+              risk: "ضعف السيطرة اللحظية على مصاريف التشغيل اليومية وظهور مفاجآت مالية أو نقص غير مفسر بنهاية الشهر.",
+              action: "وجّه المشرف المالي بفرع الجادرية برفع فواتير الغاز عبر الواتساب فور استلام الأسطوانات لتدقيقها لحظياً بذكاء النظام.",
+              impact: "1,200,000 د.ع",
+              severity: "success"
+            }
+          ],
+          chatResponses: [
+            "في مطاعم بغداد العريقة، أداء المدقق نموذج وممتاز بنسبة 98% وهو ملتزم تماماً بالـ SLA اليومية للفواتير والقيود.",
+            "الفرع يعاني فقط من تذبذب بقيمة 1.2 مليون دينار لمصاريف غاز الطهي بسبب تأخر التسجيل، غير ذلك وضع الكاش والأرباح سليم تماماً.",
+            "السجل المالي الرقمي محمي بالكامل ومقفل تشفيرياً، ونؤكد عدم حدوث أي تعديل محاسبي غير مصرح به في فروع المطاعم بنسبة 100%."
+          ]
+        }
+      };
+
+      const LEDGER_SEEDS = [
+        { at: "2026-06-28 09:14", actor: "زينب الكاظمي", action: "اعتماد مستند", target: "INV-2026-0481", hash: "a7c361fa2d0391f", department: "المشتريات", timestamp: "today" },
+        { at: "2026-06-28 09:02", actor: "زينب الكاظمي", action: "تصحيح خطأ OCR", target: "حقل المبلغ: 12.4M ← 12.45M", hash: "b21df0c44ae834a", department: "المشتريات", timestamp: "today" },
+        { at: "2026-06-27 15:45", actor: "أحمد المياحي", action: "ترحيل قيد تسوية", target: "تسوية حساب الجنوب الإسلامي", hash: "f3c3098eab110d2", department: "المالية", timestamp: "week" },
+        { at: "2026-06-26 11:20", actor: "حيدر الكرخي", action: "مطابقة رصيد المخزن", target: "8 أصناف تفاوت - مخزن الكرادة", hash: "4d76b1e8e2029bf", department: "المخازن", timestamp: "week" },
+        { at: "2026-06-25 08:31", actor: "مصطفى الجبوري", action: "منح صلاحية مؤقتة", target: "view_waste_map ← مدير المشتريات", hash: "9e88cb2cd4420c2", department: "المالية", timestamp: "week" },
+        { at: "2026-06-22 02:00", actor: "النظام", action: "تشغيل التحليل اليومي", target: "مؤشر الثقة = 78 / 100", hash: "5ff17c093a027b9", department: "عام / النظام", timestamp: "week" }
+      ];
+
+      let activeCompanyId = "c1";
+      let activeDeptFilter = "الكل";
+      let activePeriodFilter = "all";
+
+      // Toggle switcher dropdown
+      function toggleSwitcher() {
+        const dd = document.getElementById("switcher-dropdown");
+        dd.classList.toggle("show");
+      }
+
+      // Switch between companies
+      function selectCompany(id, name) {
+        activeCompanyId = id;
+        document.getElementById("active-company-name").innerText = name;
+
+        // Update switcher dropdown active state
+        const items = document.querySelectorAll(".dropdown-item");
+        items.forEach(i => i.classList.remove("active"));
+        event.currentTarget.classList.add("active");
+
+        toggleSwitcher();
+        renderCompanyData();
+      }
+
+      // Render company-specific interactive fields
+      function renderCompanyData() {
+        const data = COMPANIES_DATA[activeCompanyId];
+
+        // Update narrative
+        document.getElementById("advisor-narrative-text").innerHTML = data.narrative;
+
+        // Update kpis
+        document.getElementById("auditor-eff-val").innerText = data.efficiency;
+        document.getElementById("auditor-acc-val").innerText = data.accuracy;
+        document.getElementById("auditor-bypass-val").innerText = data.bypass;
+        document.getElementById("auditor-demerits-val").innerText = data.demerits;
+
+        // Violations list container
+        const vContainer = document.getElementById("violations-list-container");
+        vContainer.innerHTML = data.violations;
+        if(data.demerits === "0") {
+          vContainer.style.borderColor = "rgba(16, 185, 129, 0.2)";
+          vContainer.style.backgroundColor = "rgba(16, 185, 129, 0.05)";
+          vContainer.style.color = "var(--success)";
+        } else {
+          vContainer.style.borderColor = "rgba(239, 68, 68, 0.2)";
+          vContainer.style.backgroundColor = "rgba(239, 68, 68, 0.05)";
+          vContainer.style.color = "var(--danger)";
+        }
+
+        // Render issues list
+        const issuesContainer = document.getElementById("issues-container");
+        issuesContainer.innerHTML = "";
+
+        data.issues.forEach(issue => {
+          const severityColor = issue.severity === "danger" ? "var(--danger)" : issue.severity === "warning" ? "var(--warning)" : "var(--success)";
+          const severityBg = issue.severity === "danger" ? "rgba(239, 68, 68, 0.05)" : issue.severity === "warning" ? "rgba(245, 158, 11, 0.05)" : "rgba(16, 185, 129, 0.05)";
+          const severityBorder = issue.severity === "danger" ? "rgba(239, 68, 68, 0.2)" : issue.severity === "warning" ? "rgba(245, 158, 11, 0.2)" : "rgba(16, 185, 129, 0.2)";
+
+          issuesContainer.innerHTML += `
+            <div class="panel-card" style="border-color: ${severityBorder}; background-color: ${severityBg}; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <div>
+                  <h4 style="font-size: 14px; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background-color: ${severityColor}; display: inline-block;"></span>
+                    ${issue.title}
+                  </h4>
+                  <span style="font-size: 9px; font-family: monospace; color: var(--muted-foreground); background-color: var(--muted); padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block;">
+                    ${issue.tech}
+                  </span>
+                </div>
+                <div style="text-align: left;">
+                  <div style="font-size: 10px; color: var(--muted-foreground);">الأثر المالي المتوقع</div>
+                  <div style="font-size: 15px; font-weight: 800; color: var(--danger); font-family: monospace; margin-top: 2px;">${issue.impact}</div>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-cols: 1fr; gap: 14px; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
+                <div style="display: grid; grid-template-cols: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                  <div>
+                    <strong style="color: var(--primary); font-size: 11px; display: block; margin-bottom: 4px;">شنو يعني هذا الرقم فعلياً؟</strong>
+                    <p style="font-size: 11px; color: #ced4da; line-height: 1.5;">${issue.translation}</p>
+                  </div>
+                  <div>
+                    <strong style="color: var(--warning); font-size: 11px; display: block; margin-bottom: 4px;">وين الخطر؟</strong>
+                    <p style="font-size: 11px; color: #ced4da; line-height: 1.5;">${issue.risk}</p>
+                  </div>
+                  <div>
+                    <strong style="color: var(--success); font-size: 11px; display: block; margin-bottom: 4px;">شنو تسوي الحين؟ (خطوة عملية)</strong>
+                    <p style="font-size: 11px; font-weight: 600; color: #fff; background-color: rgba(16, 185, 129, 0.05); padding: 8px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.15);">${issue.action}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        // Clear chat messages and render greetings
+        const chatContainer = document.getElementById("chat-messages-container");
+        chatContainer.innerHTML = `
+          <div class="message ai">
+            أهلاً بك أبو مصطفى في لوحة مستشار شركة <strong>"${data.name}"</strong>.<br>
+            كيف يمكنني مساعدتك في تدقيق أداء مدقق الحسابات أو الكشف عن الهدر المالي المكتشف اليوم؟
+          </div>
+        `;
+
+        // Reset PDF and Hash Scan indicators
+        document.getElementById("pdf-success-banner")?.remove();
+        document.getElementById("pdf-banner-space")?.setAttribute("style", "display: none;");
+        setLedgerStatus("idle");
+      }
+
+      // Switch layout tabs across owner index/advisor/ledger pages
+      function selectTab(path: string) {
+        // simulate navigation
+        console.log("Navigating to: ", path);
+      }
+
+      // AI Advisor Preset responses
+      const handleAskPreset = (questionIdx: number) => {
+        const company = activeCompanyProfile;
+        const questions = [
+          { q: "هل المدقق المالي جالس يشتغل بضمير وبسرعة ولا نايم؟", a: `في شركة **${company.name}**، نسبة كفاءة المدقق تبلغ **${company.auditorMetrics.efficiency}%**. التزامه بمطابقة الفواتير على الوقت جيد، لكن تم تسجيل **${company.auditorMetrics.demerits}** مخالفات عليه هذا الشهر. المخالفة الأهم هي تعديل بعض الحقول وتمرير فواتير مشكوك بدقتها دون مراجعة تفصيلية للبند الأصلي. ننصحك بطلب تقرير أسبوعي يثبت مطابقة كشف الحساب المصرفي خلال 24 ساعة.` },
+          { q: "وين قاعد يروح الكاش الحين في الشركة؟", a: `في شركة **${company.name}**، أكبر مصادر الهدر المالي والتسريب هي:\n\n` + company.issues.map(i => `- **${i.title}** (الأثر المالي المتوقع: ${i.impact})`).join("\n") },
+          { q: "شلون أتأكد إن المدقق ما متلاعب بالأرقام؟", a: `أبو مصطفى، منصتنا تستخدم **السجل الرقمي المحمي (Immutable Ledger)**. هذا يعني أنه لا يمكن لأي مدقق أو محاسب أو حتى مدير نظام تعديل أو حذف أي عملية بعد إدخالها. النظام قام الآن بفحص **${company.auditorMetrics.verifiedLedgerEntriesCount}** عملية وقام بمطابقة بصمتها التشفيرية (Hash Check)، النتيجة: **سليمة بنسبة 100% ولا يوجد أي تلاعب خفي بالأرقام.**` }
+        ];
+
+        const q = questions[questionIdx];
+        appendChatMessage(q.q, "user");
+        setTimeout(() => {
+          appendChatMessage(q.a, "ai");
+        }, 400);
+      };
+
+      function appendChatMessage(text, sender) {
+        const container = document.getElementById("chat-messages-container");
+        const msg = document.createElement("div");
+        msg.className = `message ${sender}`;
+        msg.innerHTML = text.replace(/\n/g, "<br>");
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
+      }
+
+      function sendCustomMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById("chat-input");
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendChatMessage(text, "user");
+        input.value = "";
+
+        setTimeout(() => {
+          let reply = "";
+          if (text.includes("كاش") || text.includes("هدر") || text.includes("فلوس") || text.includes("خسارة")) {
+            reply = `بناءً على تحليلي اللحظي لشركة **${activeCompanyProfile.name}**، لدينا هدر مرصود بقيمة إجمالية. أهم نقاط الضعف هي في قسم المشتريات والمخازن. يرجى الاطلاع على جدول 'وين الخطر فعلياً' بالأسفل لإجراء تصحيحات فورية لإنقاذ السيولة.`;
+          } else if (text.includes("أمان") || text.includes("تلاعب") || text.includes("حماية") || text.includes("سرقة")) {
+            reply = `السجل الرقمي المشفر غير القابل للتعديل سليم بالكامل. لا توجد مؤشرات تلاعب مالي أو اختراق داخلي للأرقام. أرقامك موثوقة ومطابقة لبصمة النظام المشفرة.`;
+          } else {
+            reply = `أبو مصطفى، سؤالك مهم جداً. باختصار: وضعك المالي العام مستقر لكن السيطرة على مشتريات فروعك تتطلب التدخل لمنع هدر مالي قدره ${activeCompanyProfile.issues[0]?.impact || '12.4 مليون'}. أنصحك بالاطلاع على الخطوات العملية المقترحة بالمربع المقابل.`;
+          }
+          appendChatMessage(reply, "ai");
+        }, 500);
+      }
+
+      // Scan immutable ledger hash verification
+      function runHashScan() {
+        const banner = document.getElementById("hash-scan-success");
+        banner.style.display = "block";
+      }
+
+      // Switch UI Tabs (Advisor, Trust Index, Ledger)
+      function switchTab(tabId) {
+        document.querySelectorAll(".tab-content").forEach(el => el.style.display = "none");
+        document.getElementById(`tab-${tabId}`).style.display = "block";
+
+        document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+        event.currentTarget.classList.add("active");
+      }
+
+      // Trigger PDF generation
+      function triggerPDFExport() {
+        const btnText = document.getElementById("pdf-btn-text");
+        btnText.innerText = "جاري توليد التقرير...";
+
+        setTimeout(() => {
+          btnText.innerText = "تصدير الملخص كملف PDF";
+          const banner = document.getElementById("pdf-success-banner");
+          banner.style.display = "flex";
+        }, 1000);
+      }
+
+      // Technical terms translator library
+      function translateTerm(type) {
+        const output = document.getElementById("translator-output");
+        output.style.display = "block";
+
+        if(type === 'rls') {
+          output.innerHTML = `
+            <strong style="color: var(--primary); display: block; margin-bottom: 4px;">PostgreSQL RLS Active on Schema (حاجب البيانات الذاتي نشط)</strong>
+            <p style="margin-bottom: 6px;"><strong>شنو يعني هذا فعلياً للمالك؟</strong> صمام الأمان الإلكتروني نشط بالكامل لمنع تسريب بياناتك الحساسة عن الأرباح وخريطة الهدر والمبيعات عن أي مدقق حسابات أو محاسب خارجي دون إذنك المباشر.</p>
+            <strong style="color: var(--success); display: block; margin-bottom: 2px;">خطوتك العملية كصاحب قرار:</strong>
+            <p>اطمئن، أسرار شركتك محمية بموجب لوائح البنك المركزي العراقي في الخلفية ولا حاجة لأي إجراء إضافي.</p>
+          `;
+        } else if(type === 'sla') {
+          output.innerHTML = `
+            <strong style="color: var(--primary); display: block; margin-bottom: 4px;">Demerit Sweep Overdue Overrides (عقوبات إهمال المدقق)</strong>
+            <p style="margin-bottom: 6px;"><strong>شنو يعني هذا فعلياً للمالك؟</strong> النظام يراقب باستمرار سرعة مطابقة المدقق للفواتير البنكية، ويقوم بخصم نقاط تلقائية من تقييمه وكفاءته إذا ترك فواتير معلقة دون مراجعة لأكثر من 4 ساعات.</p>
+            <strong style="color: var(--success); display: block; margin-bottom: 2px;">خطوتك العملية كصاحب قرار:</strong>
+            <p>تابع كرت 'كفاءة المدقق' في لوحتك، واستفسر منه مباشرة إذا انخفض تقييمه عن 85% ليعلم أنك تراقبه بدقة رقمية.</p>
+          `;
+        } else if(type === 'ocr') {
+          output.innerHTML = `
+            <strong style="color: var(--primary); display: block; margin-bottom: 4px;">OCR Confidence Range Yellow / Red Certified (اعتماد مستندات غير واضحة)</strong>
+            <p style="margin-bottom: 6px;"><strong>شنو يعني هذا فعلياً للمالك؟</strong> المدقق وافق على فواتير أو كشوفات مصرفية كانت جودتها أو دقة قراءتها آلياً ضعيفة جداً ومشكوك فيها دون أن يكلف نفسه عناء مقارنتها ومطابقتها يدوياً.</p>
+            <strong style="color: var(--success); display: block; margin-bottom: 2px;">خطوتك العملية كصاحب قرار:</strong>
+            <p>ألزم فريق التدقيق ومطابقة الفواتير بإرفاق صورة للمستند الأصلي وتوقيعه يدوياً لأي معاملة يقل تقييم الذكاء الاصطناعي لها عن 70%.</p>
+          `;
+        }
+      }
+
+      // Render activity ledger records
+      function renderLedgerTable() {
+        const container = document.getElementById("ledger-table-body");
+        container.innerHTML = "";
+
+        LEDGER_SEEDS.forEach(entry => {
+          // Apply filtration based on user select
+          if(activeDeptFilter !== "الكل" && entry.department !== activeDeptFilter) return;
+          if(activePeriodFilter !== "all" && entry.timestamp !== activePeriodFilter) return;
+
+          let deptStyle = "bg-muted text-muted-foreground border border-border/40";
+          if(entry.department === "المشتريات") deptStyle = "bg-danger/5 text-danger border border-danger/10";
+          else if(entry.department === "المالية") deptStyle = "bg-success/5 text-success border border-success/10";
+          else if(entry.department === "المخازن") deptStyle = "bg-warning/5 text-warning border border-warning/10";
+
+          container.innerHTML += `
+            <tr class="ledger-row-item">
+              <td style="padding-right: 18px; color: var(--muted-foreground); font-family: monospace;" dir="ltr">${entry.at}</td>
+              <td style="font-weight: 700;">${entry.actor}</td>
+              <td><span style="display: inline-block; padding: 2px 8px; background-color: var(--primary-light); color: var(--primary); border-radius: 4px; font-weight: 600;">${entry.action}</span></td>
+              <td style="color: var(--muted-foreground); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${entry.target}</td>
+              <td><span style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;" class="${deptStyle}">${entry.department}</span></td>
+              <td style="padding-left: 18px; font-family: monospace; color: var(--primary);" dir="ltr">${entry.hash}</td>
+            </tr>
+          `;
+        });
+      }
+
+      // Ledger table live text searching
+      function filterLedgerTable() {
+        const q = document.getElementById("ledger-search-box").value.trim().toLowerCase();
+        const rows = document.querySelectorAll(".ledger-row-item");
+
+        rows.forEach(row => {
+          const text = row.innerText.toLowerCase();
+          if(text.includes(q)) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      // Filter by department pill select
+      function filterDept(dept) {
+        activeDeptFilter = dept;
+        document.querySelectorAll("[id^='btn-dept-']").forEach(btn => btn.classList.remove("active"));
+
+        if(dept === 'الكل') document.getElementById("btn-dept-all").classList.add("active");
+        else if(dept === 'المشتريات') document.getElementById("btn-dept-proc").classList.add("active");
+        else if(dept === 'المالية') document.getElementById("btn-dept-fin").classList.add("active");
+        else if(dept === 'المخازن') document.getElementById("btn-dept-ware").classList.add("active");
+
+        renderLedgerTable();
+      }
+
+      // Filter by period selector
+      function filterPeriod(period) {
+        activePeriodFilter = period;
+        document.querySelectorAll("[id^='btn-period-']").forEach(btn => btn.classList.remove("active"));
+
+        if(period === 'all') document.getElementById("btn-period-all").classList.add("active");
+        else if(period === 'today') document.getElementById("btn-period-today").classList.add("active");
+        else if(period === 'week') document.getElementById("btn-period-week").classList.add("active");
+
+        renderLedgerTable();
+      }
+
+      // Computed profiles dynamic lookup
+      let activeCompanyProfile = COMPANIES_DATA["c1"];
+      function renderCompanyActiveProfile() {
+        activeCompanyProfile = COMPANIES_DATA[activeCompanyId];
+      }
+
+      // Auto-update wrapper
+      const origRender = renderCompanyData;
+      renderCompanyData = function() {
+        origRender();
+        renderCompanyActiveProfile();
+      }
+
+      // Initializer
+      window.onload = () => {
+        renderCompanyData();
+        renderLedgerTable();
+      };
+    </script>
+  </body>
+</html>

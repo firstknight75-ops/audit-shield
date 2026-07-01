@@ -8,7 +8,7 @@ from app.api.deps import get_current_user, require_permission
 from app.db.session import get_db
 from app.models.entities import AuditLedger, Branch, Company, Permission, User, UserCompanyAccess, UserPermissionOverride
 from app.models.enums import OverrideAction, PreferredLanguage, UserRole
-from app.schemas.admin import CompanyAccessGrant, PermissionOverrideRequest, UpdateLanguageRequest, UserCreateRequest
+from app.schemas.admin import PermissionOverrideRequest, UpdateLanguageRequest, UserCreateRequest
 from app.security.passwords import get_password_hash
 from app.services.access import get_accessible_company_ids, require_company_access
 from app.services.i18n import tr

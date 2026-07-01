@@ -32,9 +32,24 @@ function SilentAI() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <Guarantee icon={EyeOff} title="لا توجد واجهة محادثة" subtitle="لا chatbot، لا assistant، لا LLM شات" passed />
-        <Guarantee icon={ShieldCheck} title="لا يوجد استدعاء API خارجي" subtitle="فحص static لجميع وحدات AI لرصد openai/anthropic/etc" passed />
-        <Guarantee icon={Cpu} title="جميع وحدات التحليل محلية" subtitle="Python خالص، يعمل داخل الصندوق" passed />
+        <Guarantee
+          icon={EyeOff}
+          title="لا توجد واجهة محادثة"
+          subtitle="لا chatbot، لا assistant، لا LLM شات"
+          passed
+        />
+        <Guarantee
+          icon={ShieldCheck}
+          title="لا يوجد استدعاء API خارجي"
+          subtitle="فحص static لجميع وحدات AI لرصد openai/anthropic/etc"
+          passed
+        />
+        <Guarantee
+          icon={Cpu}
+          title="جميع وحدات التحليل محلية"
+          subtitle="Python خالص، يعمل داخل الصندوق"
+          passed
+        />
       </div>
 
       <div className="p-5 rounded-xl bg-card border border-border">
@@ -46,32 +61,47 @@ function SilentAI() {
                 <code className="text-xs font-mono">{m.name}</code>
                 <CheckCircle2 className="w-4 h-4 text-success" />
               </div>
-              <div className="text-xs text-muted-foreground mt-2">
-                {m.functions.join(", ")}
-              </div>
+              <div className="text-xs text-muted-foreground mt-2">{m.functions.join(", ")}</div>
             </div>
           ))}
         </div>
         <div className="mt-4 pt-4 border-t border-border text-xs text-muted-foreground">
-          تم التحقق الآن. لا توجد أي نقطة خروج إلى الإنترنت من أي وحدة AI — كل شيء يعمل داخل الصندوق السيادي.
+          تم التحقق الآن. لا توجد أي نقطة خروج إلى الإنترنت من أي وحدة AI — كل شيء يعمل داخل الصندوق
+          السيادي.
         </div>
       </div>
     </div>
   );
 }
 
-function Guarantee({ icon: Icon, title, subtitle, passed }: { icon: any; title: string; subtitle: string; passed: boolean }) {
+function Guarantee({
+  icon: Icon,
+  title,
+  subtitle,
+  passed,
+}: {
+  icon: any;
+  title: string;
+  subtitle: string;
+  passed: boolean;
+}) {
   return (
-    <div className={`p-5 rounded-xl bg-card border ${passed ? "border-success/30" : "border-danger/30"}`}>
+    <div
+      className={`p-5 rounded-xl bg-card border ${passed ? "border-success/30" : "border-danger/30"}`}
+    >
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-lg ${passed ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}>
+        <div
+          className={`p-2 rounded-lg ${passed ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}
+        >
           <Icon className="w-5 h-5" />
         </div>
         <div className="flex-1">
           <h3 className="font-bold text-sm">{title}</h3>
           <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>
         </div>
-        <span className={`px-2 py-1 rounded text-[10px] font-bold ${passed ? "bg-success/15 text-success" : "bg-danger/15 text-danger"}`}>
+        <span
+          className={`px-2 py-1 rounded text-[10px] font-bold ${passed ? "bg-success/15 text-success" : "bg-danger/15 text-danger"}`}
+        >
           {passed ? "نجح" : "فشل"}
         </span>
       </div>

@@ -35,18 +35,66 @@ export const cashTrend = [
 ];
 
 export const riskAlerts = [
-  { id: "r1", severity: "critical", title: "فاتورة مكررة بمبلغ 12,400,000 د.ع", department: "المشتريات", impact: 12_400_000 },
-  { id: "r2", severity: "critical", title: "تباين بين الشراء والمخزن — 8 أصناف", department: "المخازن", impact: 6_800_000 },
-  { id: "r3", severity: "high", title: "صرف نقدي بدون مستند مساند", department: "المالية", impact: 3_200_000 },
-  { id: "r4", severity: "high", title: "تأخر تسوية حساب بنكي 14 يوم", department: "المالية", impact: 0 },
-  { id: "r5", severity: "medium", title: "زيادة شاذة في مصاريف الوقود", department: "النقل", impact: 1_900_000 },
+  {
+    id: "r1",
+    severity: "critical",
+    title: "فاتورة مكررة بمبلغ 12,400,000 د.ع",
+    department: "المشتريات",
+    impact: 12_400_000,
+  },
+  {
+    id: "r2",
+    severity: "critical",
+    title: "تباين بين الشراء والمخزن — 8 أصناف",
+    department: "المخازن",
+    impact: 6_800_000,
+  },
+  {
+    id: "r3",
+    severity: "high",
+    title: "صرف نقدي بدون مستند مساند",
+    department: "المالية",
+    impact: 3_200_000,
+  },
+  {
+    id: "r4",
+    severity: "high",
+    title: "تأخر تسوية حساب بنكي 14 يوم",
+    department: "المالية",
+    impact: 0,
+  },
+  {
+    id: "r5",
+    severity: "medium",
+    title: "زيادة شاذة في مصاريف الوقود",
+    department: "النقل",
+    impact: 1_900_000,
+  },
 ];
 
 export const pendingDocuments = [
-  { id: "d1", filename: "INV-2026-0481.pdf", category: "فاتورة شراء", confidence: 92, status: "pending" },
-  { id: "d2", filename: "كشف-حساب-بنكي-حزيران.pdf", category: "كشف حساب بنكي", confidence: 71, status: "pending" },
+  {
+    id: "d1",
+    filename: "INV-2026-0481.pdf",
+    category: "فاتورة شراء",
+    confidence: 92,
+    status: "pending",
+  },
+  {
+    id: "d2",
+    filename: "كشف-حساب-بنكي-حزيران.pdf",
+    category: "كشف حساب بنكي",
+    confidence: 71,
+    status: "pending",
+  },
   { id: "d3", filename: "عقد-مورد-جديد.docx", category: "عقد", confidence: 55, status: "pending" },
-  { id: "d4", filename: "تقرير-جرد-المخزن.xlsx", category: "تقرير جرد", confidence: 88, status: "pending" },
+  {
+    id: "d4",
+    filename: "تقرير-جرد-المخزن.xlsx",
+    category: "تقرير جرد",
+    confidence: 88,
+    status: "pending",
+  },
 ];
 
 export const sampleInvoice = {
@@ -63,28 +111,123 @@ export const sampleInvoice = {
 };
 
 export const auditorTasks = [
-  { id: "t1", title: "اعتماد فاتورة INV-2026-0481", type: "OCR", sla: "خلال ساعتين", status: "open", remaining: 88, demerits: 0 },
-  { id: "t2", title: "مطابقة كشف حساب بنكي - حزيران", type: "كشف بنكي", sla: "اليوم", status: "open", remaining: 380, demerits: 0 },
-  { id: "t3", title: "مراجعة قيد عكسي #4421", type: "قيد عكسي", sla: "متأخر", status: "overdue", remaining: -20, demerits: 3 },
-  { id: "t4", title: "اعتماد تقرير جرد المخزن", type: "OCR", sla: "خلال 4 ساعات", status: "open", remaining: 210, demerits: 0 },
+  {
+    id: "t1",
+    title: "اعتماد فاتورة INV-2026-0481",
+    type: "OCR",
+    sla: "خلال ساعتين",
+    status: "open",
+    remaining: 88,
+    demerits: 0,
+  },
+  {
+    id: "t2",
+    title: "مطابقة كشف حساب بنكي - حزيران",
+    type: "كشف بنكي",
+    sla: "اليوم",
+    status: "open",
+    remaining: 380,
+    demerits: 0,
+  },
+  {
+    id: "t3",
+    title: "مراجعة قيد عكسي #4421",
+    type: "قيد عكسي",
+    sla: "متأخر",
+    status: "overdue",
+    remaining: -20,
+    demerits: 3,
+  },
+  {
+    id: "t4",
+    title: "اعتماد تقرير جرد المخزن",
+    type: "OCR",
+    sla: "خلال 4 ساعات",
+    status: "open",
+    remaining: 210,
+    demerits: 0,
+  },
 ];
 
 export const ledgerEntries = [
-  { id: "l1", at: "2026-06-28 09:14", actor: "زينب الكاظمي", action: "اعتماد مستند", target: "INV-2026-0481", hash: "a7c3…91f" },
-  { id: "l2", at: "2026-06-28 09:02", actor: "زينب الكاظمي", action: "تصحيح OCR", target: "حقل المبلغ: 12,400,000 → 12,450,000", hash: "b21d…44a" },
-  { id: "l3", at: "2026-06-28 08:31", actor: "مصطفى", action: "منح صلاحية مؤقتة", target: "view_waste_map → مدير المشتريات (7 أيام)", hash: "9e88…0c2" },
-  { id: "l4", at: "2026-06-28 02:00", actor: "النظام", action: "تشغيل التحليل اليومي", target: "Trust Index = 78", hash: "5ff1…7b9" },
+  {
+    id: "l1",
+    at: "2026-06-28 09:14",
+    actor: "زينب الكاظمي",
+    action: "اعتماد مستند",
+    target: "INV-2026-0481",
+    hash: "a7c3…91f",
+  },
+  {
+    id: "l2",
+    at: "2026-06-28 09:02",
+    actor: "زينب الكاظمي",
+    action: "تصحيح OCR",
+    target: "حقل المبلغ: 12,400,000 → 12,450,000",
+    hash: "b21d…44a",
+  },
+  {
+    id: "l3",
+    at: "2026-06-28 08:31",
+    actor: "مصطفى",
+    action: "منح صلاحية مؤقتة",
+    target: "view_waste_map → مدير المشتريات (7 أيام)",
+    hash: "9e88…0c2",
+  },
+  {
+    id: "l4",
+    at: "2026-06-28 02:00",
+    actor: "النظام",
+    action: "تشغيل التحليل اليومي",
+    target: "Trust Index = 78",
+    hash: "5ff1…7b9",
+  },
 ];
 
 export const clients = [
-  { id: "c1", name: "مجموعة النخيل التجارية", sector: "تجارة", tier: "elite", users: 24, cap: 50, lastBackup: "قبل 6 ساعات", health: "ok" },
-  { id: "c2", name: "مصنع الفرات للأغذية", sector: "تصنيع", tier: "advanced", users: 12, cap: 20, lastBackup: "قبل 8 ساعات", health: "ok" },
-  { id: "c3", name: "مطاعم بغداد العريقة", sector: "مطاعم", tier: "essential", users: 6, cap: 10, lastBackup: "قبل يومين", health: "warning" },
-  { id: "c4", name: "العقارية المتحدة", sector: "عقارات", tier: "advanced", users: 9, cap: 20, lastBackup: "قبل 3 ساعات", health: "ok" },
+  {
+    id: "c1",
+    name: "مجموعة النخيل التجارية",
+    sector: "تجارة",
+    tier: "elite",
+    users: 24,
+    cap: 50,
+    lastBackup: "قبل 6 ساعات",
+    health: "ok",
+  },
+  {
+    id: "c2",
+    name: "مصنع الفرات للأغذية",
+    sector: "تصنيع",
+    tier: "advanced",
+    users: 12,
+    cap: 20,
+    lastBackup: "قبل 8 ساعات",
+    health: "ok",
+  },
+  {
+    id: "c3",
+    name: "مطاعم بغداد العريقة",
+    sector: "مطاعم",
+    tier: "essential",
+    users: 6,
+    cap: 10,
+    lastBackup: "قبل يومين",
+    health: "warning",
+  },
+  {
+    id: "c4",
+    name: "العقارية المتحدة",
+    sector: "عقارات",
+    tier: "advanced",
+    users: 9,
+    cap: 20,
+    lastBackup: "قبل 3 ساعات",
+    health: "ok",
+  },
 ];
 
-export const formatIQD = (n: number) =>
-  new Intl.NumberFormat("ar-IQ").format(n) + " د.ع";
+export const formatIQD = (n: number) => new Intl.NumberFormat("ar-IQ").format(n) + " د.ع";
 
 export const ownerLayer2 = [
   { department: "المشتريات", score: 5, amount: 12400000 },
@@ -93,8 +236,20 @@ export const ownerLayer2 = [
 ];
 
 export const ownerLayer3 = [
-  { id: "f1", type: "duplicate_invoice", title: "فاتورة مكررة", invoice: "INV-2026-9001", amount: 12400000 },
-  { id: "f2", type: "procurement_inventory_mismatch", title: "تضارب مشتريات/مخزن", invoice: "INV-2026-9002", amount: 6800000 },
+  {
+    id: "f1",
+    type: "duplicate_invoice",
+    title: "فاتورة مكررة",
+    invoice: "INV-2026-9001",
+    amount: 12400000,
+  },
+  {
+    id: "f2",
+    type: "procurement_inventory_mismatch",
+    title: "تضارب مشتريات/مخزن",
+    invoice: "INV-2026-9002",
+    amount: 6800000,
+  },
 ];
 
 export const ownerLayer4 = {
@@ -109,20 +264,25 @@ export const ownerLayer4 = {
   ],
 };
 
-
 export const managerWidgets = [
-  { code: 'budget_status', title: 'حالة الميزانية', value: '+12%' },
-  { code: 'open_tasks', title: 'المهام المفتوحة', value: '6' },
-  { code: 'dept_quality_index', title: 'مؤشر جودة القسم', value: '87 / 100' },
-  { code: 'team_performance', title: 'أداء الفريق', value: '91%' },
-  { code: 'pending_corrections', title: 'تصحيحات معلقة', value: '3' },
+  { code: "budget_status", title: "حالة الميزانية", value: "+12%" },
+  { code: "open_tasks", title: "المهام المفتوحة", value: "6" },
+  { code: "dept_quality_index", title: "مؤشر جودة القسم", value: "87 / 100" },
+  { code: "team_performance", title: "أداء الفريق", value: "91%" },
+  { code: "pending_corrections", title: "تصحيحات معلقة", value: "3" },
 ];
 
 export const appOwnerTemplates = [
-  { id: 't1', name: 'Manufacturing Default', sector: 'Manufacturing', version: 1 },
-  { id: 't2', name: 'Restaurant Default', sector: 'Restaurant', version: 1 },
+  { id: "t1", name: "Manufacturing Default", sector: "Manufacturing", version: 1 },
+  { id: "t2", name: "Restaurant Default", sector: "Restaurant", version: 1 },
 ];
 
 export const craasQueue = [
-  { id: 'c1', client: 'مجموعة النخيل التجارية', title: 'تقرير قطاعي خاص', status: 'quoted', price: 250000 },
+  {
+    id: "c1",
+    client: "مجموعة النخيل التجارية",
+    title: "تقرير قطاعي خاص",
+    status: "quoted",
+    price: 250000,
+  },
 ];

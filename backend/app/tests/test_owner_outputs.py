@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-import pytest
 
 from app.services.action_plan import build_adaptation_path, build_change_path
 from app.services.activation import compute_activation_status

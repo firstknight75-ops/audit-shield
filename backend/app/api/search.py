@@ -5,16 +5,14 @@ filters by company, date, and confidence.
 """
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, require_permission
+from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.models.entities import Document, OCRExtraction, User
+from app.models.entities import User
 from app.services.access import get_accessible_company_ids
 from app.services.i18n import tr
 

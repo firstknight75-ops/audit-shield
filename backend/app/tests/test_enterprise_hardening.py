@@ -14,15 +14,11 @@ Verifies:
 """
 from __future__ import annotations
 
-import asyncio
 import json
 import os
 import pathlib
 import re
-from datetime import datetime, timedelta, timezone
-from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
 APP = pathlib.Path(__file__).resolve().parents[1]
@@ -142,7 +138,7 @@ def test_json_formatter_handles_non_json_serializable_extras():
 
 
 def test_confidence_classify_threshold_table_uses_actual_duplicate_invoice_thresholds():
-    from app.services.ai_explanations import classify_confidence, CONFIDENCE_THRESHOLDS
+    from app.services.ai_explanations import CONFIDENCE_THRESHOLDS
     assert CONFIDENCE_THRESHOLDS['duplicate_invoice']['high'] == 0.95
 
 

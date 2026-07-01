@@ -11,7 +11,10 @@ const TITLES: Record<Locale, { title: string; empty: string }> = {
   ckb: { title: "ئەرکە ڕۆژانەکانم", empty: "ئەمڕۆ هیچ ئەرکێک لە بواری تۆدا نییە." },
 };
 
-const STATUS: Record<Locale, { overdue: string; remaining: (m: number) => string; demerits: (p: number) => string }> = {
+const STATUS: Record<
+  Locale,
+  { overdue: string; remaining: (m: number) => string; demerits: (p: number) => string }
+> = {
   ar: {
     overdue: "متأخر",
     remaining: (m) => `متبقي ${m} د`,
@@ -41,9 +44,10 @@ function Tasks() {
   const overdue = auditorTasks.filter((t) => t.status === "overdue").length;
   const demerits = auditorTasks.reduce((s, t) => s + t.demerits, 0);
 
-  const summary = locale === "ar"
-    ? `المنجزة: ${done} | المتأخرة: ${overdue} | النقاط السلبية: ${demerits}`
-    : `تەواوبوو: ${done} | درەنگ: ${overdue} | خاڵی نەرێنی: ${demerits}`;
+  const summary =
+    locale === "ar"
+      ? `المنجزة: ${done} | المتأخرة: ${overdue} | النقاط السلبية: ${demerits}`
+      : `تەواوبوو: ${done} | درەنگ: ${overdue} | خاڵی نەرێنی: ${demerits}`;
 
   if (auditorTasks.length === 0) {
     return (
@@ -62,19 +66,32 @@ function Tasks() {
           const overdueRow = t.status === "overdue";
           const t_status = STATUS[locale];
           return (
-            <div key={t.id} className={`p-4 rounded-xl bg-card border ${overdueRow ? "border-danger/40" : "border-border"} flex items-center justify-between`}>
+            <div
+              key={t.id}
+              className={`p-4 rounded-xl bg-card border ${overdueRow ? "border-danger/40" : "border-border"} flex items-center justify-between`}
+            >
               <div className="flex items-center gap-4">
-                <div className={`w-2 h-12 rounded-full ${overdueRow ? "bg-danger" : t.remaining < 120 ? "bg-warning" : "bg-success"}`} />
+                <div
+                  className={`w-2 h-12 rounded-full ${overdueRow ? "bg-danger" : t.remaining < 120 ? "bg-warning" : "bg-success"}`}
+                />
                 <div>
                   <div className="font-medium">{t.title}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{t.type} · {SLA_TYPE[locale]}: {t.sla}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {t.type} · {SLA_TYPE[locale]}: {t.sla}
+                  </div>
                 </div>
               </div>
               <div className="text-right">
-                <div className={`text-sm font-bold ${overdueRow ? "text-danger" : "text-foreground"}`}>
-                  {overdueRow ? `${t_status.overdue} ${Math.abs(t.remaining)} د` : t_status.remaining(t.remaining)}
+                <div
+                  className={`text-sm font-bold ${overdueRow ? "text-danger" : "text-foreground"}`}
+                >
+                  {overdueRow
+                    ? `${t_status.overdue} ${Math.abs(t.remaining)} د`
+                    : t_status.remaining(t.remaining)}
                 </div>
-                {t.demerits > 0 && <div className="text-xs text-danger mt-1">{t_status.demerits(t.demerits)}</div>}
+                {t.demerits > 0 && (
+                  <div className="text-xs text-danger mt-1">{t_status.demerits(t.demerits)}</div>
+                )}
               </div>
             </div>
           );

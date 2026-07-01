@@ -6,8 +6,20 @@ import { TrendingDown } from "lucide-react";
 export const Route = createFileRoute("/owner/waste-map")({ component: WasteMap });
 
 const items = [
-  { id: 1, desc: "فاتورة مكررة — مورد الرافدين", dept: "المشتريات", amount: 12_400_000, status: "مفتوح" },
-  { id: 2, desc: "تباين في كميات المخزن — 8 أصناف", dept: "المخازن", amount: 6_800_000, status: "قيد المراجعة" },
+  {
+    id: 1,
+    desc: "فاتورة مكررة — مورد الرافدين",
+    dept: "المشتريات",
+    amount: 12_400_000,
+    status: "مفتوح",
+  },
+  {
+    id: 2,
+    desc: "تباين في كميات المخزن — 8 أصناف",
+    dept: "المخازن",
+    amount: 6_800_000,
+    status: "قيد المراجعة",
+  },
   { id: 3, desc: "صرف نقدي بدون مستند", dept: "المالية", amount: 3_200_000, status: "مفتوح" },
   { id: 4, desc: "خصومات غير معتمدة", dept: "المبيعات", amount: 4_500_000, status: "مفتوح" },
   { id: 5, desc: "زيادة شاذة في مصاريف الوقود", dept: "النقل", amount: 1_900_000, status: "مفتوح" },
@@ -29,7 +41,10 @@ function WasteMap() {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {items.map((i) => (
-          <div key={i.id} className="p-5 rounded-xl bg-card border border-border hover:border-danger/50 transition">
+          <div
+            key={i.id}
+            className="p-5 rounded-xl bg-card border border-border hover:border-danger/50 transition"
+          >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-lg bg-danger/10 text-danger border border-danger/30">

@@ -9,7 +9,7 @@ from app.db.session import get_db
 from app.models.entities import AnalyticsOutput, AuditLedger, DailyTask, Document, OCRExtraction, User, WasteMapItem
 from app.models.enums import UserRole
 from app.schemas.analytics import OwnerDashboardResponse, RecordTraceResponse
-from app.services.access import get_accessible_company_ids, require_company_access
+from app.services.access import require_company_access
 from app.services.i18n import tr
 
 router = APIRouter(tags=['analytics'])

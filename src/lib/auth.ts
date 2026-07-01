@@ -60,11 +60,46 @@ export const SEEDED_USERS: SeededUser[] = [
       },
     ],
   },
-  { id: "u-gm", email: "gm@auditcore.local", password: "Gm123!", fullName: "بەڕێوەبەری گشتی — سالم الجبوري", role: "gm", preferredLanguage: "ckb" },
-  { id: "u-manager", email: "manager@auditcore.local", password: "Manager123!", fullName: "مدير المشتريات — حسن العاني", role: "manager", preferredLanguage: "ar" },
-  { id: "u-auditor", email: "auditor@auditcore.local", password: "Auditor123!", fullName: "ژمێریار — زينب الكاظمي", role: "auditor", preferredLanguage: "ckb" },
-  { id: "u-admin", email: "sysadmin@auditcore.local", password: "Sysadmin123!", fullName: "مدير النظام — مصطفى", role: "admin", preferredLanguage: "ar" },
-  { id: "u-appowner", email: "appowner@auditcore.local", password: "Appowner123!", fullName: "خاوەنی پلاتفۆڕم — AuditCore", role: "appowner", preferredLanguage: "ckb" },
+  {
+    id: "u-gm",
+    email: "gm@auditcore.local",
+    password: "Gm123!",
+    fullName: "بەڕێوەبەری گشتی — سالم الجبوري",
+    role: "gm",
+    preferredLanguage: "ckb",
+  },
+  {
+    id: "u-manager",
+    email: "manager@auditcore.local",
+    password: "Manager123!",
+    fullName: "مدير المشتريات — حسن العاني",
+    role: "manager",
+    preferredLanguage: "ar",
+  },
+  {
+    id: "u-auditor",
+    email: "auditor@auditcore.local",
+    password: "Auditor123!",
+    fullName: "ژمێریار — زينب الكاظمي",
+    role: "auditor",
+    preferredLanguage: "ckb",
+  },
+  {
+    id: "u-admin",
+    email: "sysadmin@auditcore.local",
+    password: "Sysadmin123!",
+    fullName: "مدير النظام — مصطفى",
+    role: "admin",
+    preferredLanguage: "ar",
+  },
+  {
+    id: "u-appowner",
+    email: "appowner@auditcore.local",
+    password: "Appowner123!",
+    fullName: "خاوەنی پلاتفۆڕم — AuditCore",
+    role: "appowner",
+    preferredLanguage: "ckb",
+  },
 ];
 
 export const ROLE_LABELS: Record<Role, string> = {
@@ -133,9 +168,14 @@ export function getCurrentUser(): SeededUser | null {
 }
 
 export function signIn(email: string, password: string): SeededUser {
-  const user = SEEDED_USERS.find((u) => u.email.toLowerCase() === email.trim().toLowerCase() && u.password === password);
+  const user = SEEDED_USERS.find(
+    (u) => u.email.toLowerCase() === email.trim().toLowerCase() && u.password === password,
+  );
   if (!user) throw new Error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
-  window.localStorage.setItem(KEY, JSON.stringify({ id: user.id, at: Date.now(), preferredLanguage: user.preferredLanguage }));
+  window.localStorage.setItem(
+    KEY,
+    JSON.stringify({ id: user.id, at: Date.now(), preferredLanguage: user.preferredLanguage }),
+  );
   return user;
 }
 

@@ -13,14 +13,13 @@ and returns only pass/fail.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.models.entities import ReportCertificate
-from app.services.i18n import tr
 from app.services.ledger import verify_ledger_integrity
 
 router = APIRouter(prefix='/verify', tags=['verify'])

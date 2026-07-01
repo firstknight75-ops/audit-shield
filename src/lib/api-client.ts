@@ -39,9 +39,10 @@ type FetchOptions = {
   raw?: boolean;
 };
 
-const DEFAULT_BASE = (typeof window !== "undefined"
-  ? (window as unknown as { __AUDITCORE_API_BASE__?: string }).__AUDITCORE_API_BASE__
-  : undefined) ?? "/api";
+const DEFAULT_BASE =
+  (typeof window !== "undefined"
+    ? (window as unknown as { __AUDITCORE_API_BASE__?: string }).__AUDITCORE_API_BASE__
+    : undefined) ?? "/api";
 
 let ACCESS_TOKEN: string | null = null;
 export function setAccessToken(t: string | null) {
@@ -69,17 +70,21 @@ export function isPreviewApiUnavailable(): boolean {
   if (typeof window === "undefined") return false;
   const host = window.location.hostname;
   const usingDefaultApi = DEFAULT_BASE === "/api";
-  return usingDefaultApi && (
-    host.includes("lovableproject.com") ||
-    host.includes("lovable.app") ||
-    host === "localhost" ||
-    host === "127.0.0.1"
+  return (
+    usingDefaultApi &&
+    (host.includes("lovableproject.com") ||
+      host.includes("lovable.app") ||
+      host === "localhost" ||
+      host === "127.0.0.1")
   );
 }
 
 async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {
   const base = DEFAULT_BASE;
-  const url = new URL(base.replace(/\/$/, "") + (path.startsWith("/") ? path : `/${path}`), window.location.origin);
+  const url = new URL(
+    base.replace(/\/$/, "") + (path.startsWith("/") ? path : `/${path}`),
+    window.location.origin,
+  );
   if (opts.query) {
     for (const [k, v] of Object.entries(opts.query)) {
       if (v === undefined || v === null) continue;
@@ -89,7 +94,10 @@ async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {
 
   const headers: Record<string, string> = {
     Accept: "application/json",
-    "X-Locale": (typeof window !== "undefined" && (window.localStorage.getItem("auditcore.locale.v1") as Locale)) || "ar",
+    "X-Locale":
+      (typeof window !== "undefined" &&
+        (window.localStorage.getItem("auditcore.locale.v1") as Locale)) ||
+      "ar",
     ...opts.headers,
   };
   if (ACCESS_TOKEN) headers.Authorization = `Bearer ${ACCESS_TOKEN}`;
@@ -113,14 +121,14 @@ async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {
       g.__AUDITCORE_API_LOGS__ = g.__AUDITCORE_API_LOGS__ || [];
       g.__AUDITCORE_API_FAILURES__ = g.__AUDITCORE_API_FAILURES__ || 0;
       g.__AUDITCORE_API_SUCCESS__ = g.__AUDITCORE_API_SUCCESS__ || 0;
-      
+
       g.__AUDITCORE_API_LOGS__.unshift({
         path,
         method: opts.method ?? "GET",
         status,
         timestamp: new Date().toLocaleTimeString(),
         detail,
-        success
+        success,
       });
       if (success) {
         g.__AUDITCORE_API_SUCCESS__++;
@@ -140,7 +148,11 @@ async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {
 
     if (!res.ok) {
       let body: ApiEnvelope<unknown> | null = null;
-      try { body = (await res.json()) as ApiEnvelope<unknown>; } catch { /* not JSON */ }
+      try {
+        body = (await res.json()) as ApiEnvelope<unknown>;
+      } catch {
+        /* not JSON */
+      }
       const err = new ApiError(res.status, body, requestId);
       registerLog(res.status, body?.detail ?? "HTTP Error Response", false);
       throw err;
@@ -160,7 +172,11 @@ async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {
 }
 
 /** Retry-on-5xx with exponential backoff. Idempotent for GETs. */
-async function requestWithRetry<T>(path: string, opts: FetchOptions = {}, maxRetries = 2): Promise<T> {
+async function requestWithRetry<T>(
+  path: string,
+  opts: FetchOptions = {},
+  maxRetries = 2,
+): Promise<T> {
   let lastErr: unknown;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -181,15 +197,15 @@ export const api = {
   // ── Auth ──
   auth: {
     login: (email: string, password: string) =>
-      requestWithRetry<{ access_token: string; refresh_token: string }>(
-        "/auth/login",
-        { method: "POST", body: { email, password } }
-      ),
+      requestWithRetry<{ access_token: string; refresh_token: string }>("/auth/login", {
+        method: "POST",
+        body: { email, password },
+      }),
     refresh: (refresh_token: string) =>
-      requestWithRetry<{ access_token: string; refresh_token: string }>(
-        "/auth/refresh",
-        { method: "POST", body: { refresh_token } }
-      ),
+      requestWithRetry<{ access_token: string; refresh_token: string }>("/auth/refresh", {
+        method: "POST",
+        body: { refresh_token },
+      }),
     me: () => requestWithRetry<MeResponse>("/auth/me"),
     setLanguage: (preferred_language: Locale) =>
       requestWithRetry<{ preferred_language: Locale }>("/admin/language", {
@@ -200,11 +216,14 @@ export const api = {
 
   // ── Owner outputs ──
   owner: {
-    picture: (company_id: string) => requestWithRetry<unknown>(`/owner/picture?company_id=${company_id}`),
+    picture: (company_id: string) =>
+      requestWithRetry<unknown>(`/owner/picture?company_id=${company_id}`),
     trustIndex: (company_id: string) =>
       requestWithRetry<unknown>(`/owner/trust-index?company_id=${company_id}`),
-    wasteMap: (company_id: string) => requestWithRetry<unknown>(`/owner/waste-map?company_id=${company_id}`),
-    riskMap: (company_id: string) => requestWithRetry<unknown>(`/owner/risk-map?company_id=${company_id}`),
+    wasteMap: (company_id: string) =>
+      requestWithRetry<unknown>(`/owner/waste-map?company_id=${company_id}`),
+    riskMap: (company_id: string) =>
+      requestWithRetry<unknown>(`/owner/risk-map?company_id=${company_id}`),
     opportunityMap: (company_id: string) =>
       requestWithRetry<unknown>(`/owner/opportunity-map?company_id=${company_id}`),
     actionPlan: (company_id: string) =>
@@ -213,7 +232,10 @@ export const api = {
     activation: (company_id: string) =>
       requestWithRetry<unknown>(`/owner/activation?company_id=${company_id}`),
     layer4: (document_id: string, company_id: string) =>
-      requestWithRetry<unknown>(`/owner/dashboard/layer4/${document_id}/image?company_id=${company_id}`, { raw: true }),
+      requestWithRetry<unknown>(
+        `/owner/dashboard/layer4/${document_id}/image?company_id=${company_id}`,
+        { raw: true },
+      ),
     runAnalysis: (company_id: string) =>
       requestWithRetry<unknown>(`/analytics/run/${company_id}`, { method: "POST" }),
     verifyLedger: (company_id: string) =>
@@ -226,11 +248,18 @@ export const api = {
   auditor: {
     next: (company_id: string) =>
       requestWithRetry<unknown>(`/certification/next?company_id=${company_id}`),
-    certify: (extraction_id: string, payload: { fields: Record<string, unknown> }, company_id: string) =>
-      requestWithRetry<unknown>(`/certification/${extraction_id}/certify?company_id=${company_id}`, {
-        method: "POST",
-        body: payload,
-      }),
+    certify: (
+      extraction_id: string,
+      payload: { fields: Record<string, unknown> },
+      company_id: string,
+    ) =>
+      requestWithRetry<unknown>(
+        `/certification/${extraction_id}/certify?company_id=${company_id}`,
+        {
+          method: "POST",
+          body: payload,
+        },
+      ),
     upload: (formData: FormData) =>
       requestWithRetry<unknown>("/documents/upload", { method: "POST", body: formData }),
   },
@@ -238,9 +267,13 @@ export const api = {
   // ── Manager ──
   manager: {
     dashboard: (company_id: string, branch_id?: string) =>
-      requestWithRetry<unknown>(`/analytics/manager/dashboard?company_id=${company_id}${branch_id ? `&branch_id=${branch_id}` : ""}`),
+      requestWithRetry<unknown>(
+        `/analytics/manager/dashboard?company_id=${company_id}${branch_id ? `&branch_id=${branch_id}` : ""}`,
+      ),
     widgets: (company_id: string, branch_id?: string) =>
-      requestWithRetry<unknown>(`/manager/widgets?company_id=${company_id}${branch_id ? `&branch_id=${branch_id}` : ""}`),
+      requestWithRetry<unknown>(
+        `/manager/widgets?company_id=${company_id}${branch_id ? `&branch_id=${branch_id}` : ""}`,
+      ),
   },
 
   // ── Exports ──
@@ -264,15 +297,22 @@ export const api = {
 
   // ── Trust verification (public, no login) ──
   verify: {
-    public: (report_id: string, payload: { ledger_hash_at_generation: string; signature: string; payload: Record<string, unknown> }) =>
-      requestWithRetry<unknown>(`/verify/${report_id}`, { method: "POST", body: payload }),
+    public: (
+      report_id: string,
+      payload: {
+        ledger_hash_at_generation: string;
+        signature: string;
+        payload: Record<string, unknown>;
+      },
+    ) => requestWithRetry<unknown>(`/verify/${report_id}`, { method: "POST", body: payload }),
   },
 
   // ── Notifications inbox ──
   inapp: {
     unreadCount: () => requestWithRetry<{ count: number }>("/inapp/unread"),
     recent: (limit = 50) => requestWithRetry<unknown[]>(`/inapp/recent?limit=${limit}`),
-    markRead: (id: string) => requestWithRetry<{ ok: boolean }>(`/inapp/${id}/read`, { method: "POST" }),
+    markRead: (id: string) =>
+      requestWithRetry<{ ok: boolean }>(`/inapp/${id}/read`, { method: "POST" }),
     markAllRead: () => requestWithRetry<{ ok: boolean }>("/inapp/read-all", { method: "POST" }),
   },
 
@@ -288,7 +328,12 @@ export const api = {
 
   // ── AI feedback ──
   ai: {
-    feedback: (finding_id: string, finding_kind: string, rating: "correct" | "false_positive" | "missed", note?: string) =>
+    feedback: (
+      finding_id: string,
+      finding_kind: string,
+      rating: "correct" | "false_positive" | "missed",
+      note?: string,
+    ) =>
       requestWithRetry<unknown>("/ai/feedback", {
         method: "POST",
         body: { finding_id, finding_kind, rating, note },

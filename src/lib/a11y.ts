@@ -48,7 +48,8 @@ export function useFocusTrap(active: boolean) {
   useEffect(() => {
     if (!active || !containerRef.current) return;
     const root = containerRef.current;
-    const sel = 'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
+    const sel =
+      'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
     const focusables = Array.from(root.querySelectorAll<HTMLElement>(sel));
     if (focusables.length === 0) return;
     const first = focusables[0];
@@ -75,21 +76,24 @@ export function useFocusTrap(active: boolean) {
  */
 export function useRovingTabIndex(itemCount: number) {
   const [active, setActive] = useState(0);
-  const onKey = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-      e.preventDefault();
-      setActive((i) => (i + 1) % itemCount);
-    } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-      e.preventDefault();
-      setActive((i) => (i - 1 + itemCount) % itemCount);
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      setActive(0);
-    } else if (e.key === "End") {
-      e.preventDefault();
-      setActive(itemCount - 1);
-    }
-  }, [itemCount]);
+  const onKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        e.preventDefault();
+        setActive((i) => (i + 1) % itemCount);
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        setActive((i) => (i - 1 + itemCount) % itemCount);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        setActive(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        setActive(itemCount - 1);
+      }
+    },
+    [itemCount],
+  );
   const tabIndex = useCallback((i: number) => (i === active ? 0 : -1), [active]);
   return { active, setActive, onKey, tabIndex };
 }

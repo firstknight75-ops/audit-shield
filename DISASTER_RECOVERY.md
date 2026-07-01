@@ -149,6 +149,7 @@ The `update.sh` and Helm upgrade path both:
 3. Run health checks — if any fails, **automatic rollback** triggers
 
 Manual rollback:
+
 ```bash
 # On-prem
 ./scripts/update.sh --rollback
@@ -174,6 +175,7 @@ If ransomware encrypts the Smart Box:
 ### Customer-facing status page
 
 `/status` (planned Phase 6) — public page showing:
+
 - System status (operational / degraded / down)
 - Recent incidents (last 90 days)
 - Scheduled maintenance windows
@@ -187,6 +189,7 @@ If ransomware encrypts the Smart Box:
 ## Appendix — Storage math
 
 Per 10,000 documents per month:
+
 - ~5 GB/month raw blobs (AES-256-GCM encrypted at rest)
 - ~200 MB/month ledger entries
 - ~50 MB/month audit certs

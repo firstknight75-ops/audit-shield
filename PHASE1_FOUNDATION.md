@@ -19,25 +19,26 @@ here and must hold through every later phase:
 
 ## Acceptance criteria — all checked
 
-| # | Criterion | Test(s) |
-|---|---|---|
-| 1 | `setup.sh` and `deploy-cloud.sh` succeed | `test_acceptance_1_*` (3 tests) |
-| 2 | `/auth/me` returns different effective permissions per role | `test_acceptance_2_*` (8 tests) |
-| 3 | Auditor RLS returns 0 rows on hidden tables | `test_acceptance_3_*` (3 tests) |
-| 4 | Cross-tenant isolation (cloud) | `test_acceptance_4_*` (3 tests) |
-| 5 | Cross-company-within-tenant | `test_acceptance_5_*` (5 tests) |
-| 6 | Cross-branch | `test_acceptance_6_*` (1 test) |
-| 7 | Temp override auto-revokes + app_owner grant blocked | `test_acceptance_7_*` (3 tests) |
-| 8 | Bilingual i18n + Sorani font coverage | `test_acceptance_8_*` (5 tests) |
-| 9 | CI fails on external AI imports | `test_acceptance_9_*` (4 tests) |
-| 10 | Encryption at rest + MIME validation | `test_acceptance_10_*` (7 tests) |
-| Activation | `activation_started_at` stamped by both scripts | `test_phase1_*` (3 tests) |
+| #          | Criterion                                                   | Test(s)                          |
+| ---------- | ----------------------------------------------------------- | -------------------------------- |
+| 1          | `setup.sh` and `deploy-cloud.sh` succeed                    | `test_acceptance_1_*` (3 tests)  |
+| 2          | `/auth/me` returns different effective permissions per role | `test_acceptance_2_*` (8 tests)  |
+| 3          | Auditor RLS returns 0 rows on hidden tables                 | `test_acceptance_3_*` (3 tests)  |
+| 4          | Cross-tenant isolation (cloud)                              | `test_acceptance_4_*` (3 tests)  |
+| 5          | Cross-company-within-tenant                                 | `test_acceptance_5_*` (5 tests)  |
+| 6          | Cross-branch                                                | `test_acceptance_6_*` (1 test)   |
+| 7          | Temp override auto-revokes + app_owner grant blocked        | `test_acceptance_7_*` (3 tests)  |
+| 8          | Bilingual i18n + Sorani font coverage                       | `test_acceptance_8_*` (5 tests)  |
+| 9          | CI fails on external AI imports                             | `test_acceptance_9_*` (4 tests)  |
+| 10         | Encryption at rest + MIME validation                        | `test_acceptance_10_*` (7 tests) |
+| Activation | `activation_started_at` stamped by both scripts             | `test_phase1_*` (3 tests)        |
 
 **Result:** `45 passed` on `test_phase1_acceptance.py`, **102 passed, 1 skipped** total.
 
 ## What was added/changed in this Phase 1 pass
 
 ### Backend
+
 - **Alembic migration 0002** — adds `activation_started_at` to `company_group`
   (`backend/alembic/versions/20260629_0002_activation_started_at.py`)
 - **`CompanyGroup` model** — `activation_started_at: Mapped[datetime | None]`
@@ -45,13 +46,14 @@ here and must hold through every later phase:
   `manage_company_users`, `export_reports`, `approve_custom_reports`,
   `grant_temporary_access`, `manage_templates`, `view_all_companies`)
 - **`ROLE_DEFAULTS`** — refactored so the six seeded roles have six
-  *distinct* permission sets (manager and auditor no longer overlap)
+  _distinct_ permission sets (manager and auditor no longer overlap)
 - **`seed.py`** — records `activation_started_at = now()` at creation
 - **API `require_permission` calls** — updated from old codes
   (`manage_users`, `view_analytics`, `view_ledger`) to spec codes
   (`manage_company_users`, `view_owner_dashboard`, `view_audit_ledger`)
 
 ### Scripts
+
 - **`scripts/check_no_external_ai.sh`** — runtime guard that scans the
   codebase for 26 known external-AI patterns (openai, anthropic, cohere,
   langchain, llama_index, semantic_kernel, huggingface_hub, plus known
@@ -61,6 +63,7 @@ here and must hold through every later phase:
   both already invoke `seed()` which now stamps `activation_started_at`.
 
 ### Tests
+
 - **`backend/app/tests/test_phase1_acceptance.py`** — 45 tests, one per
   acceptance criterion (or sub-criterion), all auto-running in pytest
   without Docker.

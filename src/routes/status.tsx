@@ -68,13 +68,15 @@ function StatusPage() {
   const { data, isLoading, refetch } = useApiData<HealthStatus | null>(
     async () => {
       const [health, ready] = await Promise.all([
-        fetch('/health').then(r => r.json()),
-        fetch('/ready', { method: 'GET' }).then(r => r.json()).catch(() => null),
+        fetch("/health").then((r) => r.json()),
+        fetch("/ready", { method: "GET" })
+          .then((r) => r.json())
+          .catch(() => null),
       ]);
       return {
-        status: health.status === 'ok' && (ready?.status === 'ok' || !ready) ? 'ok' : 'degraded',
-        database: ready?.database ?? 'ok',
-        redis: ready?.redis ?? 'ok',
+        status: health.status === "ok" && (ready?.status === "ok" || !ready) ? "ok" : "degraded",
+        database: ready?.database ?? "ok",
+        redis: ready?.redis ?? "ok",
         deployment_mode: health.deployment_mode,
       };
     },
@@ -82,11 +84,11 @@ function StatusPage() {
     { staleTime: 15_000 },
   );
 
-  const overallStatus = data?.status ?? 'ok';
+  const overallStatus = data?.status ?? "ok";
   const statusBadge = {
-    ok: { Icon: CheckCircle2, color: 'success', label: t.operational },
-    degraded: { Icon: AlertTriangle, color: 'warning', label: t.degraded },
-    down: { Icon: XCircle, color: 'danger', label: t.down },
+    ok: { Icon: CheckCircle2, color: "success", label: t.operational },
+    degraded: { Icon: AlertTriangle, color: "warning", label: t.degraded },
+    down: { Icon: XCircle, color: "danger", label: t.down },
   }[overallStatus];
 
   const Badge = statusBadge.Icon;
@@ -95,25 +97,36 @@ function StatusPage() {
     <div>
       <PageHeader title={t.title} subtitle={t.subtitle} />
 
-      <div className={`mb-6 p-6 rounded-2xl bg-${statusBadge.color}/10 border-2 border-${statusBadge.color}/30 flex items-center gap-4`}>
+      <div
+        className={`mb-6 p-6 rounded-2xl bg-${statusBadge.color}/10 border-2 border-${statusBadge.color}/30 flex items-center gap-4`}
+      >
         <div className={`p-3 rounded-xl bg-${statusBadge.color}/20 text-${statusBadge.color}`}>
           <Badge className="w-8 h-8" />
         </div>
         <div className="flex-1">
-          <div className={`text-2xl font-bold font-display text-${statusBadge.color}`}>{statusBadge.label}</div>
+          <div className={`text-2xl font-bold font-display text-${statusBadge.color}`}>
+            {statusBadge.label}
+          </div>
           <div className="text-xs text-muted-foreground mt-1 font-mono">
             {t.last_updated}: {new Date().toLocaleString(locale === "ar" ? "ar-IQ" : "ku-IQ")}
           </div>
         </div>
-        <button onClick={() => void refetch()} className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition">
+        <button
+          onClick={() => void refetch()}
+          className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition"
+        >
           {t.refresh}
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <ServiceCard icon={CheckCircle2} label={t.database} status={data?.database ?? 'checking'} />
-        <ServiceCard icon={CheckCircle2} label={t.redis} status={data?.redis ?? 'checking'} />
-        <ServiceCard icon={CheckCircle2} label={t.deployment} status={data?.deployment_mode ?? 'onpremise'} />
+        <ServiceCard icon={CheckCircle2} label={t.database} status={data?.database ?? "checking"} />
+        <ServiceCard icon={CheckCircle2} label={t.redis} status={data?.redis ?? "checking"} />
+        <ServiceCard
+          icon={CheckCircle2}
+          label={t.deployment}
+          status={data?.deployment_mode ?? "onpremise"}
+        />
       </div>
 
       <div className="p-6 rounded-2xl bg-card border border-border">
@@ -138,14 +151,16 @@ function StatusPage() {
 }
 
 function ServiceCard({ icon: Icon, label, status }: { icon: any; label: string; status: string }) {
-  const isOk = status === 'ok' || status === 'onpremise' || status === 'cloud';
+  const isOk = status === "ok" || status === "onpremise" || status === "cloud";
   return (
-    <div className={`p-5 rounded-xl bg-card border ${isOk ? 'border-success/30' : 'border-warning/30'}`}>
+    <div
+      className={`p-5 rounded-xl bg-card border ${isOk ? "border-success/30" : "border-warning/30"}`}
+    >
       <div className="flex items-center gap-2 mb-2">
-        <Icon className={`w-4 h-4 ${isOk ? 'text-success' : 'text-warning'}`} />
+        <Icon className={`w-4 h-4 ${isOk ? "text-success" : "text-warning"}`} />
         <span className="text-sm text-muted-foreground">{label}</span>
       </div>
-      <div className={`text-lg font-bold font-mono ${isOk ? 'text-success' : 'text-warning'}`}>
+      <div className={`text-lg font-bold font-mono ${isOk ? "text-success" : "text-warning"}`}>
         {status}
       </div>
     </div>

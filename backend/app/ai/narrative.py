@@ -11,7 +11,6 @@ external LLM call, no chatbot — purely templated.
 from __future__ import annotations
 
 import hashlib
-import json
 
 
 # Deterministic locale-aware templates.

@@ -1,9 +1,11 @@
 # ADR-0003: Hash-Chained Audit Ledger with Reverse-Entry Corrections
 
 ## Status
+
 Accepted · 2026-06-29
 
 ## Context
+
 AuditCore's audit ledger is the authoritative record of everything that
 happened — uploads, certifications, permission overrides, exports.
 We need:
@@ -16,6 +18,7 @@ We need:
    the application server.
 
 ## Decision
+
 We use a **SHA-256 hash chain** with reverse-entry corrections:
 
 - Each entry stores `entry_hash = SHA-256(previous_hash + canonical_json(entry_body))`
@@ -27,6 +30,7 @@ We use a **SHA-256 hash chain** with reverse-entry corrections:
   signature → public `/verify/{report_id}` endpoint re-validates
 
 ## Rationale
+
 - SHA-256 is fast, ubiquitous, well-understood
 - Canonical JSON (`sort_keys=True, ensure_ascii=False, separators=compact`)
   ensures deterministic hashing across implementations
@@ -34,6 +38,7 @@ We use a **SHA-256 hash chain** with reverse-entry corrections:
 - HMAC over the report payload binds the export to a specific ledger state
 
 ## Consequences
+
 - **+** Tampering with any entry breaks the chain immediately
 - **+** Verification is O(n) over the chain — fast enough for any size
 - **+** Exports carry proof-of-generation that's verifiable by anyone
@@ -41,6 +46,7 @@ We use a **SHA-256 hash chain** with reverse-entry corrections:
 - **−** Chain re-computation on restore requires reading all entries
 
 ## Verification
+
 - `backend/app/services/ledger.py::verify_ledger_integrity` (the algorithm)
 - `backend/app/tests/test_phase2_acceptance.py` — reverse entry, tamper detection
 - `backend/app/api/verify.py` — public verification endpoint

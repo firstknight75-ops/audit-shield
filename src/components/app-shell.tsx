@@ -1,7 +1,36 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useEffect, useState } from "react";
-import { ShieldCheck, LayoutDashboard, FileCheck2, ListTodo, AlertTriangle, Users, KeyRound, Building2, ScrollText, Boxes, Settings2, FileBarChart, LogOut, Bell, Briefcase, Sparkles, Sliders, Server, X, CheckCircle2, Terminal } from "lucide-react";
-import { Role, ROLE_LABELS, getCurrentUser, signOut, persistLanguageChange, type SeededUser } from "@/lib/auth";
+import {
+  ShieldCheck,
+  LayoutDashboard,
+  FileCheck2,
+  ListTodo,
+  AlertTriangle,
+  Users,
+  KeyRound,
+  Building2,
+  ScrollText,
+  Boxes,
+  Settings2,
+  FileBarChart,
+  LogOut,
+  Bell,
+  Briefcase,
+  Sparkles,
+  Sliders,
+  Server,
+  X,
+  CheckCircle2,
+  Terminal,
+} from "lucide-react";
+import {
+  Role,
+  ROLE_LABELS,
+  getCurrentUser,
+  signOut,
+  persistLanguageChange,
+  type SeededUser,
+} from "@/lib/auth";
 import { getLocale, setLocale, t, type Namespace } from "@/lib/i18n";
 import { CompanySwitcher } from "@/components/company-switcher";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -48,7 +77,12 @@ const NAV: Record<Role, NavItem[]> = {
   ],
   appowner: [
     { to: "/appowner", label: "client_companies", ns: "admin", icon: Briefcase },
-    { to: "/appowner/isolation-proof", label: "isolation_proof", ns: "dashboard", icon: ShieldCheck },
+    {
+      to: "/appowner/isolation-proof",
+      label: "isolation_proof",
+      ns: "dashboard",
+      icon: ShieldCheck,
+    },
     { to: "/appowner/templates", label: "template_editor", ns: "admin", icon: Sparkles },
     { to: "/appowner/maintenance", label: "maintenance_log", ns: "admin", icon: Settings2 },
   ],
@@ -58,7 +92,16 @@ function ApiMonitor() {
   const [open, setOpen] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
   const [failureCount, setFailureCount] = useState(0);
-  const [logs, setLogs] = useState<Array<{ path: string; method: string; status: number; timestamp: string; detail: string; success: boolean }>>([]);
+  const [logs, setLogs] = useState<
+    Array<{
+      path: string;
+      method: string;
+      status: number;
+      timestamp: string;
+      detail: string;
+      success: boolean;
+    }>
+  >([]);
 
   useEffect(() => {
     const handleUpdate = () => {
@@ -85,9 +128,13 @@ function ApiMonitor() {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 px-3 py-2 rounded-full border bg-card/90 backdrop-blur border-border text-[11px] font-bold shadow-lg hover:border-primary/50 transition cursor-pointer text-foreground"
       >
-        <div className={`w-2 h-2 rounded-full ${failureCount > 0 ? "bg-warning animate-pulse" : "bg-success"}`} />
+        <div
+          className={`w-2 h-2 rounded-full ${failureCount > 0 ? "bg-warning animate-pulse" : "bg-success"}`}
+        />
         <span>مراقب الـ API</span>
-        <span className="font-mono text-muted-foreground">({successCount} / {failureCount})</span>
+        <span className="font-mono text-muted-foreground">
+          ({successCount} / {failureCount})
+        </span>
       </button>
 
       {/* Floating Logs Drawer */}
@@ -98,7 +145,10 @@ function ApiMonitor() {
               <Terminal className="w-3.5 h-3.5 text-primary" />
               مراقب اتصالات السيرفر والمعاينة
             </span>
-            <button onClick={() => setOpen(false)} className="p-1 rounded hover:bg-muted text-muted-foreground">
+            <button
+              onClick={() => setOpen(false)}
+              className="p-1 rounded hover:bg-muted text-muted-foreground"
+            >
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -123,9 +173,14 @@ function ApiMonitor() {
               </div>
             ) : (
               logs.map((log, idx) => (
-                <div key={idx} className="p-2.5 rounded-lg border border-border bg-muted/30 space-y-1.5 font-mono text-[10px] text-right">
+                <div
+                  key={idx}
+                  className="p-2.5 rounded-lg border border-border bg-muted/30 space-y-1.5 font-mono text-[10px] text-right"
+                >
                   <div className="flex items-center justify-between">
-                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${log.success ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}>
+                    <span
+                      className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${log.success ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}
+                    >
                       {log.status === 0 ? "OFFLINE" : log.status}
                     </span>
                     <span className="text-muted-foreground">{log.timestamp}</span>
@@ -169,7 +224,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     setLocale(next);
     setLocalState(next);
     // Best-effort persist to backend
-    const sessionRaw = typeof window !== "undefined" ? window.localStorage.getItem("auditcore.session.v1") : null;
+    const sessionRaw =
+      typeof window !== "undefined" ? window.localStorage.getItem("auditcore.session.v1") : null;
     if (sessionRaw) {
       try {
         const { id } = JSON.parse(sessionRaw);
@@ -184,7 +240,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen flex w-full bg-background text-foreground" style={{ fontFamily: "'Noto Sans Arabic', 'Noto Sans Arabic UI', sans-serif" }}>
+    <div
+      dir="rtl"
+      className="min-h-screen flex w-full bg-background text-foreground"
+      style={{ fontFamily: "'Noto Sans Arabic', 'Noto Sans Arabic UI', sans-serif" }}
+    >
       <aside className="w-64 bg-sidebar border-l border-sidebar-border flex flex-col">
         <div className="p-5 border-b border-sidebar-border">
           <div className="flex items-center gap-2">
@@ -197,10 +257,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {items.map((it) => {
-            const active = pathname === it.to || (it.to !== "/" && pathname.startsWith(it.to + "/"));
+            const active =
+              pathname === it.to || (it.to !== "/" && pathname.startsWith(it.to + "/"));
             const Icon = it.icon;
             return (
-              <Link key={it.to} to={it.to} className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition ${active ? "bg-primary/15 text-primary border border-primary/30" : "text-sidebar-foreground hover:bg-sidebar-accent"}`}>
+              <Link
+                key={it.to}
+                to={it.to}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition ${active ? "bg-primary/15 text-primary border border-primary/30" : "text-sidebar-foreground hover:bg-sidebar-accent"}`}
+              >
                 <Icon className="w-4 h-4 shrink-0" />
                 <span>{t(it.ns, it.label, locale)}</span>
               </Link>
@@ -210,15 +275,26 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="p-3 border-t border-sidebar-border">
           <div className="px-3 py-2 mb-2">
             <div className="text-xs font-bold truncate">{user.fullName}</div>
-            <div className="text-[10px] text-muted-foreground truncate" dir="ltr">{user.email}</div>
+            <div className="text-[10px] text-muted-foreground truncate" dir="ltr">
+              {user.email}
+            </div>
           </div>
           <div className="mb-2 flex items-center justify-between text-xs">
             <span>لغة / زمان</span>
-            <button onClick={handleLanguageToggle} className="px-2 py-1 rounded border border-border hover:bg-sidebar-accent transition">
+            <button
+              onClick={handleLanguageToggle}
+              className="px-2 py-1 rounded border border-border hover:bg-sidebar-accent transition"
+            >
               {locale === "ar" ? "زمان" : "لغة"}
             </button>
           </div>
-          <button onClick={() => { signOut(); navigate({ to: "/login", replace: true }); }} className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-sidebar-accent text-muted-foreground">
+          <button
+            onClick={() => {
+              signOut();
+              navigate({ to: "/login", replace: true });
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-sidebar-accent text-muted-foreground"
+          >
             <LogOut className="w-4 h-4" />
             {t("auth", "logout", locale)}
           </button>
@@ -230,8 +306,22 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-4">
             <CompanySwitcher />
           </div>
-          <div className="text-sm text-muted-foreground hidden md:block">{new Date().toLocaleDateString(locale === "ar" ? "ar-IQ" : "ku", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
-          <div className="flex items-center gap-3"><button className="relative w-9 h-9 rounded-md bg-card border border-border flex items-center justify-center hover:border-primary transition"><Bell className="w-4 h-4" /><span className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-danger text-[10px] text-white flex items-center justify-center">3</span></button></div>
+          <div className="text-sm text-muted-foreground hidden md:block">
+            {new Date().toLocaleDateString(locale === "ar" ? "ar-IQ" : "ku", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="relative w-9 h-9 rounded-md bg-card border border-border flex items-center justify-center hover:border-primary transition">
+              <Bell className="w-4 h-4" />
+              <span className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-danger text-[10px] text-white flex items-center justify-center">
+                3
+              </span>
+            </button>
+          </div>
         </header>
         <main className="flex-1 p-6 overflow-auto">
           <ErrorBoundary>{children}</ErrorBoundary>
@@ -242,6 +332,22 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 }
 
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
-  return <div className="flex items-start justify-between mb-6 pb-4 border-b border-border"><div><h1 className="text-2xl font-bold">{title}</h1>{subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}</div>{action}</div>;
+export function PageHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex items-start justify-between mb-6 pb-4 border-b border-border">
+      <div>
+        <h1 className="text-2xl font-bold">{title}</h1>
+        {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+      </div>
+      {action}
+    </div>
+  );
 }

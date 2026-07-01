@@ -11,14 +11,14 @@ Two rules govern this phase absolutely:
 
 ## Acceptance criteria — all auto-tested
 
-| # | Criterion | Test(s) |
-|---|---|---|
-| 1 | Arabic invoice → OCR + color-flags; certify → ledger entry | 8 tests |
-| 2 | Auditor scope: tasks + cert queue never include out-of-scope company/branch | 4 tests |
-| 3 | After certifying, Auditor still cannot reach analytics | 3 tests |
-| 4 | Missing SLA → demerit within 15 minutes | 7 tests |
-| 5 | `/owner/ledger/verify` clean=true, tampered=names entry | 6 tests |
-| 6 | Certification + onboarding render fully in ckb; trust copy in both | 10 tests |
+| #   | Criterion                                                                   | Test(s)  |
+| --- | --------------------------------------------------------------------------- | -------- |
+| 1   | Arabic invoice → OCR + color-flags; certify → ledger entry                  | 8 tests  |
+| 2   | Auditor scope: tasks + cert queue never include out-of-scope company/branch | 4 tests  |
+| 3   | After certifying, Auditor still cannot reach analytics                      | 3 tests  |
+| 4   | Missing SLA → demerit within 15 minutes                                     | 7 tests  |
+| 5   | `/owner/ledger/verify` clean=true, tampered=names entry                     | 6 tests  |
+| 6   | Certification + onboarding render fully in ckb; trust copy in both          | 10 tests |
 
 **Result:** `38 passed` on `test_phase2_acceptance.py`, **140 passed, 1 skipped** total.
 
@@ -38,6 +38,7 @@ Two rules govern this phase absolutely:
 ## What Phase 2 added
 
 ### New: Reverse-entry mechanism (production correction path)
+
 - **`append_reverse_entry(session, company_id, actor_user_id, target_entry_id, reason, correction_payload)`**
   in `backend/app/services/ledger.py` — appends a new ledger entry referencing
   the original by id; never modifies the original.
@@ -48,6 +49,7 @@ Two rules govern this phase absolutely:
   detects it. In production, all corrections flow through `/reverse/{id}`.
 
 ### New: AuditorOnboarding component (bilingual trust framing)
+
 - **`src/components/auditor-onboarding.tsx`** — bilingual card with the
   trust-framing copy exactly as the spec requires:
   - Greeting in both languages
@@ -62,6 +64,7 @@ Two rules govern this phase absolutely:
   certification screen (`force` prop) every session.
 
 ### Updated: Auditor UI pages
+
 - **`src/routes/auditor.index.tsx`** — now uses `getLocale()` + locale-driven
   strings (ar/ckb). The certification button label, color-flag labels
   (أخضر/أصفر/أحمر / سەوز/زەرد/سوور), "no pending" message, and onboarding
@@ -70,6 +73,7 @@ Two rules govern this phase absolutely:
   remaining/overdue/demerits labels, summary line, empty-state message.
 
 ### New i18n keys (backend)
+
 - `auditor.onboarding.*` (8 keys × 2 languages): greeting, headline,
   trust_pct, why, explanation, training_target, no_auto_commit,
   irreversible, dismiss
@@ -82,6 +86,7 @@ Two rules govern this phase absolutely:
   remaining_minutes, demerit_points, empty, summary
 
 ### Updated: Owner ledger endpoints
+
 - `tamper` endpoint now returns a `note` field warning that this is
   test-only behavior — production corrections use `/reverse/{id}`.
 - The ledger `/verify` endpoint behavior is unchanged: returns

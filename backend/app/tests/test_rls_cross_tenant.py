@@ -17,11 +17,8 @@ This file provides:
 """
 from __future__ import annotations
 
-import asyncio
 import pathlib
-import re
 from datetime import datetime, timezone
-from unittest.mock import MagicMock
 
 import pytest
 
@@ -222,8 +219,7 @@ class TestCrossTenantRuntime:
     async def test_two_tenants_with_data_owner_a_sees_only_a(self, db_session):
         """Strong test: seed two tenants with real data, owner A sees only A."""
         from sqlalchemy import text
-        from app.models.entities import Company, CompanyGroup, Document, OCRExtraction, User
-        from app.core.security import get_password_hash  # type: ignore
+        from app.models.entities import Company, CompanyGroup
         from app.db.session import set_session_context
         import uuid as uuidlib
 

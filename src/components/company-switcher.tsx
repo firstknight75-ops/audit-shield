@@ -4,9 +4,24 @@ import { getCurrentUser, type AccessibleCompany } from "@/lib/auth";
 import { getLocale, type Locale } from "@/lib/i18n";
 import { getActiveCompanyId, setActiveCompanyId } from "@/lib/api-client";
 
-const LABELS: Record<Locale, { group: string; company: string; branch: string; allBranches: string; pickCompany: string }> = {
-  ar: { group: "المجموعة", company: "الشركة", branch: "الفرع", allBranches: "كل الفروع", pickCompany: "اختر شركة" },
-  ckb: { group: "گروپ", company: "کۆمپانیا", branch: "لق", allBranches: "هەموو لقەکان", pickCompany: "کۆمپانیایەک هەڵبژێرە" },
+const LABELS: Record<
+  Locale,
+  { group: string; company: string; branch: string; allBranches: string; pickCompany: string }
+> = {
+  ar: {
+    group: "المجموعة",
+    company: "الشركة",
+    branch: "الفرع",
+    allBranches: "كل الفروع",
+    pickCompany: "اختر شركة",
+  },
+  ckb: {
+    group: "گروپ",
+    company: "کۆمپانیا",
+    branch: "لق",
+    allBranches: "هەموو لقەکان",
+    pickCompany: "کۆمپانیایەک هەڵبژێرە",
+  },
 };
 
 /**
@@ -87,7 +102,9 @@ export function CompanySwitcher() {
       </button>
       {open && (
         <div className="absolute end-0 mt-2 w-72 bg-popover border border-border rounded-xl shadow-2xl z-50 p-2">
-          <div className="px-2 py-1 text-[10px] uppercase tracking-wide text-muted-foreground">{labels.pickCompany}</div>
+          <div className="px-2 py-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+            {labels.pickCompany}
+          </div>
           <div className="space-y-1">
             {companies.map((c) => (
               <div key={c.company_id}>

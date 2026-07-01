@@ -22,11 +22,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, require_permission
+from app.api.deps import require_permission
 from app.db.session import get_db
 from app.models.entities import (
     AnalyticsOutput,
-    AuditLedger,
     Company,
     CompanyGroup,
     Document,
@@ -215,7 +214,7 @@ async def owner_waste_map(
     current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
-    lang = await _ensure_company_access(current_user, db, company_id)
+    await _ensure_company_access(current_user, db, company_id)
     rows = (await db.execute(select(WasteMapItem).where(WasteMapItem.company_id == company_id))).scalars().all()
     return {
         'title': 'خريطة الهدر',
@@ -239,7 +238,7 @@ async def owner_risk_map(
     current_user: User = Depends(require_permission('view_owner_dashboard')),
     db: AsyncSession = Depends(get_db),
 ):
-    lang = await _ensure_company_access(current_user, db, company_id)
+    await _ensure_company_access(current_user, db, company_id)
     rows = (await db.execute(select(RiskAlert).where(RiskAlert.company_id == company_id))).scalars().all()
     by_severity: dict[str, int] = {}
     for r in rows:
@@ -516,8 +515,8 @@ async def owner_ai_advisor(
                 "ckb": f"سیستمەکە ئاگادارییەکی دۆزیوەتەوە: {r.message}."
             },
             "risk": {
-                "ar": f"خطر تراكم المعاملات غير المطابقة أو السداد المزدوج بالخطأ دون تدقيق كافٍ.",
-                "ckb": f"مەترسی هەیە بەهۆی کەمتەرخەمی لە هاوتاکردنەوە."
+                "ar": "خطر تراكم المعاملات غير المطابقة أو السداد المزدوج بالخطأ دون تدقيق كافٍ.",
+                "ckb": "مەترسی هەیە بەهۆی کەمتەرخەمی لە هاوتاکردنەوە."
             },
             "action": {
                 "ar": "وجّه المدقق بوقف المعاملة وسحب المستند الأصلي فوراً لمطابقتها يدوياً.",

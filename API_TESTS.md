@@ -437,8 +437,6 @@ curl "$BASE_URL/api/auth/me" \
   -H "X-Tenant-Schema: tenant_a"
 ```
 
-
-
 ---
 
 ## 41) Trigger local analytics run
@@ -501,7 +499,6 @@ curl "$BASE_URL/api/manager/dashboard" \
 curl "$BASE_URL/api/owner/dashboard" \
   -H "Authorization: Bearer <AUDITOR_ACCESS_TOKEN>"
 ```
-
 
 ---
 

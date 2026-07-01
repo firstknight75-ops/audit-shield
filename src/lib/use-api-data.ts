@@ -86,7 +86,7 @@ export function useApiData<T>(
       onSuccess?.(result);
     } catch (err) {
       if (!mountedRef.current || ac.signal.aborted) return;
-      const e = err instanceof ApiError ? err : (err instanceof Error ? err : new Error(String(err)));
+      const e = err instanceof ApiError ? err : err instanceof Error ? err : new Error(String(err));
       setError(e);
       if (e instanceof ApiError) setRequestId(e.request_id);
       onError?.(e);
@@ -113,12 +113,15 @@ export function useApiData<T>(
   // Stale-time refresh — runs every staleTime/3 ms to refresh in background
   useEffect(() => {
     if (!enabled || staleTime === Infinity) return;
-    const interval = setInterval(() => {
-      const age = lastFetchedAt.current ? Date.now() - lastFetchedAt.current : Infinity;
-      if (age >= staleTime) {
-        doFetch();
-      }
-    }, Math.max(staleTime / 3, 5_000));
+    const interval = setInterval(
+      () => {
+        const age = lastFetchedAt.current ? Date.now() - lastFetchedAt.current : Infinity;
+        if (age >= staleTime) {
+          doFetch();
+        }
+      },
+      Math.max(staleTime / 3, 5_000),
+    );
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, staleTime, ...deps]);

@@ -26,9 +26,6 @@ BACKEND = pathlib.Path(__file__).resolve().parents[2]
 
 
 from app.services.access import (
-    get_accessible_branch_ids,
-    get_accessible_company_ids,
-    get_accessible_companies,
     require_company_access,
 )
 from app.services.encryption import decrypt_bytes_to_memory, encrypt_bytes
@@ -437,7 +434,9 @@ def test_acceptance_9_no_external_ai_imports_in_app_code():
 def test_acceptance_9_guard_script_runs_clean():
     """Run the guard against a temp copy of the repo with test files removed,
     so test docstrings/literals don't trip the pattern matcher."""
-    import subprocess, tempfile, shutil
+    import subprocess
+    import tempfile
+    import shutil
     with tempfile.TemporaryDirectory() as tmpdir:
         # Copy repo excluding tests (the pattern strings live there)
         ignore = shutil.ignore_patterns('tests', '.git', '__pycache__')

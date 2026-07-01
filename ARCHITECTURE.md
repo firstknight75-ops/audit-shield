@@ -91,6 +91,7 @@ AuditCore follows **Clean Architecture** with strict layer boundaries:
 ## Deployment Topologies
 
 ### On-Premise (Smart Box)
+
 ```
 ┌─────────────────────────────────────────────┐
 │  One physical Smart Box per company_group     │
@@ -108,6 +109,7 @@ AuditCore follows **Clean Architecture** with strict layer boundaries:
 ```
 
 ### Cloud
+
 ```
                 ┌──────────────────────────┐
                 │  Multi-tenant control plane │
@@ -133,19 +135,19 @@ AuditCore follows **Clean Architecture** with strict layer boundaries:
 
 ### Defense in Depth
 
-| Layer | Mechanism |
-|---|---|
-| Transport | TLS 1.2+, HSTS |
-| Headers | CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy |
-| Rate limit | 120 rpm per IP for unauthenticated (Redis-backed token bucket) |
-| Auth | JWT access (15 min) + refresh (24h), refresh-token rotation, lockout after 5 failed logins for 15 min |
-| Authn (future) | MFA TOTP, SAML, OIDC, LDAP, Azure AD, Google Workspace, SCIM |
-| Authz | RBAC (6 roles × 17 permissions) + ABAC (per-company overrides via `user_permission_override`) |
-| DB | Row-Level Security (3 hidden tables × 2 policies each = 6 RLS predicates) |
-| Tenant isolation | Schema-per-tenant (Essential/Advanced) OR dedicated-DB-per-tenant (Elite) |
-| Secrets | Vault (cloud) / company-key derivation (on-prem). Keys never stored in DB |
-| Audit | SHA-256 hash-chained ledger, immutable, reverse-entry only |
-| Export integrity | HMAC-SHA256 tamper-proof certificate per export, public /verify endpoint |
+| Layer            | Mechanism                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| Transport        | TLS 1.2+, HSTS                                                                                        |
+| Headers          | CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy                     |
+| Rate limit       | 120 rpm per IP for unauthenticated (Redis-backed token bucket)                                        |
+| Auth             | JWT access (15 min) + refresh (24h), refresh-token rotation, lockout after 5 failed logins for 15 min |
+| Authn (future)   | MFA TOTP, SAML, OIDC, LDAP, Azure AD, Google Workspace, SCIM                                          |
+| Authz            | RBAC (6 roles × 17 permissions) + ABAC (per-company overrides via `user_permission_override`)         |
+| DB               | Row-Level Security (3 hidden tables × 2 policies each = 6 RLS predicates)                             |
+| Tenant isolation | Schema-per-tenant (Essential/Advanced) OR dedicated-DB-per-tenant (Elite)                             |
+| Secrets          | Vault (cloud) / company-key derivation (on-prem). Keys never stored in DB                             |
+| Audit            | SHA-256 hash-chained ledger, immutable, reverse-entry only                                            |
+| Export integrity | HMAC-SHA256 tamper-proof certificate per export, public /verify endpoint                              |
 
 ### Trust boundaries enforced at DB level (not UI)
 
@@ -219,42 +221,42 @@ analytics_outputs / waste_map_items / risk_alerts  (HIDDEN FROM AUDITORS)
 
 Every cycle, the Owner receives exactly 7 deliverables:
 
-| # | Output (AR)            | Output (EN)             | First-class deliverable? |
-|---|------------------------|------------------------|--------------------------|
-| 1 | الصورة الحقيقية       | The True Picture       | Yes |
-| 2 | مؤشر الموثوقية        | Trust Index            | **Yes** — standalone page, breakdown + 6-cycle trend |
-| 3 | خريطة الهدر           | Waste Map              | Yes |
-| 4 | خريطة المخاطر         | Risk Map               | Yes |
-| 5 | خريطة الفرص           | Opportunity Map        | Yes (NEW in Phase 3) |
-| 6 | خطة العمل             | Action Plan            | Yes (Change + Adaptation paths) |
-| 7 | لوحات القيادة         | Role Dashboards        | Yes |
+| #   | Output (AR)     | Output (EN)      | First-class deliverable?                             |
+| --- | --------------- | ---------------- | ---------------------------------------------------- |
+| 1   | الصورة الحقيقية | The True Picture | Yes                                                  |
+| 2   | مؤشر الموثوقية  | Trust Index      | **Yes** — standalone page, breakdown + 6-cycle trend |
+| 3   | خريطة الهدر     | Waste Map        | Yes                                                  |
+| 4   | خريطة المخاطر   | Risk Map         | Yes                                                  |
+| 5   | خريطة الفرص     | Opportunity Map  | Yes (NEW in Phase 3)                                 |
+| 6   | خطة العمل       | Action Plan      | Yes (Change + Adaptation paths)                      |
+| 7   | لوحات القيادة   | Role Dashboards  | Yes                                                  |
 
 Plus: Activation tracker, Portfolio (multi-company), Trust Center (proof).
 
 ## Operational Guarantees
 
-| SLA | Target | How |
-|---|---|---|
-| First login after install | ≤ 30 min (on-prem), ≤ 10 min (cloud) | `install.sh` / `deploy-cloud.sh` |
-| First real report after install | ≤ 48 h | 4-stage activation tracker |
-| OCR throughput | 3 s/page | Tesseract with `lang='ara'` + pdf2image |
-| Daily analysis | < 1 h for ~10,000 tx/day | Celery-Beat at 02:00 Baghdad |
-| API p50 | < 150 ms | Prometheus metrics + indexed queries |
-| Concurrent users | 1000+ | Async FastAPI + Redis cache + connection pooling |
-| Audit chain integrity | 100% | SHA-256 chain + nightly verify job |
+| SLA                             | Target                               | How                                              |
+| ------------------------------- | ------------------------------------ | ------------------------------------------------ |
+| First login after install       | ≤ 30 min (on-prem), ≤ 10 min (cloud) | `install.sh` / `deploy-cloud.sh`                 |
+| First real report after install | ≤ 48 h                               | 4-stage activation tracker                       |
+| OCR throughput                  | 3 s/page                             | Tesseract with `lang='ara'` + pdf2image          |
+| Daily analysis                  | < 1 h for ~10,000 tx/day             | Celery-Beat at 02:00 Baghdad                     |
+| API p50                         | < 150 ms                             | Prometheus metrics + indexed queries             |
+| Concurrent users                | 1000+                                | Async FastAPI + Redis cache + connection pooling |
+| Audit chain integrity           | 100%                                 | SHA-256 chain + nightly verify job               |
 
 ## Why we cannot "accidentally" violate the principles
 
-| Failure mode | Why it's prevented |
-|---|---|
-| Auditor reads analytics | RLS `auditor_no_access_*` policy — DB-level |
-| Manager sees other company's data | `user_company_access` rows are default-deny; `require_company_access` returns False if no row |
-| App Owner reads tenant financial data | App Owner has only `app_owner_*` permissions; queries use only `inventory.*` schema tables |
-| Ledger tampered with directly | Hash chain detects; verification endpoint flags exact broken entry |
-| External AI API call added | CI guard `scripts/check_no_external_ai.sh` fails the build |
-| Chatbot added | Same guard — `/chat`, `/assistant`, `/llm` paths rejected |
-| OCR auto-commits | Workflow: `pending → certified`; low-confidence fields block certify |
-| Tenant data leaks cross-tenant | RLS `tenant_isolation_*` + factory-based key derivation |
+| Failure mode                          | Why it's prevented                                                                            |
+| ------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Auditor reads analytics               | RLS `auditor_no_access_*` policy — DB-level                                                   |
+| Manager sees other company's data     | `user_company_access` rows are default-deny; `require_company_access` returns False if no row |
+| App Owner reads tenant financial data | App Owner has only `app_owner_*` permissions; queries use only `inventory.*` schema tables    |
+| Ledger tampered with directly         | Hash chain detects; verification endpoint flags exact broken entry                            |
+| External AI API call added            | CI guard `scripts/check_no_external_ai.sh` fails the build                                    |
+| Chatbot added                         | Same guard — `/chat`, `/assistant`, `/llm` paths rejected                                     |
+| OCR auto-commits                      | Workflow: `pending → certified`; low-confidence fields block certify                          |
+| Tenant data leaks cross-tenant        | RLS `tenant_isolation_*` + factory-based key derivation                                       |
 
 ## See also
 

@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
 
 import pandas as pd
 from celery.schedules import crontab
-from sqlalchemy import select, text, delete
+from sqlalchemy import select, delete
 
 from app.ai.anomaly import run_anomaly_detection
 from app.ai.cross_reference import run_cross_reference

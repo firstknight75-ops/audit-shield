@@ -12,7 +12,6 @@ existing public API.
 """
 from __future__ import annotations
 
-import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -20,7 +19,6 @@ from email.message import EmailMessage
 from typing import Literal
 
 import aiofiles
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings

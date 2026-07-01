@@ -71,11 +71,7 @@ const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
           style={{ height: typeof height === "number" ? `${height}px` : height }}
           {...props}
         >
-          <RechartsPrimitive.ResponsiveContainer
-            width="100%"
-            height="100%"
-            aspect={aspect}
-          >
+          <RechartsPrimitive.ResponsiveContainer width="100%" height="100%" aspect={aspect}>
             {children}
           </RechartsPrimitive.ResponsiveContainer>
         </div>
@@ -169,8 +165,7 @@ export const ResponsiveContainer = RechartsPrimitive.ResponsiveContainer;
 
 // ── Tooltip ────────────────────────────────────────────────────────
 
-export interface ChartTooltipContentProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface ChartTooltipContentProps extends React.HTMLAttributes<HTMLDivElement> {
   active?: boolean;
   payload?: ReadonlyArray<{
     name?: string | number;
@@ -213,9 +208,7 @@ export function ChartTooltipContent({
     const key = `${labelKey ?? item?.dataKey ?? item?.name ?? "value"}`;
     const itemConfig = config[key];
     const value =
-      !labelKey && typeof label === "string"
-        ? (config[label]?.label ?? label)
-        : itemConfig?.label;
+      !labelKey && typeof label === "string" ? (config[label]?.label ?? label) : itemConfig?.label;
     if (labelFormatter && typeof label === "string") {
       return labelFormatter(label);
     }
@@ -254,10 +247,7 @@ export function ChartTooltipContent({
                   style={{ backgroundColor: indicatorColor }}
                 />
               ) : indicator === "line" ? (
-                <span
-                  className="h-0.5 w-3 shrink-0"
-                  style={{ backgroundColor: indicatorColor }}
-                />
+                <span className="h-0.5 w-3 shrink-0" style={{ backgroundColor: indicatorColor }} />
               ) : (
                 <span
                   className="h-0.5 w-3 shrink-0 border-dashed"
@@ -265,9 +255,7 @@ export function ChartTooltipContent({
                 />
               )}
               <span className="flex flex-1 items-center justify-between gap-2 leading-none">
-                <span className="text-muted-foreground">
-                  {itemConfig?.label ?? item.name}
-                </span>
+                <span className="text-muted-foreground">{itemConfig?.label ?? item.name}</span>
                 <span className="font-mono font-medium tabular-nums text-foreground">
                   {displayValue}
                 </span>
@@ -358,7 +346,12 @@ ChartLegend.displayName = "ChartLegend";
  * have to hand-roll the config object.
  */
 export function buildChartConfig(
-  series: ReadonlyArray<{ key: string; label: string; color?: string; formatter?: keyof typeof FORMATTERS }>,
+  series: ReadonlyArray<{
+    key: string;
+    label: string;
+    color?: string;
+    formatter?: keyof typeof FORMATTERS;
+  }>,
 ): ChartConfig {
   const config: ChartConfig = {};
   for (const s of series) {

@@ -34,17 +34,25 @@ function AdminUsers() {
             {visible.map((u) => (
               <tr key={u.id} className="border-t border-border hover:bg-secondary/40">
                 <td className="p-3 font-medium">{u.fullName}</td>
-                <td className="p-3 text-muted-foreground" dir="ltr">{u.email}</td>
+                <td className="p-3 text-muted-foreground" dir="ltr">
+                  {u.email}
+                </td>
                 <td className="p-3">
                   <span className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary border border-primary/30">
                     {ROLE_LABELS[u.role]}
                   </span>
                 </td>
                 <td className="p-3 text-muted-foreground">{u.branch || u.department || "—"}</td>
-                <td className="p-3"><span className="text-xs text-success">نشط</span></td>
+                <td className="p-3">
+                  <span className="text-xs text-success">نشط</span>
+                </td>
                 <td className="p-3 text-left flex gap-1 justify-end">
-                  <button className="p-2 rounded-md hover:bg-secondary"><KeyRound className="w-4 h-4" /></button>
-                  <button className="p-2 rounded-md hover:bg-danger/10 text-danger"><Power className="w-4 h-4" /></button>
+                  <button className="p-2 rounded-md hover:bg-secondary">
+                    <KeyRound className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 rounded-md hover:bg-danger/10 text-danger">
+                    <Power className="w-4 h-4" />
+                  </button>
                 </td>
               </tr>
             ))}

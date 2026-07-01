@@ -42,7 +42,10 @@ function AuditorCert() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  const [queue, setQueue] = useState([sampleInvoice, { ...sampleInvoice, id: "d2", filename: "INV-2026-0482.pdf" }]);
+  const [queue, setQueue] = useState([
+    sampleInvoice,
+    { ...sampleInvoice, id: "d2", filename: "INV-2026-0482.pdf" },
+  ]);
   const current = queue[0];
   const [fields, setFields] = useState(current.fields);
   const [done, setDone] = useState(false);
@@ -105,14 +108,18 @@ function AuditorCert() {
                 <div key={f.key}>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-sm font-medium">{f.label}</label>
-                    <span className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-md border ${toneClass[tone]}`}>
+                    <span
+                      className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-md border ${toneClass[tone]}`}
+                    >
                       <Icon className="w-3 h-3" /> {label} ({f.confidence}%)
                     </span>
                   </div>
                   <input
                     value={String(f.value)}
                     onChange={(e) =>
-                      setFields(fields.map((x, idx) => (idx === i ? { ...x, value: e.target.value } : x)))
+                      setFields(
+                        fields.map((x, idx) => (idx === i ? { ...x, value: e.target.value } : x)),
+                      )
                     }
                     className={`w-full px-3 py-2 rounded-md bg-background border ${toneClass[tone]}`}
                     dir="ltr"
