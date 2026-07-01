@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, RefreshCw } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { getLocale, type Locale } from "@/lib/i18n";
 import { api, getActiveCompanyId, isPreviewApiUnavailable } from "@/lib/api-client";
