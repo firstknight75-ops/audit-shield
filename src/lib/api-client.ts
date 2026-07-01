@@ -54,6 +54,7 @@ export function setActiveCompanyId(c: string | null) {
   if (typeof window !== "undefined") {
     if (c) window.localStorage.setItem("auditcore.active.company", c);
     else window.localStorage.removeItem("auditcore.active.company");
+    window.dispatchEvent(new Event("auditcore.active_company_changed"));
   }
 }
 export function getActiveCompanyId(): string | null {
@@ -62,6 +63,13 @@ export function getActiveCompanyId(): string | null {
     return window.localStorage.getItem("auditcore.active.company");
   }
   return null;
+}
+
+export function isPreviewApiUnavailable(): boolean {
+  if (typeof window === "undefined") return false;
+  const host = window.location.hostname;
+  const usingDefaultApi = DEFAULT_BASE === "/api";
+  return usingDefaultApi && (host.includes("lovableproject.com") || host.includes("lovable.app"));
 }
 
 async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {

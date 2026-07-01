@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Building2, ChevronDown, GitBranch } from "lucide-react";
 import { getCurrentUser, type AccessibleCompany } from "@/lib/auth";
 import { getLocale, type Locale } from "@/lib/i18n";
+import { getActiveCompanyId, setActiveCompanyId } from "@/lib/api-client";
 
 const LABELS: Record<Locale, { group: string; company: string; branch: string; allBranches: string; pickCompany: string }> = {
   ar: { group: "المجموعة", company: "الشركة", branch: "الفرع", allBranches: "كل الفروع", pickCompany: "اختر شركة" },
@@ -24,10 +25,16 @@ export function CompanySwitcher() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const cid = window.localStorage.getItem("auditcore.active.company");
+    const cid = getActiveCompanyId();
     const bid = window.localStorage.getItem("auditcore.active.branch");
     setActiveCompany(cid);
     setActiveBranch(bid);
+    const onCompanyChanged = () => {
+      setActiveCompany(getActiveCompanyId());
+      setActiveBranch(window.localStorage.getItem("auditcore.active.branch"));
+    };
+    window.addEventListener("auditcore.active_company_changed", onCompanyChanged);
+    return () => window.removeEventListener("auditcore.active_company_changed", onCompanyChanged);
   }, []);
 
   if (!user || !user.accessibleCompanies) return null;
@@ -44,9 +51,8 @@ export function CompanySwitcher() {
     setActiveCompany(cid);
     setActiveBranch(null);
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("auditcore.active.company", cid);
+      setActiveCompanyId(cid);
       window.localStorage.removeItem("auditcore.active.branch");
-      window.dispatchEvent(new Event("auditcore.active_company_changed"));
     }
     setOpen(false);
   };

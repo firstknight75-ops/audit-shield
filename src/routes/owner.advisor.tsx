@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { getLocale, type Locale } from "@/lib/i18n";
 import { getCurrentUser, type AccessibleCompany } from "@/lib/auth";
-import { getActiveCompanyId, setActiveCompanyId, api } from "@/lib/api-client";
+import { getActiveCompanyId, setActiveCompanyId, api, isPreviewApiUnavailable } from "@/lib/api-client";
 import { useApiData } from "@/lib/use-api-data";
 import { formatIQD } from "@/lib/mock-data";
 
@@ -344,6 +344,7 @@ function OwnerAdvisorPage() {
   } | null>(
     async () => {
       try {
+        if (isPreviewApiUnavailable()) return null;
         if (!activeCompanyId) return null;
         const res = await api.owner.aiAdvisor(activeCompanyId);
         return res as any;
@@ -353,7 +354,7 @@ function OwnerAdvisorPage() {
       }
     },
     [activeCompanyId],
-    { enabled: !!activeCompanyId }
+    { enabled: !!activeCompanyId && !isPreviewApiUnavailable(), staleTime: Infinity }
   );
 
   const activeCompanyProfile = useMemo(() => {

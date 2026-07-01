@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { getLocale, type Locale } from "@/lib/i18n";
-import { api, getActiveCompanyId } from "@/lib/api-client";
+import { api, getActiveCompanyId, isPreviewApiUnavailable } from "@/lib/api-client";
 import { useApiData } from "@/lib/use-api-data";
 
 export const Route = createFileRoute("/owner/trust-index")({ component: TrustIndexPage });
@@ -85,6 +85,28 @@ function TrustIndexPage() {
   const { data } = useApiData<TrustIndexData | null>(
     async () => {
       if (!companyId) return null;
+      if (isPreviewApiUnavailable()) {
+        return {
+          score: 78,
+          coverage_pct: 92.5,
+          certified_pct: 84.0,
+          certified_documents: 101,
+          total_documents: 120,
+          missing_field_pct: 2.8,
+          missing_fields_total: 14,
+          duplicate_pct: 4.2,
+          duplicate_documents: 5,
+          trend: [
+            { cycle: "الدورة 1", score: 71 },
+            { cycle: "الدورة 2", score: 74 },
+            { cycle: "الدورة 3", score: 75 },
+            { cycle: "الدورة 4", score: 77 },
+            { cycle: "الدورة 5", score: 78 },
+            { cycle: "الدورة 6", score: 78 },
+          ],
+          generatedAt: new Date().toLocaleDateString("ar-IQ"),
+        };
+      }
       try {
         const res = await api.owner.trustIndex(companyId) as Record<string, unknown>;
         return {
