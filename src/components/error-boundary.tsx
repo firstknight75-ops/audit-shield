@@ -26,7 +26,6 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, info: ErrorInfo): void {
     // Production: POST to /api/errors with request_id, user_id, stack
     // For now, log to console in dev; in prod wire to Sentry/Datadog.
-    // eslint-disable-next-line no-console
     console.error("react_error_boundary", error, info.componentStack);
     void fetch("/api/errors", {
       method: "POST",
