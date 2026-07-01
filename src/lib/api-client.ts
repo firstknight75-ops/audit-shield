@@ -69,7 +69,12 @@ export function isPreviewApiUnavailable(): boolean {
   if (typeof window === "undefined") return false;
   const host = window.location.hostname;
   const usingDefaultApi = DEFAULT_BASE === "/api";
-  return usingDefaultApi && (host.includes("lovableproject.com") || host.includes("lovable.app"));
+  return usingDefaultApi && (
+    host.includes("lovableproject.com") ||
+    host.includes("lovable.app") ||
+    host === "localhost" ||
+    host === "127.0.0.1"
+  );
 }
 
 async function request<T>(path: string, opts: FetchOptions = {}): Promise<T> {

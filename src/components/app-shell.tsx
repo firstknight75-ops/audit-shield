@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useEffect, useState } from "react";
 import { ShieldCheck, LayoutDashboard, FileCheck2, ListTodo, AlertTriangle, Users, KeyRound, Building2, ScrollText, Boxes, Settings2, FileBarChart, LogOut, Bell, Briefcase, Sparkles, Sliders, Server } from "lucide-react";
-import { Role, ROLE_LABELS, getCurrentUser, signOut, persistLanguageChange } from "@/lib/auth";
+import { Role, ROLE_LABELS, getCurrentUser, signOut, persistLanguageChange, type SeededUser } from "@/lib/auth";
 import { getLocale, setLocale, t, type Namespace } from "@/lib/i18n";
 import { CompanySwitcher } from "@/components/company-switcher";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -56,7 +56,7 @@ const NAV: Record<Role, NavItem[]> = {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState(() => getCurrentUser());
+  const [user, setUser] = useState<SeededUser | null>(null);
   const [locale, setLocalState] = useState(getLocale());
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
